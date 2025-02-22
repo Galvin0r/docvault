@@ -4,4 +4,114 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <changeSet id="1" author="Roman">
+        <createTable tableName="roles">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created" type="TIMESTAMP"/>
+            <column name="last_modified" type="TIMESTAMP"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2" author="Roman">
+        <createTable tableName="users">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created" type="TIMESTAMP"/>
+            <column name="last_modified" type="TIMESTAMP"/>
+            <column name="login" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(255)"/>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="3" author="Roman">
+        <createTable tableName="activation_tokens">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="token" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="expires_at" type="TIMESTAMP"/>
+            <column name="validated_at" type="TIMESTAMP"/>
+            <column name="user_id" type="BIGINT"/>
+        </createTable>
+        <addForeignKeyConstraint
+                constraintName="fk_activation_tokens_user"
+                baseTableName="activation_tokens"
+                baseColumnNames="user_id"
+                referencedTableName="users"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="4" author="Roman">
+        <createTable tableName="users_roles">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey
+                columnNames="user_id, role_id"
+                tableName="users_roles"/>
+        <addForeignKeyConstraint
+                constraintName="fk_users_roles_user"
+                baseTableName="users_roles"
+                baseColumnNames="user_id"
+                referencedTableName="users"
+                referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+                constraintName="fk_users_roles_role"
+                baseTableName="users_roles"
+                baseColumnNames="role_id"
+                referencedTableName="roles"
+                referencedColumnNames="id"/>
+    </changeSet>
+    
+    <changeSet id="5" author="Roman">
+        <createSequence sequenceName="users_seq"/>
+        <createSequence sequenceName="roles_seq"/>
+        <createSequence sequenceName="activation_tokens_seq"/>
+    </changeSet>
+
+    <changeSet id="6" author="Roman">
+        <createTable tableName="refresh_tokens">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="true"/>
+            </column>
+            <column name="token" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expires_at" type="TIMESTAMP"/>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint
+                constraintName="fk_refresh_tokens_user"
+                baseTableName="refresh_tokens"
+                baseColumnNames="user_id"
+                referencedTableName="users"
+                referencedColumnNames="id"/>
+        <createSequence sequenceName="refresh_tokens_seq"/>
+    </changeSet>
+
+    <include file="db.insert-data.xml" relativeToChangelogFile="true" />
 </databaseChangeLog>

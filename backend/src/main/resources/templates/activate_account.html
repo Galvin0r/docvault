@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Confirm Your Email</title>
+        <style>
+            .button:hover {
+                background: #0056b3 !important;
+            }
+        </style>
+    </head>
+    <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+        <div style="max-width: 600px; margin: 20px auto; background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); text-align: center;">
+            <div style="background: #007bff; color: #ffffff; padding: 15px; font-size: 24px; font-weight: bold; border-radius: 8px 8px 0 0;">
+                Confirm Your Email
+            </div>
+
+            <div style="padding: 20px; color: #000000 !important;">
+                <p style="color: #000000 !important;">Hello, <strong th:text="${username}"></strong>!</p>
+                <p style="color: #000000 !important;">Thank you for registering. Please confirm your email address by clicking the button below:</p>
+
+                <a th:href="${confirmationUrl}" class="button"
+                   style="display: inline-block; padding: 12px 20px; font-size: 16px; color: #ffffff !important; background: #007bff; text-decoration: none; border-radius: 5px; margin-top: 20px; font-weight: bold;
+                       border: none; transition: background 0.3s ease-in-out;">
+                    Confirm Email
+                </a>
+
+                <p style="color: #000000 !important;">If the button doesn't work, you can copy and paste the following link into your browser:</p>
+                <p><a th:href="${confirmationUrl}" style="color: #007bff !important;">http://localhost:4200/activate-account</a></p>
+                <p style="color: #000000 !important;">Your activation code: <strong th:text="${activationCode}"></strong></p>
+            </div>
+        </div>
+    </body>
+</html>
