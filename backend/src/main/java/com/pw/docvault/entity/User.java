@@ -33,6 +33,9 @@ public class User extends BaseEntity implements UserDetails, Principal {
     )
     private List<Role> roles;
 
+    @Column(name="oauth2_provider")
+    private String oauth2Provider;
+
     private boolean enabled;
 
     public User() {
@@ -86,6 +89,14 @@ public class User extends BaseEntity implements UserDetails, Principal {
         this.enabled = enabled;
     }
 
+    public String getOauth2Provider() {
+        return oauth2Provider;
+    }
+
+    public void setOauth2Provider(String oauth2Provider) {
+        this.oauth2Provider = oauth2Provider;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles
@@ -111,11 +122,11 @@ public class User extends BaseEntity implements UserDetails, Principal {
 
     @Override
     public String getUsername() {
-        return email;
+        return login;
     }
 
     @Override
     public String getName() {
-        return email;
+        return login;
     }
 }

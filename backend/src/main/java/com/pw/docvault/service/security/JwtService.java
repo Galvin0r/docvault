@@ -37,6 +37,9 @@ public class JwtService {
     @Value(value = "${app.security.cookieMaxAge}")
     private int cookieMaxAge;
 
+    @Value(value = "${app.security.jSessionIdCookieName}")
+    private String jSessionIdCookieName;
+
     public SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
@@ -118,7 +121,11 @@ public class JwtService {
     }
 
     public ResponseCookie getCleanJwtRefreshCookie() {
-        return ResponseCookie.from(jwtRefreshCookieName, null).path("/api/auth/refreshToken").build();
+        return ResponseCookie.from(jwtRefreshCookieName, null).path("/api").build();
+    }
+
+    public ResponseCookie getCleanJSessionIdCookie() {
+        return ResponseCookie.from(jSessionIdCookieName, null).path("/api").build();
     }
 
     public String getJwtFromCookies(HttpServletRequest request) {

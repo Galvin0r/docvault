@@ -4,7 +4,11 @@ import com.pw.docvault.entity.User;
 import com.pw.docvault.service.security.CredentialsService;
 import com.pw.docvault.service.security.JwtService;
 import com.pw.docvault.service.security.RefreshTokenService;
+import com.pw.docvault.util.Constants;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,6 +16,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/account")
@@ -28,7 +35,7 @@ public class CredentialsController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout() {
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user != null) {
             Long userId = user.getId();
@@ -37,11 +44,13 @@ public class CredentialsController {
 
         ResponseCookie jwtCookie = jwtService.getCleanJwtCookies();
         ResponseCookie jwtRefreshCookie = jwtService.getCleanJwtRefreshCookie();
+        ResponseCookie jSessionIdCookie = jwtService.getCleanJSessionIdCookie();
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
-                .body("You've been signed out!");
+                .header(HttpHeaders.SET_COOKIE, jSessionIdCookie.toString())
+                .build();
     }
 
     @PostMapping("/change-login")

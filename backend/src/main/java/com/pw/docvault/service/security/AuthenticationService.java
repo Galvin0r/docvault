@@ -3,7 +3,6 @@ package com.pw.docvault.service.security;
 import com.pw.docvault.entity.security.RefreshToken;
 import com.pw.docvault.entity.security.Role;
 import com.pw.docvault.exception.InvalidActivationTokenException;
-import com.pw.docvault.exception.TokenRefreshException;
 import com.pw.docvault.exception.UserAlreadyExistsException;
 import com.pw.docvault.entity.security.ActivationToken;
 import com.pw.docvault.entity.User;
@@ -15,7 +14,6 @@ import com.pw.docvault.repository.RoleRepository;
 import com.pw.docvault.repository.UserRepository;
 import com.pw.docvault.service.EmailService;
 import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -129,7 +127,7 @@ public class AuthenticationService {
 
         return new AuthenticationCookies(jwtCookie,
                 jwtRefreshCookie,
-                new UserInfo(user.getLogin(), user.getEmail(), roles));
+                new UserInfo(user.getLogin(), user.getEmail(), roles, user.getOauth2Provider()));
     }
 
     @Transactional

@@ -112,6 +112,14 @@
                 referencedColumnNames="id"/>
         <createSequence sequenceName="refresh_tokens_seq"/>
     </changeSet>
+    <changeSet id="7" author="Roman">
+        <addColumn tableName="users">
+            <column name="oauth2_provider" type="varchar(10)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="8" author="Roman">
+        <dropNotNullConstraint tableName="users" columnName="email"/>
+    </changeSet>
 
     <include file="db.insert-data.xml" relativeToChangelogFile="true" />
 </databaseChangeLog>
