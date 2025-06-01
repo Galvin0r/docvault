@@ -23,6 +23,9 @@ public class RefreshToken {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(name = "device_info")
+    private String deviceInfo;
+
     public RefreshToken() {}
 
     public Long getId() {
@@ -55,5 +58,13 @@ public class RefreshToken {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getDeviceInfo() {
+        return deviceInfo;
+    }
+
+    public void setDeviceInfo(String deviceInfo) {
+        this.deviceInfo = deviceInfo;
     }
 }

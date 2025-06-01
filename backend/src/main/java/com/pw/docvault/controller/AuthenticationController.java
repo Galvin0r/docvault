@@ -4,14 +4,12 @@ import com.pw.docvault.model.security.AuthenticationRequest;
 import com.pw.docvault.model.security.AuthenticationCookies;
 import com.pw.docvault.model.security.RegistrationRequest;
 import com.pw.docvault.service.security.AuthenticationService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping("auth")
 public class AuthenticationController {
 

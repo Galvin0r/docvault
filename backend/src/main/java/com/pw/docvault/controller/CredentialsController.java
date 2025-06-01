@@ -8,12 +8,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequestMapping("/account")
 public class CredentialsController {
 
@@ -28,11 +28,11 @@ public class CredentialsController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout() {
+    public ResponseEntity<String> logout(String deviceInfo) {
         User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user != null) {
             Long userId = user.getId();
-            refreshTokenService.deleteByUserId(userId);
+            refreshTokenService.deleteByUserIdAndDeviceInfo(userId, deviceInfo);
         }
 
         ResponseCookie jwtCookie = jwtService.getCleanJwtCookies();

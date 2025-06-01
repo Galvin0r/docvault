@@ -1,9 +1,7 @@
 package com.pw.docvault.service.security;
 
 import com.pw.docvault.entity.security.RefreshToken;
-import com.pw.docvault.entity.security.Role;
 import com.pw.docvault.exception.InvalidActivationTokenException;
-import com.pw.docvault.exception.TokenRefreshException;
 import com.pw.docvault.exception.UserAlreadyExistsException;
 import com.pw.docvault.entity.security.ActivationToken;
 import com.pw.docvault.entity.User;
@@ -15,7 +13,6 @@ import com.pw.docvault.repository.RoleRepository;
 import com.pw.docvault.repository.UserRepository;
 import com.pw.docvault.service.EmailService;
 import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -119,12 +116,12 @@ public class AuthenticationService {
         var auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, request.password()));
 
         var user = (User) auth.getPrincipal();
-        List<String> roles = user.getRoles().stream()
-                .map(Role::getName)
+        List<RoleCode> roles = user.getRoles().stream()
+                .map(r -> RoleCode.valueOf(r.getName()))
                 .toList();
 
         ResponseCookie jwtCookie = jwtService.generateJwtCookie(user);
-        RefreshToken refreshToken = refreshTokenService.getRefreshToken(user);
+        RefreshToken refreshToken = refreshTokenService.getRefreshToken(user, request.deviceInfo());
         ResponseCookie jwtRefreshCookie = jwtService.generateRefreshJwtCookie(refreshToken.getToken());
 
         return new AuthenticationCookies(jwtCookie,
