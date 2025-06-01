@@ -29,9 +29,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="password" type="VARCHAR(255)"/>
-            <column name="email" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
+            <column name="email" type="VARCHAR(255)"/>
             <column name="enabled" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
@@ -47,9 +45,13 @@
                 <constraints nullable="false"/>
             </column>
             <column name="created_at" type="TIMESTAMP"/>
-            <column name="expires_at" type="TIMESTAMP"/>
+            <column name="expires_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
             <column name="validated_at" type="TIMESTAMP"/>
-            <column name="user_id" type="BIGINT"/>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
         <addForeignKeyConstraint
                 constraintName="fk_activation_tokens_user"
@@ -94,14 +96,19 @@
     <changeSet id="6" author="Roman">
         <createTable tableName="refresh_tokens">
             <column name="id" type="BIGINT">
-                <constraints primaryKey="true" nullable="true"/>
+                <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="token" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="expires_at" type="TIMESTAMP"/>
+            <column name="expires_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
             <column name="user_id" type="BIGINT">
-                <constraints nullable="true"/>
+                <constraints nullable="false"/>
+            </column>
+            <column name="device_info" type="VARCHAR(255)">
+                <constraints nullable="false"/>
             </column>
         </createTable>
         <addForeignKeyConstraint
@@ -111,6 +118,143 @@
                 referencedTableName="users"
                 referencedColumnNames="id"/>
         <createSequence sequenceName="refresh_tokens_seq"/>
+    </changeSet>
+
+    <changeSet id="7" author="Roman">
+        <addUniqueConstraint tableName="activation_tokens"
+                             columnNames="user_id"
+                             constraintName="uq_activation_tokens_user"/>
+        <addUniqueConstraint tableName="refresh_tokens"
+                             columnNames="user_id, device_info"
+                             constraintName="uq_user_device_unique"/>
+    </changeSet>
+
+    <changeSet id="8" author="Roman">
+        <createTable tableName="groups">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created" type="TIMESTAMP"/>
+            <column name="last_modified" type="TIMESTAMP"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="9" author="Roman">
+        <createTable tableName="group_membership">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created" type="TIMESTAMP"/>
+            <column name="last_modified" type="TIMESTAMP"/>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="group_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role" type="VARCHAR(40)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="group_membership"
+                baseColumnNames="user_id"
+                referencedTableName="users"
+                referencedColumnNames="id"
+                constraintName="fk_membership_user"/>
+
+        <addForeignKeyConstraint
+                baseTableName="group_membership"
+                baseColumnNames="group_id"
+                referencedTableName="groups"
+                referencedColumnNames="id"
+                constraintName="fk_membership_group"/>
+    </changeSet>
+    
+    <changeSet id="10" author="Roman">
+        <createTable tableName="documents">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created" type="TIMESTAMP"/>
+            <column name="last_modified" type="TIMESTAMP"/>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="original_filename" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="path" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="mime_type" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="visibility" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owner_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="documents"
+                baseColumnNames="owner_id"
+                referencedTableName="users"
+                referencedColumnNames="id"
+                constraintName="fk_documents_owner"/>
+    </changeSet>
+    
+    <changeSet id="11" author="Roman">
+        <createTable tableName="document_access">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created" type="TIMESTAMP"/>
+            <column name="last_modified" type="TIMESTAMP"/>
+            <column name="document_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT"/>
+            <column name="group_id" type="BIGINT"/>
+            <column name="permission" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="document_access"
+                baseColumnNames="document_id"
+                referencedTableName="documents"
+                referencedColumnNames="id"
+                constraintName="fk_docaccess_document"/>
+
+        <addForeignKeyConstraint
+                baseTableName="document_access"
+                baseColumnNames="user_id"
+                referencedTableName="users"
+                referencedColumnNames="id"
+                constraintName="fk_docaccess_user"/>
+
+        <addForeignKeyConstraint
+                baseTableName="document_access"
+                baseColumnNames="group_id"
+                referencedTableName="groups"
+                referencedColumnNames="id"
+                constraintName="fk_docaccess_group"/>
+    </changeSet>
+    
+    <changeSet id="12" author="Roman">
+        <createSequence sequenceName="groups_seq"/>
+        <createSequence sequenceName="documents_seq"/>
+        <createSequence sequenceName="document_access_seq"/>
+        <createSequence sequenceName="group_membership_seq"/>
     </changeSet>
 
     <include file="db.insert-data.xml" relativeToChangelogFile="true" />
