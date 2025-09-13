@@ -1,4 +1,4 @@
-package com.pw.docvault.service;
+package com.pw.docvault.service.security;
 
 import com.pw.docvault.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;

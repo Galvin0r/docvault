@@ -1,5 +1,7 @@
 package com.pw.docvault.model;
 
+import com.pw.docvault.model.enums.AccessPermission;
+
 public record DocumentAccessDto(
         Long id,
         Long documentId,

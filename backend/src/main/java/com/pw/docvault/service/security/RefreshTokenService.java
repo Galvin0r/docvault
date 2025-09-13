@@ -27,15 +27,14 @@ public class RefreshTokenService {
 
     @Transactional
     public RefreshToken getRefreshToken(User user, String deviceInfo) {
-        refreshTokenRepository.deleteByUserIdAndDeviceInfo(user.getId(), deviceInfo);
-
-        RefreshToken refreshToken = new RefreshToken();
-        refreshToken.setUser(user);
-        refreshToken.setExpiresAt(LocalDateTime.now().plusSeconds(jwtRefreshTokenExpiration));
-        refreshToken.setToken(UUID.randomUUID().toString());
-        refreshToken.setDeviceInfo(deviceInfo);
-
-        return refreshTokenRepository.save(refreshToken);
+        return refreshTokenRepository.findByUserIdAndDeviceInfo(user.getId(), deviceInfo).orElseGet(() -> {
+            RefreshToken refreshToken = new RefreshToken();
+            refreshToken.setUser(user);
+            refreshToken.setExpiresAt(LocalDateTime.now().plusSeconds(jwtRefreshTokenExpiration));
+            refreshToken.setToken(UUID.randomUUID().toString());
+            refreshToken.setDeviceInfo(deviceInfo);
+            return refreshTokenRepository.save(refreshToken);
+        });
     }
 
     public RefreshToken verifyExpiration(RefreshToken token) {

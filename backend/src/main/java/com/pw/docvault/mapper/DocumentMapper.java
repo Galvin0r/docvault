@@ -2,6 +2,7 @@ package com.pw.docvault.mapper;
 
 import com.pw.docvault.entity.Document;
 import com.pw.docvault.model.DocumentDto;
+import com.pw.docvault.model.enums.DocumentVisibility;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -15,4 +16,12 @@ public interface DocumentMapper {
 
     @InheritInverseConfiguration
     Document toEntity(DocumentDto dto);
+
+    default DocumentVisibility map(String value) {
+        return value != null ? DocumentVisibility.valueOf(value) : null;
+    }
+
+    default String map(DocumentVisibility visibility) {
+        return visibility != null ? visibility.name() : null;
+    }
 }
