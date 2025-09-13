@@ -1,4 +1,4 @@
-package com.pw.docvault.model;
+package com.pw.docvault.model.enums;
 
 public enum EmailTemplateName {
     ACTIVATE_ACCOUNT("activate_account");

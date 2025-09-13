@@ -1,10 +1,8 @@
 package com.pw.docvault.service.security;
 
 import com.pw.docvault.entity.security.RefreshToken;
-import com.pw.docvault.exception.JwtTokenException;
 import com.pw.docvault.exception.TokenRefreshException;
 import com.pw.docvault.repository.RefreshTokenRepository;
-import com.pw.docvault.service.UserDetailsServiceImpl;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -14,7 +12,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;

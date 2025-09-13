@@ -1,1 +1,6 @@
-/* You can add global styles to this file, and also import other style files */
+@import "primeicons/primeicons.css";
+
+html.app-dark, 
+html.app-dark body {
+  background-color: var(--p-surface-950);
+}

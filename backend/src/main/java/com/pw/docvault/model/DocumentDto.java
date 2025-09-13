@@ -1,5 +1,7 @@
 package com.pw.docvault.model;
 
+import com.pw.docvault.model.enums.DocumentVisibility;
+
 import java.time.LocalDateTime;
 
 public record DocumentDto(
@@ -10,7 +12,7 @@ public record DocumentDto(
         String mimeType,
         String path,
         LocalDateTime uploadedAt,
-        String visibility,
+        DocumentVisibility visibility,
         Long ownerId,
         String ownerLogin
 ) {}

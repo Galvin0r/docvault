@@ -5,7 +5,7 @@ import com.pw.docvault.exception.InvalidActivationTokenException;
 import com.pw.docvault.exception.UserAlreadyExistsException;
 import com.pw.docvault.entity.security.ActivationToken;
 import com.pw.docvault.entity.User;
-import com.pw.docvault.model.EmailTemplateName;
+import com.pw.docvault.model.enums.EmailTemplateName;
 import com.pw.docvault.model.security.*;
 import com.pw.docvault.repository.ActivationTokenRepository;
 import com.pw.docvault.repository.RefreshTokenRepository;

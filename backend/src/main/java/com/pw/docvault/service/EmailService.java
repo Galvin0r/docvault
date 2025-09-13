@@ -1,6 +1,6 @@
 package com.pw.docvault.service;
 
-import com.pw.docvault.model.EmailTemplateName;
+import com.pw.docvault.model.enums.EmailTemplateName;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;
