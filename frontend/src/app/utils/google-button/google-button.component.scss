@@ -1,0 +1,22 @@
+.google-btn.p-button {
+  background: #fff !important;
+  color: #3c4043 !important;
+  border: 1px solid #747775 !important;
+  font-weight: 500;
+  height: 40px;
+  gap: 0.625rem;
+  padding-inline: 1rem;
+  box-shadow: none;
+}
+
+.google-btn.p-button:not(:disabled):hover {
+  background: #f1f3f4 !important;
+}
+.google-btn.p-button:not(:disabled):active {
+  background: #f1f3f4 !important;
+}
+.google-btn .p-button-icon svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}

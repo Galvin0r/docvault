@@ -13,9 +13,10 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 
 import { providePrimeNG } from 'primeng/config';
 import { SkyPreset } from '../presets';
+import { HomeComponent } from './home/home.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, HomeComponent],
   imports: [BrowserModule, AppRoutingModule],
   providers: [
     provideHttpClient(withInterceptorsFromDi()),

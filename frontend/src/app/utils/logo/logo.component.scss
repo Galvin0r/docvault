@@ -1,0 +1,6 @@
+:host {
+  display: inline-block;
+  background: var(--p-primary-color);
+  -webkit-mask: url('../../../assets/docvaultLogo.svg') no-repeat center / contain;
+          mask: url('../../../assets/docvaultLogo.svg') no-repeat center / contain;
+}

@@ -1,1 +1,81 @@
-<p>login works!</p>
+<div class="min-h-screen w-full flex items-center justify-center p-4">
+  <p-card
+    class="p-4 w-full max-w-md bg-white/10 dark:bg-zinc-900/30 !backdrop-blur-md border border-white/20 dark:border-white/10 !shadow-2xl !rounded"
+  >
+    <ng-template pTemplate="content">
+      <div class="flex flex-col items-center space-y-2">
+        <app-logo />
+        <h1 class="text-2xl font-semibold tracking-tight">
+          Sign in to DocVault
+        </h1>
+      </div>
+
+      <form
+        class="mt-8 space-y-3"
+        [formGroup]="form"
+        (ngSubmit)="onSubmit()"
+      >
+        <div class="flex flex-col space-y-1">
+          <label class="font-semibold">Username or email</label>
+          <p-input-group>
+            <p-inputgroup-addon>
+              <i class="pi pi-user"></i>
+            </p-inputgroup-addon>
+            <input pInputText type="text" formControlName="identifier" />
+          </p-input-group>
+        </div>
+
+        <div class="flex flex-col space-y-1">
+          <label class="font-semibold">Password</label>
+          <p-input-group>
+            <p-inputgroup-addon>
+              <i class="pi pi-lock"></i>
+            </p-inputgroup-addon>
+            <p-password
+              formControlName="password"
+              [feedback]="false"
+              [toggleMask]="true"
+            />
+          </p-input-group>
+
+          <div class="mt-1 flex items-center justify-between">
+            <div class="flex items-center">
+              <p-check-box
+                [binary]="true"
+                formControlName="rememberMe"
+                size="small"
+                class="mr-1"
+              />
+              <label class="font-thin small-label">Remember me</label>
+            </div>
+
+            <div>
+              <a class="small-label" routerLink="/recoverPassword">Forgot password?</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-center w-full mt-8">
+          <button
+            pButton
+            class="w-2/3 !rounded font-semibold"
+            type="submit"
+            [disabled]="!this.form.valid"
+          >
+            Sign in
+          </button>
+        </div>
+      </form>
+
+      <p-divider>or</p-divider>
+      <div class="flex justify-center w-full">
+        <app-google-button (continue)="loginWithGoogle()" class="block w-2/3" />
+      </div>
+
+      <div class="flex justify-center w-full gap-1 my-3">
+        <span class="font-light">Don't have an account?</span>
+        <a class="small-label" routerLink="/register">Sign up</a>
+      </div>
+    </ng-template>
+  </p-card>
+</div>
