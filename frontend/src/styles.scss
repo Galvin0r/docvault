@@ -73,3 +73,31 @@ a:hover {
   color: var(--link-hover);
   cursor: pointer;
 }
+
+.cdk-overlay-container .theme-popup .p-button.p-button-text {
+  color: var(--p-text-color);
+  background: transparent;
+  border: none;
+}
+
+.cdk-overlay-container .theme-popup .p-button.p-button-text:hover,
+.cdk-overlay-container .theme-popup .p-button.p-button-text:active {
+  color: var(--p-text-color);
+  background: var(--p-form-field-filled-hover-background);
+}
+
+.cdk-overlay-container .theme-popup .icon-item.p-button {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  line-height: 1;
+}
+
+.cdk-overlay-container .theme-popup .icon-item .p-button-icon {
+  font-size: 1.1rem;
+}
+.cdk-overlay-container .theme-popup .icon-item .p-button-label {
+  font-size: 0.75rem;
+}

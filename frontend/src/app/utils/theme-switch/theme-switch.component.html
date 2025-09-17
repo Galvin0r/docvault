@@ -1,0 +1,56 @@
+<div class="theme-trigger-wrap" cdkOverlayOrigin #origin="cdkOverlayOrigin">
+  <button
+    [text]="true"
+    pButton
+    [rounded]="true"
+    (click)="toggle()"
+    [icon]="triggerIcon"
+    [attr.aria-label]="triggerAria"
+    class="theme-trigger !border !border-white/20 !dark:border-white/10"
+  ></button>
+</div>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="origin"
+  [cdkConnectedOverlayOpen]="open"
+  [cdkConnectedOverlayPositions]="positions"
+  [cdkConnectedOverlayOffsetX]="8"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
+  (backdropClick)="close()"
+>
+  <div
+    class="theme-popup !border !border-white/20 !dark:border-white/10"
+    role="menu"
+    aria-label="Theme"
+  >
+    <button
+      pButton
+      [text]="true"
+      icon="pi pi-desktop"
+      (click)="choose('system')"
+      role="menuitemradio"
+      class="icon-item"
+      label="System"
+    ></button>
+    <button
+      pButton
+      [text]="true"
+      icon="pi pi-moon"
+      (click)="choose('dark')"
+      role="menuitemradio"
+      class="icon-item"
+      label="Dark"
+    ></button>
+    <button
+      pButton
+      [text]="true"
+      icon="pi pi-sun"
+      (click)="choose('light')"
+      role="menuitemradio"
+      class="icon-item"
+      label="Light"
+    ></button>
+  </div>
+</ng-template>

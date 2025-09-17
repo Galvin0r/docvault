@@ -1,0 +1,33 @@
+.theme-trigger-wrap {
+  position: fixed;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: 1000;
+}
+
+:host ::ng-deep .theme-trigger.p-button {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--p-content-background);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+:host ::ng-deep .theme-trigger.p-button:hover {
+  background: var(--p-form-field-filled-hover-background);
+}
+:host ::ng-deep .theme-trigger .p-button-icon {
+  font-size: 1.1rem;
+}
+
+.theme-popup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.4rem;
+  border-radius: 0.75rem;
+  background: var(--p-content-background);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+:host ::ng-deep .theme-trigger.p-button.p-button-text {
+  color: var(--p-text-color);
+}

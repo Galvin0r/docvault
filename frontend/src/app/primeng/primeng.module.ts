@@ -7,6 +7,9 @@ import { PasswordModule } from 'primeng/password';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
+import { MenuModule } from 'primeng/menu';
+import { TooltipModule } from 'primeng/tooltip';
+import { MessageModule } from 'primeng/message';
 
 const primeNgModules = [
   CardModule,
@@ -17,6 +20,9 @@ const primeNgModules = [
   CheckboxModule,
   ButtonModule,
   DividerModule,
+  MenuModule,
+  TooltipModule,
+  MessageModule,
 ];
 
 @NgModule({

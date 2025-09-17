@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { inject, NgModule, provideAppInitializer } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -14,10 +14,12 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { providePrimeNG } from 'primeng/config';
 import { SkyPreset } from '../presets';
 import { HomeComponent } from './home/home.component';
+import { ThemeService } from './utils/theme.service';
+import { UtilsModule } from './utils/utils.module';
 
 @NgModule({
   declarations: [AppComponent, HomeComponent],
-  imports: [BrowserModule, AppRoutingModule],
+  imports: [BrowserModule, AppRoutingModule, UtilsModule],
   providers: [
     provideHttpClient(withInterceptorsFromDi()),
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
@@ -30,6 +32,7 @@ import { HomeComponent } from './home/home.component';
         },
       },
     }),
+    provideAppInitializer(() => inject(ThemeService).init()),
   ],
   bootstrap: [AppComponent],
 })

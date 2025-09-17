@@ -10,19 +10,29 @@
         </h1>
       </div>
 
-      <form
-        class="mt-8 space-y-3"
-        [formGroup]="form"
-        (ngSubmit)="onSubmit()"
-      >
+      <form class="mt-8 space-y-3" [formGroup]="form" (ngSubmit)="onSubmit()">
         <div class="flex flex-col space-y-1">
           <label class="font-semibold">Username or email</label>
           <p-input-group>
             <p-inputgroup-addon>
               <i class="pi pi-user"></i>
             </p-inputgroup-addon>
-            <input pInputText type="text" formControlName="identifier" />
+            <input
+              pInputText
+              type="text"
+              formControlName="identifier"
+              [ngClass]="{
+                'p-invalid': isInvalid('identifier'),
+                'p-valid': isValid('identifier')
+              }"
+              [attr.aria-invalid]="isInvalid('identifier')"
+            />
           </p-input-group>
+          @if (isInvalid('identifier')) {
+          <p-message severity="error" variant="simple" size="small">
+            Username or email is required.</p-message
+          >
+          }
         </div>
 
         <div class="flex flex-col space-y-1">
@@ -35,8 +45,20 @@
               formControlName="password"
               [feedback]="false"
               [toggleMask]="true"
+              [inputStyleClass]="
+                isInvalid('password')
+                  ? 'p-invalid'
+                  : isValid('password')
+                  ? 'p-valid'
+                  : ''
+              "
             />
           </p-input-group>
+          @if (isInvalid('password')) {
+          <p-message severity="error" variant="simple" size="small">
+            Password is required.</p-message
+          >
+          }
 
           <div class="mt-1 flex items-center justify-between">
             <div class="flex items-center">
@@ -50,18 +72,15 @@
             </div>
 
             <div>
-              <a class="small-label" routerLink="/recoverPassword">Forgot password?</a>
+              <a class="small-label" routerLink="/recoverPassword"
+                >Forgot password?</a
+              >
             </div>
           </div>
         </div>
 
         <div class="flex justify-center w-full mt-8">
-          <button
-            pButton
-            class="w-2/3 !rounded font-semibold"
-            type="submit"
-            [disabled]="!this.form.valid"
-          >
+          <button pButton class="w-2/3 !rounded font-semibold" type="submit">
             Sign in
           </button>
         </div>

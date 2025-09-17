@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-signup',
@@ -7,5 +8,10 @@ import { Component } from '@angular/core';
   styleUrl: './signup.component.scss'
 })
 export class SignupComponent {
+  formBuilder = inject(FormBuilder);
 
+  form = this.formBuilder.group({
+    username: ['', [Validators.required]],
+    emaio: ['', [Validators.required]]
+  });
 }
