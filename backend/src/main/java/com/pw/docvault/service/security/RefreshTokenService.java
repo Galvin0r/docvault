@@ -4,7 +4,6 @@ import com.pw.docvault.entity.User;
 import com.pw.docvault.entity.security.RefreshToken;
 import com.pw.docvault.exception.TokenRefreshException;
 import com.pw.docvault.repository.RefreshTokenRepository;
-import com.pw.docvault.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,20 +16,22 @@ public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
-    @Value(value = "${app.security.jwtRefreshTokenExpirationMs}")
-
+    @Value(value = "${app.security.jwtRefreshTokenExpiration}")
     private int jwtRefreshTokenExpiration;
+
+    @Value(value = "${app.security.jwtRefreshTokenExpirationShort}")
+    private int jwtRefreshTokenExpirationShort;
 
     public RefreshTokenService(RefreshTokenRepository refreshTokenRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
     @Transactional
-    public RefreshToken getRefreshToken(User user, String deviceInfo) {
+    public RefreshToken getRefreshToken(User user, String deviceInfo, boolean rememberMe) {
         return refreshTokenRepository.findByUserIdAndDeviceInfo(user.getId(), deviceInfo).orElseGet(() -> {
             RefreshToken refreshToken = new RefreshToken();
             refreshToken.setUser(user);
-            refreshToken.setExpiresAt(LocalDateTime.now().plusSeconds(jwtRefreshTokenExpiration));
+            refreshToken.setExpiresAt(LocalDateTime.now().plusSeconds(rememberMe ? jwtRefreshTokenExpiration : jwtRefreshTokenExpirationShort));
             refreshToken.setToken(UUID.randomUUID().toString());
             refreshToken.setDeviceInfo(deviceInfo);
             return refreshTokenRepository.save(refreshToken);

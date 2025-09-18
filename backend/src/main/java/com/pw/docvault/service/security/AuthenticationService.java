@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AuthenticationService {
@@ -114,17 +115,12 @@ public class AuthenticationService {
         var auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, request.password()));
 
         var user = (User) auth.getPrincipal();
-        List<RoleCode> roles = user.getRoles().stream()
-                .map(r -> RoleCode.valueOf(r.getName()))
-                .toList();
 
         ResponseCookie jwtCookie = jwtService.generateJwtCookie(user);
-        RefreshToken refreshToken = refreshTokenService.getRefreshToken(user, request.deviceInfo());
+        RefreshToken refreshToken = refreshTokenService.getRefreshToken(user, request.deviceInfo(), Optional.of(request.rememberMe()).orElse(false));
         ResponseCookie jwtRefreshCookie = jwtService.generateRefreshJwtCookie(refreshToken.getToken());
 
-        return new AuthenticationCookies(jwtCookie,
-                jwtRefreshCookie,
-                new UserInfo(user.getLogin(), user.getEmail(), roles));
+        return new AuthenticationCookies(jwtCookie, jwtRefreshCookie);
     }
 
     @Transactional

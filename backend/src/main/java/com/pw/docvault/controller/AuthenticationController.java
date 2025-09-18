@@ -31,7 +31,7 @@ public class AuthenticationController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, response.jwtCookie().toString())
                 .header(HttpHeaders.SET_COOKIE, response.jwtRefreshCookie().toString())
-                .body(response.userInfo());
+                .build();
     }
 
     @PostMapping("/activateAccount")
