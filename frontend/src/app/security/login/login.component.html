@@ -10,7 +10,7 @@
         </h1>
       </div>
 
-      <form class="mt-8 space-y-3" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <form class="mt-8" [formGroup]="form" (ngSubmit)="onSubmit()">
         <div class="flex flex-col space-y-1">
           <label class="font-semibold">Username or email</label>
           <p-input-group>
@@ -30,8 +30,8 @@
           </p-input-group>
           @if (isInvalid('identifier')) {
           <p-message severity="error" variant="simple" size="small">
-            Username or email is required.</p-message
-          >
+            Username or email is required
+          </p-message>
           }
         </div>
 
@@ -56,8 +56,8 @@
           </p-input-group>
           @if (isInvalid('password')) {
           <p-message severity="error" variant="simple" size="small">
-            Password is required.</p-message
-          >
+            Password is required
+          </p-message>
           }
 
           <div class="mt-1 flex items-center justify-between">
@@ -72,9 +72,9 @@
             </div>
 
             <div>
-              <a class="small-label" routerLink="/recoverPassword"
-                >Forgot password?</a
-              >
+              <a class="small-label" routerLink="/recoverPassword">
+                Forgot password?
+              </a>
             </div>
           </div>
         </div>
@@ -88,7 +88,7 @@
 
       <p-divider>or</p-divider>
       <div class="flex justify-center w-full">
-        <app-google-button (continue)="loginWithGoogle()" class="block w-2/3" />
+        <app-google-button (continue)="continueWithGoogle()" class="block w-2/3" />
       </div>
 
       <div class="flex justify-center w-full gap-1 my-3">

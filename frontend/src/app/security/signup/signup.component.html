@@ -5,13 +5,137 @@
     <ng-template pTemplate="content">
       <div class="flex flex-col items-center space-y-2">
         <app-logo />
-        <h1 class="text-2xl font-semibold tracking-tight">
-          Sign up for DocVault
-        </h1>
+        <h1 class="text-2xl font-semibold tracking-tight">Sign up for DocVault</h1>
       </div>
 
-      <form>
-        
+      <form class="mt-8 space-y-4" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="flex flex-col space-y-1">
+          <label class="font-semibold">Username</label>
+          <p-input-group>
+            <p-inputgroup-addon>
+              <i class="pi pi-user"></i>
+            </p-inputgroup-addon>
+            <input
+              pInputText
+              type="text"
+              formControlName="username"
+              [ngClass]="{
+                'p-invalid': isInvalid('username'),
+                'p-valid': isValid('username')
+              }"
+              [attr.aria-invalid]="isInvalid('username')"
+            />
+          </p-input-group>
+          <!-- prettier-ignore -->
+          @if (isInvalid('username')) { 
+          @if(hasError('username', 'required')) {
+          <p-message severity="error" variant="simple" size="small">Username is required</p-message>
+          } @else if (hasError('username', 'TODO')) {
+          <p-message severity="error" variant="simple" size="small">
+            This username already exists
+          </p-message>
+          } }
+        </div>
+
+        <div class="flex flex-col space-y-1">
+          <label class="font-semibold">Email</label>
+          <p-input-group>
+            <p-inputgroup-addon>
+              <i class="pi pi-at"></i>
+            </p-inputgroup-addon>
+            <input
+              pInputText
+              type="test"
+              formControlName="email"
+              [ngClass]="{
+                'p-invalid': isInvalid('email'),
+                'p-valid': isValid('email')
+              }"
+              [attr.aria-invalid]="isInvalid('email')"
+            />
+          </p-input-group>
+          <!-- prettier-ignore -->
+          @if (isInvalid('email')) { 
+          @if(hasError('email', 'required')) {
+          <p-message severity="error" variant="simple" size="small">Email is required</p-message>
+          } @else if (hasError('email', 'email')) {
+          <p-message severity="error" variant="simple" size="small">Not a valid email</p-message>
+          } }
+        </div>
+
+        <div formGroupName="passwords" class="flex flex-col space-y-4">
+          <div class="flex flex-col space-y-1">
+            <label class="font-semibold">Password</label>
+            <p-input-group>
+              <p-inputgroup-addon>
+                <i class="pi pi-lock"></i>
+              </p-inputgroup-addon>
+              <p-password
+                formControlName="password"
+                [feedback]="false"
+                [toggleMask]="true"
+                [inputStyleClass]="
+                  isInvalid('passwords.password')
+                    ? 'p-invalid'
+                    : isValid('passwords.password')
+                    ? 'p-valid'
+                    : ''
+                "
+              />
+            </p-input-group>
+            <!-- prettier-ignore -->
+            @if (isInvalid('passwords.password')) {
+              @if(hasError('passwords.password', 'required')) {
+            <p-message severity="error" variant="simple" size="small">
+              Password is required
+            </p-message>
+            } @else if(hasError('passwords.password', 'minlength')) {
+            <p-message severity="error" variant="simple" size="small">
+              Password should be at least 8 charecters long
+            </p-message>
+            } }
+          </div>
+
+          <div class="flex flex-col space-y-1">
+            <label class="font-semibold">Confirm password</label>
+            <p-input-group>
+              <p-inputgroup-addon>
+                <i class="pi pi-lock"></i>
+              </p-inputgroup-addon>
+              <p-password
+                formControlName="confirmPassword"
+                [feedback]="false"
+                [toggleMask]="true"
+                [inputStyleClass]="
+                  isMismatched()
+                    ? 'p-invalid'
+                    : isValid('passwords.confirmPassword')
+                    ? 'p-valid'
+                    : ''
+                "
+              />
+            </p-input-group>
+            @if (isMismatched()) {
+            <p-message severity="error" variant="simple" size="small">
+              Passwords don't match
+            </p-message>
+            }
+          </div>
+        </div>
+
+        <div class="flex justify-center w-full mt-8">
+          <button pButton class="w-2/3 !rounded font-semibold" type="submit">Sign up</button>
+        </div>
+
+        <p-divider>or</p-divider>
+        <div class="flex justify-center w-full">
+          <app-google-button (continue)="continueWithGoogle()" class="block w-2/3" />
+        </div>
+
+        <div class="flex justify-center w-full gap-1 my-3">
+        <span class="font-light">Already have an account?</span>
+        <a class="small-label" routerLink="/login">Sign in</a>
+      </div>
       </form>
     </ng-template>
   </p-card>
