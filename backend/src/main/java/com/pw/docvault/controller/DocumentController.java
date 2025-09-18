@@ -26,7 +26,7 @@ public class DocumentController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<?> upload(@RequestParam("file")MultipartFile file,
+    public ResponseEntity<Void> upload(@RequestParam("file")MultipartFile file,
                                     @RequestParam("title") String title,
                                     @RequestParam("description") String description,
                                     @RequestParam("visibility") String visibility) {
@@ -45,7 +45,7 @@ public class DocumentController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         documentService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

@@ -45,7 +45,7 @@ public class CredentialsController {
     }
 
     @PostMapping("/change-login")
-    public ResponseEntity<?> changeLogin(@RequestParam String newLogin) {
+    public ResponseEntity<Void> changeLogin(@RequestParam String newLogin) {
         credentialsService.changeLogin(newLogin);
         return ResponseEntity.ok().build();
     }

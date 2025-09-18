@@ -20,13 +20,13 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegistrationRequest request) {
+    public ResponseEntity<Void> register(@RequestBody RegistrationRequest request) {
         authenticationService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest request) {
+    public ResponseEntity<Void> authenticate(@RequestBody AuthenticationRequest request) {
         AuthenticationCookies response = authenticationService.authenticate(request);
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, response.jwtCookie().toString())
@@ -35,13 +35,13 @@ public class AuthenticationController {
     }
 
     @PostMapping("/activateAccount")
-    public ResponseEntity<?> activateAccount(@RequestParam String token) {
+    public ResponseEntity<Void> activateAccount(@RequestParam String token) {
         authenticationService.activateAccount(token);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/resendActivation")
-    public ResponseEntity<?> resendActivationToken(@RequestParam String email) {
+    public ResponseEntity<Void> resendActivationToken(@RequestParam String email) {
         authenticationService.resendActivationToken(email);
         return ResponseEntity.accepted().build();
     }
