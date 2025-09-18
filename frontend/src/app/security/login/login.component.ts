@@ -20,6 +20,8 @@ export class LoginComponent extends BaseFormComponent {
 
   onSubmit() {
     if (!this.guardSubmit()) return;
+
+    
   }
 
   continueWithGoogle() {

@@ -12,14 +12,19 @@ import { PasswordRecoveryComponent } from './password-recovery/password-recovery
 import { EmailVerificationComponent } from './email-verification/email-verification.component';
 
 @NgModule({
-  declarations: [LoginComponent, SignupComponent, PasswordRecoveryComponent, EmailVerificationComponent],
+  declarations: [
+    LoginComponent,
+    SignupComponent,
+    PasswordRecoveryComponent,
+    EmailVerificationComponent,
+  ],
   imports: [
     CommonModule,
     SecurityRoutingModule,
     Card,
     PrimeNgModule,
     UtilsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
   providers: [SecurityService],
 })
