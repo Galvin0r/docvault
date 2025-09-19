@@ -37,11 +37,13 @@ public class CredentialsController {
 
         ResponseCookie jwtCookie = jwtService.getCleanJwtCookies();
         ResponseCookie jwtRefreshCookie = jwtService.getCleanJwtRefreshCookie();
+        ResponseCookie jSessionIdCookie = jwtService.getCleanJSessionIdCookie();
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
-                .body("You've been signed out!");
+                .header(HttpHeaders.SET_COOKIE, jSessionIdCookie.toString())
+                .build();
     }
 
     @PostMapping("/change-login")

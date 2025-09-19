@@ -6,12 +6,12 @@ import com.pw.docvault.repository.RefreshTokenRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,12 +23,6 @@ import java.io.IOException;
 
 @Service
 public class JwtFilter extends OncePerRequestFilter {
-
-    @Value(value = "${app.security.jwtCookieName}")
-    private String jwtCookieName;
-
-    @Value(value = "${app.security.cookieMaxAge}")
-    private int cookieMaxAge;
 
     Logger logger = LoggerFactory.getLogger(JwtFilter.class);
 
@@ -58,9 +52,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
         try {
             if (jwt != null) {
-                String userEmail = jwtService.extractUsername(jwt);
-                if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(userEmail);
+                String userLogin = jwtService.extractUsername(jwt);
+                if (userLogin != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(userLogin);
 
                     if (jwtService.isTokenValid(jwt, userDetails)) {
                         setAuthentication(userDetails, request);
@@ -74,14 +68,11 @@ public class JwtFilter extends OncePerRequestFilter {
                         .orElseThrow(() -> new TokenRefreshException("Refresh token expired"));
 
                 if (rt != null) {
-                    UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(rt.getUser().getEmail());
+                    UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(rt.getUser().getLogin());
 
                     String newJwt = jwtService.generateToken(userDetails);
-                    Cookie jwtCookie = new Cookie(jwtCookieName, newJwt);
-                    jwtCookie.setHttpOnly(true);
-                    jwtCookie.setPath("/api");
-                    jwtCookie.setMaxAge(cookieMaxAge);
-                    response.addCookie(jwtCookie);
+                    ResponseCookie jwtCookie = jwtService.generateJwtCookie(newJwt);
+                    response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
                     setAuthentication(userDetails, request);
                 } else {
