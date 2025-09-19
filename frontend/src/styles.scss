@@ -5,6 +5,14 @@ html.app-dark {
   --app-bg-primary-per: 20%;
 }
 
+html:not(.app-dark) {
+  --p-message-error-background: var(--p-red-300);
+  --p-message-error-border-color: var(--p-red-300);
+  --p-message-error-simple-color: var(--p-red-700);
+  --p-message-error-color: var(--p-red-800);
+  --p-message-error-close-button-hover-background: var(--p-red-400);
+}
+
 html,
 body {
   height: 100%;

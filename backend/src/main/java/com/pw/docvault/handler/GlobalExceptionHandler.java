@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleBadCredentials(BadCredentialsException ex) {
         logger.error("Bad credentials: {}", ex.getMessage());
         Map<String, String> response = new HashMap<>();
-        response.put("error", ex.getMessage());
+        response.put("error", "Bad credentials");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 

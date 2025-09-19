@@ -1,10 +1,14 @@
 import { inject } from "@angular/core";
 import { AbstractControl, FormBuilder, FormGroup } from "@angular/forms";
+import { SecurityService } from "./security.service";
+import { Router } from "@angular/router";
 
 export abstract class BaseFormComponent {
   form!: FormGroup;
   submitted = false;
   protected formBuilder = inject(FormBuilder);
+  protected securityService = inject(SecurityService);
+  protected router = inject(Router);
 
   protected abstract buildForm(): FormGroup;
 
