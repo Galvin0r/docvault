@@ -29,14 +29,14 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2User oAuth2User =  super.loadUser(userRequest);
+        OAuth2User oAuth2User = super.loadUser(userRequest);
         String provider = userRequest.getClientRegistration().getRegistrationId();
         Map<String, String> userInfo = extractUserInfo(oAuth2User, provider);
 
         String email = userInfo.get("email");
         String login = userInfo.get("login");
 
-        if (userRepository.findByLogin(login).isEmpty()) {
+        if (userRepository.findByEmail(email).isEmpty()) {
             User newUser = new User();
             newUser.setEmail(email);
             newUser.setLogin(login);
@@ -53,13 +53,11 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 
     private Map<String, String> extractUserInfo(OAuth2User oAuth2User, String provider) {
         Map<String, Object> attributes = oAuth2User.getAttributes();
-        String email = (String)attributes.get(Constants.ATTRIBUTE_EMAIL);
+        String email = (String)attributes.get(Constants.ATTRIBUTE_GOOGLE_EMAIL);
         String login;
 
         if (provider.equals(Constants.PROVIDER_GOOGLE)) {
             login = (String) attributes.get(Constants.ATTRIBUTE_GOOGLE_LOGIN);
-        } else if (provider.equals(Constants.PROVIDER_GITHUB)) {
-            login = (String) attributes.get(Constants.ATTRIBUTE_GITHUB_LOGIN);
         } else {
             throw new OAuth2AuthenticationException("Unsupported provider: " + provider);
         }
