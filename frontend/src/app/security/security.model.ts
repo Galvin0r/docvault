@@ -6,8 +6,15 @@ export interface AuthenticationRequest {
   rememberMe: boolean
 }
 
+export interface RegistrationRequest {
+  email: string,
+  password: string,
+  login: string;
+}
+
 export interface UserInfo {
   login: string,
   email: string,
+  activated: boolean,
   roles: string[]
 }

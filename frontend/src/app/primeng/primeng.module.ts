@@ -10,6 +10,7 @@ import { DividerModule } from 'primeng/divider';
 import { MenuModule } from 'primeng/menu';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageModule } from 'primeng/message';
+import { InputOtpModule } from 'primeng/inputotp';
 
 const primeNgModules = [
   CardModule,
@@ -23,6 +24,7 @@ const primeNgModules = [
   MenuModule,
   TooltipModule,
   MessageModule,
+  InputOtpModule,
 ];
 
 @NgModule({
