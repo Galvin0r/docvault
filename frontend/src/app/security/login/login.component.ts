@@ -48,5 +48,9 @@ export class LoginComponent extends BaseFormComponent {
     this.incorrectCredentials = false;
   }
 
-  continueWithGoogle() {}
+  continueWithGoogle() {
+    const deviceId = getDeviceId();
+    document.cookie = `deviceId=${getDeviceId()}; path=/`;
+    window.location.href = `/api/oauth2/authorization/google`;
+  }
 }

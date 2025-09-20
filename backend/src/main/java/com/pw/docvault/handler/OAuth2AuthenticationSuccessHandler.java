@@ -2,11 +2,11 @@ package com.pw.docvault.handler;
 
 import com.pw.docvault.entity.User;
 import com.pw.docvault.entity.security.RefreshToken;
-import com.pw.docvault.repository.RefreshTokenRepository;
 import com.pw.docvault.repository.UserRepository;
 import com.pw.docvault.service.security.JwtService;
 import com.pw.docvault.service.security.RefreshTokenService;
 import com.pw.docvault.util.Constants;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,8 +19,6 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 
 @Component
 public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
@@ -31,13 +29,11 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
-    private final RefreshTokenRepository refreshTokenRepository;
 
-    public OAuth2AuthenticationSuccessHandler(UserRepository userRepository, JwtService jwtService, RefreshTokenService refreshTokenService, RefreshTokenRepository refreshTokenRepository) {
+    public OAuth2AuthenticationSuccessHandler(UserRepository userRepository, JwtService jwtService, RefreshTokenService refreshTokenService) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
-        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     @Override
@@ -55,14 +51,17 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
                 .orElseThrow(() -> new RuntimeException("User not found"));
         user.setOauth2Provider(provider);
 
-        String deviceInfo = request.getParameter("state");
-        if (deviceInfo != null) {
-            deviceInfo = URLDecoder.decode(deviceInfo, StandardCharsets.UTF_8);
+        String deviceInfo = null;
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("deviceId")) {
+                    deviceInfo = cookie.getValue();
+                }
+            }
         }
 
         String jwt = jwtService.generateToken(user);
         RefreshToken refreshToken = refreshTokenService.getRefreshToken(user, deviceInfo, true);
-        refreshTokenRepository.save(refreshToken);
 
         ResponseCookie jwtCookie = jwtService.generateJwtCookie(jwt);
         ResponseCookie refreshCookie = jwtService.generateRefreshJwtCookie(refreshToken.getToken());
