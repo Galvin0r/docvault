@@ -223,5 +223,6 @@ public class AuthenticationService {
         }
         User user = passwordResetToken.getUser();
         user.setPassword(passwordEncoder.encode(password));
+        passwordResetTokenRepository.deleteByUser(user);
     }
 }
