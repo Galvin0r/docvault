@@ -4,6 +4,7 @@ import { BaseFormComponent } from '../base-form.component';
 import { passwordsMatchValidator } from '../../utils/validators';
 import { RegistrationRequest } from '../security.model';
 import { HttpErrorResponse } from '@angular/common/http';
+import { getDeviceId } from '../../utils/functions';
 
 @Component({
   selector: 'app-signup',
@@ -60,7 +61,8 @@ export class SignupComponent extends BaseFormComponent {
   }
 
   continueWithGoogle() {
-    
+    document.cookie = `deviceId=${getDeviceId()}; path=/`;
+    window.location.href = `/api/oauth2/authorization/google`;
   }
 
   onErrorClose() {
