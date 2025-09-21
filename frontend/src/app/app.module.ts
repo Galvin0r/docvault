@@ -16,10 +16,12 @@ import { SkyPreset } from '../presets';
 import { HomeComponent } from './home/home.component';
 import { ThemeService } from './utils/theme.service';
 import { UtilsModule } from './utils/utils.module';
+import { PrimeNgModule } from './primeng/primeng.module';
+import { MessageService } from 'primeng/api';
 
 @NgModule({
   declarations: [AppComponent, HomeComponent],
-  imports: [BrowserModule, AppRoutingModule, UtilsModule],
+  imports: [BrowserModule, AppRoutingModule, UtilsModule, PrimeNgModule],
   providers: [
     provideHttpClient(withInterceptorsFromDi()),
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
@@ -33,6 +35,7 @@ import { UtilsModule } from './utils/utils.module';
       },
     }),
     provideAppInitializer(() => inject(ThemeService).init()),
+    MessageService
   ],
   bootstrap: [AppComponent],
 })

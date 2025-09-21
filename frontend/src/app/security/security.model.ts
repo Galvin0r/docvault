@@ -15,6 +15,5 @@ export interface RegistrationRequest {
 export interface UserInfo {
   login: string,
   email: string,
-  activated: boolean,
   roles: string[]
 }

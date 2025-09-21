@@ -8,7 +8,6 @@ import com.pw.docvault.entity.User;
 import com.pw.docvault.model.enums.EmailTemplateName;
 import com.pw.docvault.model.security.*;
 import com.pw.docvault.repository.ActivationTokenRepository;
-import com.pw.docvault.repository.RefreshTokenRepository;
 import com.pw.docvault.repository.RoleRepository;
 import com.pw.docvault.repository.UserRepository;
 import com.pw.docvault.service.EmailService;
@@ -21,6 +20,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -79,10 +79,18 @@ public class AuthenticationService {
     private void sendValidationEmail(User user) {
         try {
             String newToken = generateActivationToken(user);
-            emailService.sendEmail(user.getEmail(), user.getLogin(), EmailTemplateName.ACTIVATE_ACCOUNT, activationUrl, newToken, "Account activation");
+            emailService.sendEmail(user.getEmail(), user.getLogin(), EmailTemplateName.ACTIVATE_ACCOUNT, buildActivationUrl(user.getEmail()), newToken, "Account activation");
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String buildActivationUrl(String email) {
+        return UriComponentsBuilder
+                .fromUriString(activationUrl)
+                .queryParam("email", email)
+                .build()
+                .toUriString();
     }
 
     private String generateActivationToken(User user) {

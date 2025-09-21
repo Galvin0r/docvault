@@ -16,7 +16,26 @@
         (ngSubmit)="onSubmit()"
         class="flex flex-col items-center space-y-8 mt-8"
       >
-        <p-input-otp formControlName="code" [integerOnly]="true" />
+        @if (isTokenExpired) {
+        <p-message
+          severity="error"
+          class="inline-block flex w-full justify-between"
+          [closable]="true"
+          (onClose)="onErrorClose()"
+        >
+          Activation token has expired.
+        </p-message>
+        } @else if (isTokenInvalid) {
+        <p-message
+          severity="error"
+          class="inline-block flex w-full justify-between"
+          [closable]="true"
+          (onClose)="onErrorClose()"
+        >
+          Invalid activation token.
+        </p-message>
+        }
+        <p-input-otp formControlName="code" [integerOnly]="true" [length]="6" />
         <button pButton class="w-2/3 !rounded font-semibold" type="submit">Verify email</button>
       </form>
 

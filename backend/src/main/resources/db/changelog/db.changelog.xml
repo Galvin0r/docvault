@@ -263,5 +263,38 @@
         <createSequence sequenceName="group_membership_seq"/>
     </changeSet>
 
+    <changeSet id="15" author="Roman">
+        <createTable tableName="password_reset_tokens">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="token" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expires_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint
+                constraintName="fk_password_reset_tokens_user"
+                baseTableName="password_reset_tokens"
+                baseColumnNames="user_id"
+                referencedTableName="users"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="16" author="Roman">
+        <addUniqueConstraint tableName="password_reset_tokens"
+                              columnNames="user_id"
+                              constraintName="uq_password_reset_tokens_user"/>
+    </changeSet>
+
+    <changeSet id="17" author="Roman">
+        <createSequence sequenceName="password_reset_tokens_seq"/>
+    </changeSet>
+
     <include file="db.insert-data.xml" relativeToChangelogFile="true" />
 </databaseChangeLog>

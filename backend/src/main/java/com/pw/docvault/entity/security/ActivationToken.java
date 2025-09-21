@@ -29,9 +29,6 @@ public class ActivationToken {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public ActivationToken() {
-    }
-
     public Long getId() {
         return id;
     }

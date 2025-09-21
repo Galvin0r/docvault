@@ -9,6 +9,16 @@
       </div>
 
       <form class="mt-8 space-y-4" [formGroup]="form" (ngSubmit)="onSubmit()">
+        @if (duplicateEmail || duplicateName) {
+          <p-message
+          severity="error"
+          class="inline-block flex w-full justify-between"
+          [closable]="true"
+          (onClose)="onErrorClose()"
+        >
+          User with this {{ duplicateEmail ? 'email' : 'username' }} already exists.
+        </p-message>
+        }
         <div class="flex flex-col space-y-1">
           <label class="font-semibold">Username</label>
           <p-input-group>

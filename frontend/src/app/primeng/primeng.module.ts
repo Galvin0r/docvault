@@ -11,6 +11,7 @@ import { MenuModule } from 'primeng/menu';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageModule } from 'primeng/message';
 import { InputOtpModule } from 'primeng/inputotp';
+import { ToastModule } from 'primeng/toast';
 
 const primeNgModules = [
   CardModule,
@@ -25,6 +26,7 @@ const primeNgModules = [
   TooltipModule,
   MessageModule,
   InputOtpModule,
+  ToastModule,
 ];
 
 @NgModule({
