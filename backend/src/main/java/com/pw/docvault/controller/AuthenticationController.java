@@ -45,4 +45,16 @@ public class AuthenticationController {
         authenticationService.resendActivationToken(email);
         return ResponseEntity.accepted().build();
     }
+
+    @PostMapping("/resetPassword")
+    public ResponseEntity<Void> resetPassword(@RequestParam String email) {
+        authenticationService.initiatePasswordReset(email);
+        return ResponseEntity.accepted().build();
+    }
+
+    @PostMapping("/setNewPassword")
+    public ResponseEntity<Void> setNewPassword(@RequestParam String token, @RequestParam String password) {
+        authenticationService.setNewPassword(token, password);
+        return ResponseEntity.accepted().build();
+    }
 }

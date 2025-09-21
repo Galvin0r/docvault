@@ -15,15 +15,27 @@ export class SecurityService {
     return this.httpClient.post<void>('api/auth/register', regRequest);
   }
 
-  resendActivationCode(email: string) {
+  resendActivationCode(email: string): Observable<void> {
     return this.httpClient.post<void>('api/auth/resendActivation', null, {
       params: { email }
     });
   }
 
-  activateAccount(token: number) {
+  activateAccount(token: number): Observable<void> {
     return this.httpClient.post<void>('api/auth/activateAccount', null, {
       params: { token }
+    });
+  }
+
+  resetPassword(email: string): Observable<void> {
+    return this.httpClient.post<void>('api/auth/resetPassword', null, {
+      params: { email }
+    });
+  }
+
+  setNewPassword(token: string, password: string): Observable<void> {
+    return this.httpClient.post<void>('api/auth/setNewPassword', null, {
+      params: { token, password }
     });
   }
 }

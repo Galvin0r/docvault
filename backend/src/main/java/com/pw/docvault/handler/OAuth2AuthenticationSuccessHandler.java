@@ -50,6 +50,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         user.setOauth2Provider(provider);
+        user.setEnabled(true);
 
         String deviceInfo = null;
         if (request.getCookies() != null) {

@@ -1,7 +1,8 @@
 package com.pw.docvault.model.enums;
 
 public enum EmailTemplateName {
-    ACTIVATE_ACCOUNT("activate_account");
+    ACTIVATE_ACCOUNT("activate_account"),
+    RESET_PASSWORD("reset_password");
 
     private final String name;
 

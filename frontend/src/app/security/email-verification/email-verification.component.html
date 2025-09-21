@@ -4,6 +4,7 @@
   >
     <ng-template pTemplate="content">
       <div class="flex flex-col items-center">
+        <app-logo />
         <h1 class="text-2xl font-semibold tracking-tight">Check your email</h1>
         <div class="mt-3 flex flex-col items-center">
           <label class="font-normal">We sent a vaerification code to</label>
@@ -11,11 +12,7 @@
         </div>
       </div>
 
-      <form
-        [formGroup]="form"
-        (ngSubmit)="onSubmit()"
-        class="flex flex-col items-center space-y-8 mt-8"
-      >
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4 mt-8">
         @if (isTokenExpired) {
         <p-message
           severity="error"
@@ -35,8 +32,10 @@
           Invalid activation token.
         </p-message>
         }
-        <p-input-otp formControlName="code" [integerOnly]="true" [length]="6" />
-        <button pButton class="w-2/3 !rounded font-semibold" type="submit">Verify email</button>
+        <div class="flex flex-col space-y-8 items-center">
+          <p-input-otp formControlName="code" [integerOnly]="true" [length]="6" />
+          <button pButton class="w-2/3 !rounded font-semibold" type="submit">Verify email</button>
+        </div>
       </form>
 
       <div class="flex justify-center mt-6">

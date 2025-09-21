@@ -30,7 +30,7 @@ public class EmailService {
     }
 
     @Async
-    public void sendEmail(String to, String username, EmailTemplateName emailTemplateName, String confirmationUrl, String activationCode, String subject) throws MessagingException {
+    public void sendEmail(String to, String username, EmailTemplateName emailTemplateName, String confirmationUrl, String code, String subject) throws MessagingException {
         String templateName;
         if (emailTemplateName == null) {
             templateName = "confirm-email";
@@ -43,7 +43,7 @@ public class EmailService {
         Map<String, Object> properties = new HashMap<>();
         properties.put("username", username);
         properties.put("confirmationUrl", confirmationUrl);
-        properties.put("activationCode", activationCode);
+        properties.put("code", code);
 
         Context context = new Context();
         context.setVariables(properties);

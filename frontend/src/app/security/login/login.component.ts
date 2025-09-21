@@ -13,6 +13,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 export class LoginComponent extends BaseFormComponent {
   incorrectCredentials = false;
+  notActiveAccout = false;
 
   protected buildForm(): FormGroup {
     return this.formBuilder.group({
@@ -29,6 +30,7 @@ export class LoginComponent extends BaseFormComponent {
     const { identifier, password, rememberMe } = this.form.value;
     const authRequest: AuthenticationRequest = {
       login: identifier,
+      email: identifier,
       password: password,
       rememberMe: rememberMe,
       deviceInfo: deviceId,
@@ -37,8 +39,13 @@ export class LoginComponent extends BaseFormComponent {
     this.securityService.login(authRequest).subscribe({
       next: () => this.router.navigate(['/home']),
       error: (err: HttpErrorResponse) => {
-        if (err.status === 401 && String(err.error.error).includes("Bad credentials")) {
-          this.incorrectCredentials = true;
+        const error = String(err.error.error);
+        if (err.status === 401 && error.includes("Bad credentials")) {
+          if (error.includes("Account is not activated")) {
+            this.notActiveAccout = true;
+          } else {
+            this.incorrectCredentials = true;
+          }
         }
       }
     });
@@ -46,6 +53,7 @@ export class LoginComponent extends BaseFormComponent {
 
   onErrorClose() {
     this.incorrectCredentials = false;
+    this.notActiveAccout = false;
   }
 
   continueWithGoogle() {

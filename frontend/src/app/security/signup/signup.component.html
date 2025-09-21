@@ -40,10 +40,6 @@
           @if (isInvalid('username')) { 
           @if(hasError('username', 'required')) {
           <p-message severity="error" variant="simple" size="small">Username is required</p-message>
-          } @else if (hasError('username', 'TODO')) {
-          <p-message severity="error" variant="simple" size="small">
-            This username already exists
-          </p-message>
           } }
         </div>
 

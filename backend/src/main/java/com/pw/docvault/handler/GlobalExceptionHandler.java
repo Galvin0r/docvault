@@ -1,6 +1,7 @@
 package com.pw.docvault.handler;
 
 import com.pw.docvault.exception.InvalidActivationTokenException;
+import com.pw.docvault.exception.InvalidPasswordResetTokenException;
 import com.pw.docvault.exception.TokenRefreshException;
 import com.pw.docvault.exception.UserAlreadyExistsException;
 import org.slf4j.Logger;
@@ -35,11 +36,19 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 
+    @ExceptionHandler(InvalidPasswordResetTokenException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidPasswordResetToken(InvalidPasswordResetTokenException ex) {
+        logger.error("Invalid password reset token: {}", ex.getMessage());
+        Map<String, String> response = new HashMap<>();
+        response.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Map<String, String>> handleBadCredentials(BadCredentialsException ex) {
         logger.error("Bad credentials: {}", ex.getMessage());
         Map<String, String> response = new HashMap<>();
-        response.put("error", "Bad credentials");
+        response.put("error", "Bad credentials: " + ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 

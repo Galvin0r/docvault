@@ -122,11 +122,11 @@ public class User extends BaseEntity implements UserDetails, Principal {
 
     @Override
     public String getUsername() {
-        return login;
+        return email;
     }
 
     @Override
     public String getName() {
-        return login;
+        return email;
     }
 }

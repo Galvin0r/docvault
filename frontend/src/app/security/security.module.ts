@@ -10,6 +10,7 @@ import { UtilsModule } from '../utils/utils.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { PasswordRecoveryComponent } from './password-recovery/password-recovery.component';
 import { EmailVerificationComponent } from './email-verification/email-verification.component';
+import { InitiatePasswordResetComponent } from './password-recovery/initiate-password-reset/initiate-password-reset.component';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import { EmailVerificationComponent } from './email-verification/email-verificat
     SignupComponent,
     PasswordRecoveryComponent,
     EmailVerificationComponent,
+    InitiatePasswordResetComponent,
   ],
   imports: [
     CommonModule,
