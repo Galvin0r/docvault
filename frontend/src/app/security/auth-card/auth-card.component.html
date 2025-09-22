@@ -1,0 +1,30 @@
+<div class="min-h-screen w-full flex items-center justify-center p-4">
+  <p-card
+    class="p-4 w-full max-w-md bg-white/10 dark:bg-zinc-900/30 !backdrop-blur-md border border-white/20 dark:border-white/10 !shadow-2xl !rounded"
+  >
+    <ng-template pTemplate="content">
+      <div
+        class="flex flex-col items-center"
+        [class.space-y-2]="!subtitle()"
+        [class.space-y-1]="!!subtitle()"
+      >
+        <app-logo />
+        <h1 class="text-2xl font-semibold tracking-tight">{{ title() }}</h1>
+        @if (subtitle()) {
+        <p class="font-thin text-sm text-foreground/80">{{ subtitle() }}</p>
+        }
+      </div>
+
+      <ng-content select="[card-body]"></ng-content>
+
+      @if (showGoogle()) {
+      <p-divider>or</p-divider>
+      <div class="flex justify-center w-full">
+        <app-google-button class="block w-2/3" (continue)="googleContinue.emit()" />
+      </div>
+      }
+
+      <ng-content select="[card-footer]"></ng-content>
+    </ng-template>
+  </p-card>
+</div>

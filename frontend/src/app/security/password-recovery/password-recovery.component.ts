@@ -3,7 +3,6 @@ import { BaseFormComponent } from '../base-form.component';
 import { FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
-import { HttpErrorResponse } from '@angular/common/http';
 import { passwordsMatchValidator } from '../../utils/validators';
 
 @Component({
@@ -13,8 +12,6 @@ import { passwordsMatchValidator } from '../../utils/validators';
   styleUrl: './password-recovery.component.scss',
 })
 export class PasswordRecoveryComponent extends BaseFormComponent implements OnInit {
-  invalidToken = false;
-  expiredToken = false;
   activatedRoute = inject(ActivatedRoute);
   messageService = inject(MessageService);
   token: string | null = null;
@@ -46,22 +43,10 @@ export class PasswordRecoveryComponent extends BaseFormComponent implements OnIn
         });
         this.router.navigate(['/login']);
       },
-      error: (err: HttpErrorResponse) => {
-        if (err.status === 403) {
-          const error = String(err.error.error);
-          if (error.includes('Invalid password activation token')) {
-            this.invalidToken = true;
-          } else if (error.includes("Password reset token has expired")) {
-            this.expiredToken = true;
-          }
-        }
+      error: (e) => {
+        this.error = e.appCode;
       },
     });
-  }
-
-  onErrorClose() {
-    this.invalidToken = false;
-    this.expiredToken = false;
   }
 
   isMismatched() {

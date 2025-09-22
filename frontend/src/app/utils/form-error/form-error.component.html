@@ -1,0 +1,10 @@
+@if ( error() ) {
+<p-message
+  severity="error"
+  class="inline-block flex w-full justify-between"
+  [closable]="true"
+  (onClose)="onClose.emit()"
+>
+  {{ error() | code : httpErrorCodes }}
+</p-message>
+}

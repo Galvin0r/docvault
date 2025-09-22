@@ -1,51 +1,22 @@
-<div class="min-h-screen w-full flex items-center justify-center p-4">
-  <p-card
-    class="p-4 w-full max-w-md bg-white/10 dark:bg-zinc-900/30 !backdrop-blur-md border border-white/20 dark:border-white/10 !shadow-2xl !rounded"
-  >
-    <ng-template pTemplate="content">
-      <div class="flex flex-col items-center">
-        <app-logo />
-        <h1 class="text-2xl font-semibold tracking-tight">Check your email</h1>
-        <div class="mt-3 flex flex-col items-center">
-          <label class="font-normal">We sent a vaerification code to</label>
-          <label class="font-medium">{{ email }}</label>
-        </div>
-      </div>
+<app-auth-card [title]="'Check your email'">
+  <form card-body [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4 mt-1">
+    <div class="flex flex-col items-center">
+      <label class="font-normal">We sent a verification code to</label>
+      <label class="font-medium">{{ email }}</label>
+    </div>
+    <app-form-error [error]="error" (onClose)="onErrorClose()" />
+    <div class="flex flex-col space-y-8 items-center mt-6">
+      <p-input-otp formControlName="code" [integerOnly]="true" [length]="6" />
+      <button pButton class="w-2/3 !rounded font-semibold" type="submit">Verify email</button>
+    </div>
+  </form>
 
-      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4 mt-8">
-        @if (isTokenExpired) {
-        <p-message
-          severity="error"
-          class="inline-block flex w-full justify-between"
-          [closable]="true"
-          (onClose)="onErrorClose()"
-        >
-          Activation token has expired.
-        </p-message>
-        } @else if (isTokenInvalid) {
-        <p-message
-          severity="error"
-          class="inline-block flex w-full justify-between"
-          [closable]="true"
-          (onClose)="onErrorClose()"
-        >
-          Invalid activation token.
-        </p-message>
-        }
-        <div class="flex flex-col space-y-8 items-center">
-          <p-input-otp formControlName="code" [integerOnly]="true" [length]="6" />
-          <button pButton class="w-2/3 !rounded font-semibold" type="submit">Verify email</button>
-        </div>
-      </form>
-
-      <div class="flex justify-center mt-6">
-        <label>Didn't recieve an email?</label>
-        @if (cooldown > 0) {
-        <span class="ml-1 text-gray-400">Try again in {{ cooldown }}s</span>
-        } @else {
-        <a class="ml-1" (click)="onResend()">Click to resend</a>
-        }
-      </div>
-    </ng-template>
-  </p-card>
-</div>
+  <div card-footer class="flex justify-center mt-6">
+    <label>Didn't receive an email?</label>
+    @if (cooldown > 0) {
+    <span class="ml-1 text-gray-400">Try again in {{ cooldown }}s</span>
+    } @else {
+    <a class="ml-1" (click)="onResend()">Click to resend</a>
+    }
+  </div>
+</app-auth-card>

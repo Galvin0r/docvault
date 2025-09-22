@@ -1,102 +1,72 @@
-<div class="min-h-screen w-full flex items-center justify-center p-4">
-  <p-card
-    class="p-4 w-full max-w-md bg-white/10 dark:bg-zinc-900/30 !backdrop-blur-md border border-white/20 dark:border-white/10 !shadow-2xl !rounded"
-  >
-    <ng-template pTemplate="content">
-      <div class="flex flex-col items-center space-y-2">
-        <app-logo />
-        <h1 class="text-2xl font-semibold tracking-tight">Sign in to DocVault</h1>
-      </div>
+<app-auth-card
+  [title]="'Sign in to DocVault'"
+  [showGoogle]="true"
+  (googleContinue)="continueWithGoogle()"
+>
+  <form card-body class="mt-8 space-y-4" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-error [error]="error" (onClose)="onErrorClose()" />
+    <div class="flex flex-col space-y-1 mt-2">
+      <label class="font-semibold">Username or email</label>
+      <p-input-group>
+        <p-inputgroup-addon>
+          <i class="pi pi-user"></i>
+        </p-inputgroup-addon>
+        <input
+          pInputText
+          type="text"
+          formControlName="identifier"
+          [ngClass]="{
+            'p-invalid': isInvalid('identifier'),
+            'p-valid': isValid('identifier')
+          }"
+          [attr.aria-invalid]="isInvalid('identifier')"
+        />
+      </p-input-group>
+      @if (isInvalid('identifier')) {
+      <p-message severity="error" variant="simple" size="small">
+        Username or email is required
+      </p-message>
+      }
+    </div>
 
-      <form class="mt-8 space-y-4" [formGroup]="form" (ngSubmit)="onSubmit()">
-        @if (incorrectCredentials) {
-        <p-message
-          severity="error"
-          class="inline-block flex w-full justify-between"
-          [closable]="true"
-          (onClose)="onErrorClose()"
-        >
-          Incorrect username/email or password.
-        </p-message>
-        } @else if (notActiveAccout) {
-        <p-message
-          severity="error"
-          class="inline-block flex w-full justify-between"
-          [closable]="true"
-          (onClose)="onErrorClose()"
-        >
-          Account is not activated.
-        </p-message>
-        }
-        <div class="flex flex-col space-y-1 mt-2">
-          <label class="font-semibold">Username or email</label>
-          <p-input-group>
-            <p-inputgroup-addon>
-              <i class="pi pi-user"></i>
-            </p-inputgroup-addon>
-            <input
-              pInputText
-              type="text"
-              formControlName="identifier"
-              [ngClass]="{
-                'p-invalid': isInvalid('identifier'),
-                'p-valid': isValid('identifier')
-              }"
-              [attr.aria-invalid]="isInvalid('identifier')"
-            />
-          </p-input-group>
-          @if (isInvalid('identifier')) {
-          <p-message severity="error" variant="simple" size="small">
-            Username or email is required
-          </p-message>
-          }
+    <div class="flex flex-col space-y-1">
+      <label class="font-semibold">Password</label>
+      <p-input-group>
+        <p-inputgroup-addon>
+          <i class="pi pi-lock"></i>
+        </p-inputgroup-addon>
+        <p-password
+          formControlName="password"
+          [feedback]="false"
+          [toggleMask]="true"
+          [inputStyleClass]="
+            isInvalid('password') ? 'p-invalid' : isValid('password') ? 'p-valid' : ''
+          "
+        />
+      </p-input-group>
+      @if (isInvalid('password')) {
+      <p-message severity="error" variant="simple" size="small">Password is required</p-message>
+      }
+
+      <div class="mt-1 flex items-center justify-between">
+        <div class="flex items-center">
+          <p-check-box [binary]="true" formControlName="rememberMe" size="small" class="mr-1" />
+          <label class="font-thin small-label">Remember me</label>
         </div>
 
-        <div class="flex flex-col space-y-1">
-          <label class="font-semibold">Password</label>
-          <p-input-group>
-            <p-inputgroup-addon>
-              <i class="pi pi-lock"></i>
-            </p-inputgroup-addon>
-            <p-password
-              formControlName="password"
-              [feedback]="false"
-              [toggleMask]="true"
-              [inputStyleClass]="
-                isInvalid('password') ? 'p-invalid' : isValid('password') ? 'p-valid' : ''
-              "
-            />
-          </p-input-group>
-          @if (isInvalid('password')) {
-          <p-message severity="error" variant="simple" size="small">Password is required</p-message>
-          }
-
-          <div class="mt-1 flex items-center justify-between">
-            <div class="flex items-center">
-              <p-check-box [binary]="true" formControlName="rememberMe" size="small" class="mr-1" />
-              <label class="font-thin small-label">Remember me</label>
-            </div>
-
-            <div>
-              <a class="small-label" routerLink="/initiatePasswordReset">Forgot password?</a>
-            </div>
-          </div>
+        <div>
+          <a class="small-label" routerLink="/initiatePasswordReset">Forgot password?</a>
         </div>
-
-        <div class="flex justify-center w-full mt-8">
-          <button pButton class="w-2/3 !rounded font-semibold" type="submit">Sign in</button>
-        </div>
-      </form>
-
-      <p-divider>or</p-divider>
-      <div class="flex justify-center w-full">
-        <app-google-button (continue)="continueWithGoogle()" class="block w-2/3" />
       </div>
+    </div>
 
-      <div class="flex justify-center w-full gap-1 my-3">
-        <span class="font-light">Don't have an account?</span>
-        <a class="small-label" routerLink="/register">Sign up</a>
-      </div>
-    </ng-template>
-  </p-card>
-</div>
+    <div class="flex justify-center w-full mt-8">
+      <button pButton class="w-2/3 !rounded font-semibold" type="submit">Sign in</button>
+    </div>
+  </form>
+
+  <div card-footer class="flex justify-center w-full gap-1 my-3">
+    <span class="font-light">Don't have an account?</span>
+    <a class="small-label" routerLink="/register">Sign up</a>
+  </div>
+</app-auth-card>

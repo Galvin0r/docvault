@@ -11,6 +11,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { PasswordRecoveryComponent } from './password-recovery/password-recovery.component';
 import { EmailVerificationComponent } from './email-verification/email-verification.component';
 import { InitiatePasswordResetComponent } from './password-recovery/initiate-password-reset/initiate-password-reset.component';
+import { AuthCardComponent } from './auth-card/auth-card.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { InitiatePasswordResetComponent } from './password-recovery/initiate-pas
     PasswordRecoveryComponent,
     EmailVerificationComponent,
     InitiatePasswordResetComponent,
+    AuthCardComponent,
   ],
   imports: [
     CommonModule,

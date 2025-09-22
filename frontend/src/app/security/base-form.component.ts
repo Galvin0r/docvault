@@ -2,6 +2,7 @@ import { inject } from "@angular/core";
 import { AbstractControl, FormBuilder, FormGroup } from "@angular/forms";
 import { SecurityService } from "./security.service";
 import { Router } from "@angular/router";
+import { HttpErrorCode } from "../utils/consts";
 
 export abstract class BaseFormComponent {
   form!: FormGroup;
@@ -9,6 +10,7 @@ export abstract class BaseFormComponent {
   protected formBuilder = inject(FormBuilder);
   protected securityService = inject(SecurityService);
   protected router = inject(Router);
+  protected error: HttpErrorCode | null = null;
 
   protected abstract buildForm(): FormGroup;
 
@@ -33,6 +35,10 @@ export abstract class BaseFormComponent {
   hasError(name: string, validator: string) {
     const c = this.ctrl(name);
     return c?.hasError(validator);
+  }
+  
+  onErrorClose() {
+    this.error = null;
   }
 
   protected guardSubmit(): boolean {

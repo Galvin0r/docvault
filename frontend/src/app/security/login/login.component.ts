@@ -3,7 +3,6 @@ import { FormGroup, Validators } from '@angular/forms';
 import { BaseFormComponent } from '../base-form.component';
 import { getDeviceId } from '../../utils/functions';
 import { AuthenticationRequest } from '../security.model';
-import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -12,9 +11,6 @@ import { HttpErrorResponse } from '@angular/common/http';
   styleUrl: './login.component.scss',
 })
 export class LoginComponent extends BaseFormComponent {
-  incorrectCredentials = false;
-  notActiveAccout = false;
-
   protected buildForm(): FormGroup {
     return this.formBuilder.group({
       identifier: ['', Validators.required],
@@ -38,22 +34,10 @@ export class LoginComponent extends BaseFormComponent {
 
     this.securityService.login(authRequest).subscribe({
       next: () => this.router.navigate(['/home']),
-      error: (err: HttpErrorResponse) => {
-        const error = String(err.error.error);
-        if (err.status === 401 && error.includes("Bad credentials")) {
-          if (error.includes("Account is not activated")) {
-            this.notActiveAccout = true;
-          } else {
-            this.incorrectCredentials = true;
-          }
-        }
+      error: (e) => {
+       this.error = e.appCode;
       }
     });
-  }
-
-  onErrorClose() {
-    this.incorrectCredentials = false;
-    this.notActiveAccout = false;
   }
 
   continueWithGoogle() {

@@ -1,9 +1,8 @@
-import { Component, inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component } from '@angular/core';
+import { FormGroup, Validators } from '@angular/forms';
 import { BaseFormComponent } from '../base-form.component';
 import { passwordsMatchValidator } from '../../utils/validators';
 import { RegistrationRequest } from '../security.model';
-import { HttpErrorResponse } from '@angular/common/http';
 import { getDeviceId } from '../../utils/functions';
 
 @Component({
@@ -13,9 +12,6 @@ import { getDeviceId } from '../../utils/functions';
   styleUrl: './signup.component.scss',
 })
 export class SignupComponent extends BaseFormComponent {
-  duplicateName = false;
-  duplicateEmail = false;
-
   protected buildForm(): FormGroup {
     return this.formBuilder.group({
       username: ['', [Validators.required]],
@@ -39,7 +35,7 @@ export class SignupComponent extends BaseFormComponent {
   onSubmit() {
     if (!this.guardSubmit()) return;
 
-    const { username, email, passwords: {password, conformPassword} } = this.form.value;
+    const { username, email, passwords: {password, confirmPassword} } = this.form.value;
     const regRequest: RegistrationRequest = {
       login: username,
       password: password,
@@ -47,15 +43,8 @@ export class SignupComponent extends BaseFormComponent {
     } as RegistrationRequest;
     this.securityService.register(regRequest).subscribe({
       next: () => this.router.navigate(['/emailVerification'], {queryParams: {email: email}}),
-      error: (err: HttpErrorResponse) => {
-        if (err.status === 409) {
-          const error = String(err.error.error);
-          if (error.includes("User with email")) {
-            this.duplicateEmail = true;
-          } else if (error.includes("User with login")) {
-            this.duplicateName = true;
-          }
-        }
+      error: (e) => {
+        this.error = e.appCode;
       }
     });
   }
@@ -63,10 +52,5 @@ export class SignupComponent extends BaseFormComponent {
   continueWithGoogle() {
     document.cookie = `deviceId=${getDeviceId()}; path=/`;
     window.location.href = `/api/oauth2/authorization/google`;
-  }
-
-  onErrorClose() {
-    this.duplicateEmail = false;
-    this.duplicateName = false;
   }
 }

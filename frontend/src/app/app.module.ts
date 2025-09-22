@@ -3,12 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import {
-  HTTP_INTERCEPTORS,
-  provideHttpClient,
-  withInterceptorsFromDi,
-} from '@angular/common/http';
-import { AuthInterceptor } from './auth.interceptor';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 import { providePrimeNG } from 'primeng/config';
@@ -18,13 +13,13 @@ import { ThemeService } from './utils/theme.service';
 import { UtilsModule } from './utils/utils.module';
 import { PrimeNgModule } from './primeng/primeng.module';
 import { MessageService } from 'primeng/api';
+import { InterceptorModule } from './security/interceptors/interceptor.module';
 
 @NgModule({
   declarations: [AppComponent, HomeComponent],
-  imports: [BrowserModule, AppRoutingModule, UtilsModule, PrimeNgModule],
+  imports: [BrowserModule, AppRoutingModule, UtilsModule, PrimeNgModule, InterceptorModule],
   providers: [
     provideHttpClient(withInterceptorsFromDi()),
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
@@ -35,7 +30,7 @@ import { MessageService } from 'primeng/api';
       },
     }),
     provideAppInitializer(() => inject(ThemeService).init()),
-    MessageService
+    MessageService,
   ],
   bootstrap: [AppComponent],
 })
