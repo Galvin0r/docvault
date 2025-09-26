@@ -1,0 +1,28 @@
+.darker-sky {
+  color: var(--p-primary-600);
+}
+
+:host ::ng-deep .p-menubar {
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--p-menubar-border-color);
+  box-shadow: 0 1px 3px var(--p-menubar-border-color);
+  border-left: none;
+  border-top: none;
+  border-right: none;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+}
+
+:host ::ng-deep .p-menu-overlay {
+  transform: translateY(8px);
+}
+
+.avatar-small {
+  width: 30px;
+  height: 30px;
+}

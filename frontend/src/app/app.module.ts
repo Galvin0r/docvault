@@ -8,16 +8,23 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 
 import { providePrimeNG } from 'primeng/config';
 import { SkyPreset } from '../presets';
-import { HomeComponent } from './home/home.component';
 import { ThemeService } from './utils/theme.service';
 import { UtilsModule } from './utils/utils.module';
 import { PrimeNgModule } from './primeng/primeng.module';
 import { MessageService } from 'primeng/api';
 import { InterceptorModule } from './security/interceptors/interceptor.module';
+import { MenuModule } from './menu/menu.module';
 
 @NgModule({
-  declarations: [AppComponent, HomeComponent],
-  imports: [BrowserModule, AppRoutingModule, UtilsModule, PrimeNgModule, InterceptorModule],
+  declarations: [AppComponent],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    UtilsModule,
+    PrimeNgModule,
+    InterceptorModule,
+    MenuModule,
+  ],
   providers: [
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimationsAsync(),

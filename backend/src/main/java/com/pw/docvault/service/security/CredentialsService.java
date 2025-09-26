@@ -1,6 +1,7 @@
 package com.pw.docvault.service.security;
 
 import com.pw.docvault.entity.User;
+import com.pw.docvault.model.security.UserInfo;
 import com.pw.docvault.repository.UserRepository;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,5 +23,10 @@ public class CredentialsService {
         }
         user.setLogin(newLogin);
         userRepository.save(user);
+    }
+
+    public UserInfo getUserInfo() {
+        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return new UserInfo(user.getLogin(), user.getEmail());
     }
 }

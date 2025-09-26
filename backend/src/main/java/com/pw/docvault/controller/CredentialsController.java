@@ -1,6 +1,7 @@
 package com.pw.docvault.controller;
 
 import com.pw.docvault.entity.User;
+import com.pw.docvault.model.security.UserInfo;
 import com.pw.docvault.service.security.CredentialsService;
 import com.pw.docvault.service.security.JwtService;
 import com.pw.docvault.service.security.RefreshTokenService;
@@ -8,10 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/account")
@@ -56,5 +54,11 @@ public class CredentialsController {
     public ResponseEntity<?> changeEmail(@RequestParam String newEmail) {
         //TODO
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserInfo> getMe() {
+        UserInfo info = credentialsService.getUserInfo();
+        return ResponseEntity.ok().body(info);
     }
 }

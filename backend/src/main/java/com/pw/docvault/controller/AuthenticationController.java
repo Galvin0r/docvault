@@ -3,6 +3,7 @@ package com.pw.docvault.controller;
 import com.pw.docvault.model.security.AuthenticationRequest;
 import com.pw.docvault.model.security.AuthenticationCookies;
 import com.pw.docvault.model.security.RegistrationRequest;
+import com.pw.docvault.model.security.UserInfo;
 import com.pw.docvault.service.security.AuthenticationService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

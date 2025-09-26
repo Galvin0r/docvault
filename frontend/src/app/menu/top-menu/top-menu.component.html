@@ -1,0 +1,49 @@
+<p-menubar>
+  <ng-template #start>
+    <div (click)="home()" class="flex items-center no-underline cursor-pointer">
+      <app-logo [size]="45" />
+      <div class="flex items-center no-underline">
+        <span class="text-primary text-2xl font-bold tracking-tight">Doc</span>
+        <span class="text-2xl font-bold tracking-tight darker-sky">Vault</span>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #end>
+    <div class="flex mr-2">
+      <p-divider layout="vertical" />
+      @if(userInfo) {
+      <button
+        type="button"
+        class="rounded-full overflow-hidden avatar cursor-pointer"
+        (click)="menu.toggle($event)"
+      >
+        <img
+          src="assets/blank-user-circles.png"
+          alt="avatar"
+          class="w-full h-full object-cover rounded-full"
+        />
+      </button>
+      <p-menu #menu [popup]="true" [model]="menuItems">
+        <ng-template #start>
+          <div class="flex items-center mt-1 ml-2 p-1 gap-2">
+            <div class="rounded-full overflow-hidden avatar-small">
+              <img
+                src="assets/blank-user-circles.png"
+                alt="avatar"
+                class="w-full h-full object-cover rounded-full"
+              />
+            </div>
+            <label class="font-semibold text-lg">{{ userInfo.login }}</label>
+          </div>
+        </ng-template>
+      </p-menu>
+      } @else {
+      <div class="flex gap-2">
+        <p-button label="Sign in" severity="contrast" variant="text" routerLink="/login" />
+        <p-button label="Sign up" severity="contrast" variant="outlined" routerLink="/register" />
+      </div>
+      }
+    </div>
+  </ng-template>
+</p-menubar>

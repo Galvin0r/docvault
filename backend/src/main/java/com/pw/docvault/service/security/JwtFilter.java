@@ -68,7 +68,7 @@ public class JwtFilter extends OncePerRequestFilter {
                         .orElseThrow(() -> new TokenRefreshException("Refresh token expired"));
 
                 if (rt != null) {
-                    UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(rt.getUser().getLogin());
+                    UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(rt.getUser().getEmail());
 
                     String newJwt = jwtService.generateToken(userDetails);
                     ResponseCookie jwtCookie = jwtService.generateJwtCookie(newJwt);

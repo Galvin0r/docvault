@@ -1,17 +1,29 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { HomeComponent } from './home/home.component';
+import { MainLayoutComponent } from './menu/main-layout/main-layout.component';
+import { AuthLayoutComponent } from './menu/auth-layout/auth-layout.component';
+import { HomeComponent } from './menu/home/home.component';
+import { userResolver } from './security/security.service';
 
 const routes: Routes = [
   {
     path: '',
-    component: HomeComponent,
-    pathMatch: 'full',
+    component: MainLayoutComponent,
+    resolve: {
+      userInfo: userResolver,
+    },
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        component: HomeComponent,
+      },
+    ],
   },
   {
     path: '',
-    loadChildren: () =>
-      import('./security/security.module').then((m) => m.SecurityModule),
+    component: AuthLayoutComponent,
+    loadChildren: () => import('./security/security.module').then((m) => m.SecurityModule),
   },
   {
     path: '**',

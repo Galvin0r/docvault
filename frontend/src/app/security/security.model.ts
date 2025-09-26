@@ -14,6 +14,5 @@ export interface RegistrationRequest {
 
 export interface UserInfo {
   login: string,
-  email: string,
-  roles: string[]
+  email: string
 }
