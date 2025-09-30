@@ -1,15 +1,15 @@
 package com.pw.docvault.entity;
 
-import com.pw.docvault.model.enums.GroupRole;
+import com.pw.docvault.model.enums.GroupJoinRequestStatus;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "group_membership")
-public class GroupMembership extends BaseEntity {
+@Table(name = "group_join_requests")
+public class GroupJoinRequest extends BaseEntity {
 
     @Id
-    @SequenceGenerator(name = "GROUP_MEMBERSHIP_ID_GENERATOR", sequenceName = "group_membership_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "GROUP_MEMBERSHIP_ID_GENERATOR")
+    @SequenceGenerator(name = "GROUP_JOIN_REQUESTS_GENERATOR", sequenceName = "group_join_requests_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "GROUP_JOIN_REQUESTS_GENERATOR")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -19,9 +19,7 @@ public class GroupMembership extends BaseEntity {
     private Group group;
 
     @Enumerated(EnumType.STRING)
-    private GroupRole role;
-
-    public GroupMembership() {}
+    private GroupJoinRequestStatus status;
 
     public Long getId() {
         return id;
@@ -47,11 +45,11 @@ public class GroupMembership extends BaseEntity {
         this.group = group;
     }
 
-    public GroupRole getRole() {
-        return role;
+    public GroupJoinRequestStatus getStatus() {
+        return status;
     }
 
-    public void setRole(GroupRole role) {
-        this.role = role;
+    public void setStatus(GroupJoinRequestStatus status) {
+        this.status = status;
     }
 }

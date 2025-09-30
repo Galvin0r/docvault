@@ -1,5 +1,6 @@
 package com.pw.docvault.entity;
 
+import com.pw.docvault.model.enums.DocumentVisibility;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -25,7 +26,8 @@ public class Document extends BaseEntity {
     @Column(name = "mime_type")
     private String mimeType;
 
-    private String visibility;
+    @Enumerated(EnumType.STRING)
+    private DocumentVisibility visibility;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User owner;
@@ -80,11 +82,11 @@ public class Document extends BaseEntity {
         this.mimeType = mimeType;
     }
 
-    public String getVisibility() {
+    public DocumentVisibility getVisibility() {
         return visibility;
     }
 
-    public void setVisibility(String visibility) {
+    public void setVisibility(DocumentVisibility visibility) {
         this.visibility = visibility;
     }
 

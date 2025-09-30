@@ -10,4 +10,5 @@ public record DocumentAccessDto(
         Long groupId,
         String groupName,
         AccessPermission permission
-) {}
+) {
+}

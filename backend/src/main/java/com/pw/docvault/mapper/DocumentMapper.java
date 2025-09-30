@@ -16,12 +16,4 @@ public interface DocumentMapper {
 
     @InheritInverseConfiguration
     Document toEntity(DocumentDto dto);
-
-    default DocumentVisibility map(String value) {
-        return value != null ? DocumentVisibility.valueOf(value) : null;
-    }
-
-    default String map(DocumentVisibility visibility) {
-        return visibility != null ? visibility.name() : null;
-    }
 }

@@ -1,5 +1,6 @@
 package com.pw.docvault.entity;
 
+import com.pw.docvault.model.enums.AccessPermission;
 import jakarta.persistence.*;
 
 @Entity
@@ -20,7 +21,8 @@ public class DocumentAccess extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Group group;
 
-    private String permission;
+    @Enumerated(EnumType.STRING)
+    private AccessPermission permission;
 
     public DocumentAccess() {}
 
@@ -56,11 +58,11 @@ public class DocumentAccess extends BaseEntity {
         this.group = group;
     }
 
-    public String getPermission() {
+    public AccessPermission getPermission() {
         return permission;
     }
 
-    public void setPermission(String permission) {
+    public void setPermission(AccessPermission permission) {
         this.permission = permission;
     }
 }
