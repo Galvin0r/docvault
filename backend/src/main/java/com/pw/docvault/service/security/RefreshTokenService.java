@@ -3,7 +3,7 @@ package com.pw.docvault.service.security;
 import com.pw.docvault.entity.User;
 import com.pw.docvault.entity.security.RefreshToken;
 import com.pw.docvault.exception.TokenRefreshException;
-import com.pw.docvault.repository.RefreshTokenRepository;
+import com.pw.docvault.repository.security.RefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

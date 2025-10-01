@@ -2,6 +2,7 @@ package com.pw.docvault.service;
 
 import com.pw.docvault.entity.Document;
 import com.pw.docvault.entity.User;
+import com.pw.docvault.model.enums.DocumentVisibility;
 import com.pw.docvault.repository.DocumentRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,7 +28,7 @@ public class DocumentService {
         this.googleCloudStorageService = googleCloudStorageService;
     }
 
-    public void upload(MultipartFile file, String title, String description, String visibility) {
+    public void upload(MultipartFile file, String title, String description, DocumentVisibility visibility) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long userId = user.getId();
         try {

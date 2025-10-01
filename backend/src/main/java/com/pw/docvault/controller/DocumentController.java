@@ -1,6 +1,7 @@
 package com.pw.docvault.controller;
 
 import com.pw.docvault.entity.Document;
+import com.pw.docvault.model.enums.DocumentVisibility;
 import com.pw.docvault.repository.DocumentRepository;
 import com.pw.docvault.service.DocumentService;
 import org.springframework.http.HttpHeaders;
@@ -26,10 +27,10 @@ public class DocumentController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<Void> upload(@RequestParam("file")MultipartFile file,
-                                    @RequestParam("title") String title,
-                                    @RequestParam("description") String description,
-                                    @RequestParam("visibility") String visibility) {
+    public ResponseEntity<Void> upload(@RequestParam("file") MultipartFile file,
+                                       @RequestParam("title") String title,
+                                       @RequestParam("description") String description,
+                                       @RequestParam("visibility") DocumentVisibility visibility) {
         documentService.upload(file, title, description, visibility);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

@@ -2,7 +2,7 @@ package com.pw.docvault.service.security;
 
 import com.pw.docvault.entity.security.RefreshToken;
 import com.pw.docvault.exception.TokenRefreshException;
-import com.pw.docvault.repository.RefreshTokenRepository;
+import com.pw.docvault.repository.security.RefreshTokenRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

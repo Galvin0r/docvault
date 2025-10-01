@@ -1,5 +1,6 @@
 package com.pw.docvault.entity;
 
+import com.pw.docvault.model.enums.GroupVisibility;
 import jakarta.persistence.*;
 
 @Entity
@@ -12,6 +13,11 @@ public class Group extends BaseEntity {
     private Long id;
 
     private String name;
+
+    private String description;
+
+    @Enumerated(EnumType.STRING)
+    private GroupVisibility visibility;
 
     public Group() {}
 
@@ -29,5 +35,21 @@ public class Group extends BaseEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public GroupVisibility getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(GroupVisibility visibility) {
+        this.visibility = visibility;
     }
 }

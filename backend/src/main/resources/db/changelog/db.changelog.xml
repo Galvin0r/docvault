@@ -301,6 +301,7 @@
             <column name="visibility" type="VARCHAR(30)" defaultValue="public">
                 <constraints nullable="false"/>
             </column>
+            <column name="description" type="VARCHAR(200)" />
         </addColumn>
     </changeSet>
 

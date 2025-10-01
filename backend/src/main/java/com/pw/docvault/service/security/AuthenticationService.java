@@ -9,9 +9,9 @@ import com.pw.docvault.entity.security.ActivationToken;
 import com.pw.docvault.entity.User;
 import com.pw.docvault.model.enums.EmailTemplateName;
 import com.pw.docvault.model.security.*;
-import com.pw.docvault.repository.ActivationTokenRepository;
-import com.pw.docvault.repository.PasswordResetTokenRepository;
-import com.pw.docvault.repository.RoleRepository;
+import com.pw.docvault.repository.security.ActivationTokenRepository;
+import com.pw.docvault.repository.security.PasswordResetTokenRepository;
+import com.pw.docvault.repository.security.RoleRepository;
 import com.pw.docvault.repository.UserRepository;
 import com.pw.docvault.service.EmailService;
 import jakarta.mail.MessagingException;
@@ -171,7 +171,7 @@ public class AuthenticationService {
         user = (User) auth.getPrincipal();
 
         ResponseCookie jwtCookie = jwtService.generateJwtCookie(user);
-        RefreshToken refreshToken = refreshTokenService.getRefreshToken(user, request.deviceInfo(), Optional.of(request.rememberMe()).orElse(false));
+        RefreshToken refreshToken = refreshTokenService.getRefreshToken(user, request.deviceInfo(), Optional.ofNullable(request.rememberMe()).orElse(false));
         ResponseCookie jwtRefreshCookie = jwtService.generateRefreshJwtCookie(refreshToken.getToken());
 
         return new AuthenticationCookies(jwtCookie, jwtRefreshCookie);

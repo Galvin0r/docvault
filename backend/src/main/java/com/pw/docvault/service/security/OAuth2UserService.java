@@ -3,7 +3,7 @@ package com.pw.docvault.service.security;
 import com.pw.docvault.entity.User;
 import com.pw.docvault.entity.security.Role;
 import com.pw.docvault.model.security.RoleCode;
-import com.pw.docvault.repository.RoleRepository;
+import com.pw.docvault.repository.security.RoleRepository;
 import com.pw.docvault.repository.UserRepository;
 import com.pw.docvault.util.Constants;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;

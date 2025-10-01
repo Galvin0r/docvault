@@ -1,4 +1,4 @@
-package com.pw.docvault.repository;
+package com.pw.docvault.repository.security;
 
 import com.pw.docvault.entity.User;
 import com.pw.docvault.entity.security.PasswordResetToken;
