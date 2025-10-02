@@ -37,7 +37,8 @@ public class DocumentController {
 
     @GetMapping(value = "/download/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<StreamingResponseBody> download(@PathVariable Long id) {
-        Document document = documentRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Document with id " + id + " not found"));
+        Document document = documentRepository.findById(id).orElseThrow(
+                () -> new NoSuchElementException("Document with id " + id + " not found"));
         StreamingResponseBody stream = documentService.download(document);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getOriginalFilename() + "\"")

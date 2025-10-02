@@ -30,14 +30,16 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
 
-    public OAuth2AuthenticationSuccessHandler(UserRepository userRepository, JwtService jwtService, RefreshTokenService refreshTokenService) {
+    public OAuth2AuthenticationSuccessHandler(UserRepository userRepository, JwtService jwtService,
+                                              RefreshTokenService refreshTokenService) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
     }
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+                                        Authentication authentication) throws IOException {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         OAuth2AuthenticationToken authToken = (OAuth2AuthenticationToken) authentication;
         String provider = authToken.getAuthorizedClientRegistrationId();

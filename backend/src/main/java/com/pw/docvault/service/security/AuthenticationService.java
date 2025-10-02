@@ -20,6 +20,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -160,13 +161,19 @@ public class AuthenticationService {
     public AuthenticationCookies authenticate(AuthenticationRequest request) {
         String email = request.email() != null ? request.email() :
                 userRepository.getEmailByLogin(request.login())
-                        .orElseThrow(() -> new BadCredentialsException("Invalid email or login"));
+                        .orElseThrow(() -> new BadCredentialsException("Invalid email/login or password"));
         var user = userRepository.findByEmail(email).orElseThrow(() -> new BadCredentialsException("Invalid email or login"));
         if (!user.isEnabled()) {
             throw new BadCredentialsException("Account is not activated");
         }
 
-        var auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, request.password()));
+        Authentication auth;
+        try {
+            auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, request.password()));
+        } catch (Exception e) {
+            throw new BadCredentialsException("Invalid email/login or password");
+        }
+
 
         user = (User) auth.getPrincipal();
 

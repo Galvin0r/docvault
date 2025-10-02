@@ -1,12 +1,10 @@
 package com.pw.docvault.controller;
 
 import com.pw.docvault.model.GroupDto;
-import com.pw.docvault.model.enums.GroupVisibility;
+import com.pw.docvault.model.enums.GroupRole;
 import com.pw.docvault.service.GroupService;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,21 +19,19 @@ public class GroupController {
         this.groupService = groupService;
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<Long> create(@RequestParam("name") String groupName,
-                                       @RequestParam("description") String description,
-                                       @RequestParam("visibility") GroupVisibility visibility) {
-        Long newId = groupService.create(groupName, description, visibility);
+    @PostMapping
+    public ResponseEntity<Long> create(@RequestBody GroupDto dto) {
+        Long newId = groupService.create(dto.name(), dto.description(), dto.visibility());
         return ResponseEntity.status(HttpStatus.CREATED).body(newId);
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<Void> delete(@RequestParam("id") Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         groupService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/edit/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<Void> edit(@PathVariable("id") Long id, @RequestBody GroupDto groupDto) {
         groupService.edit(id, groupDto);
         return ResponseEntity.noContent().build();
@@ -43,14 +39,36 @@ public class GroupController {
 
     @GetMapping("{id}")
     public ResponseEntity<GroupDto> get(@PathVariable("id") Long id) {
-        GroupDto groupDto = groupService.get(id);
-        return ResponseEntity.status(HttpStatus.OK).body(groupDto);
+        return ResponseEntity.status(HttpStatus.OK).body(groupService.get(id));
     }
 
-    @GetMapping("/find")
-    public ResponseEntity<Page<GroupDto>> find(@RequestParam("name") String name, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("name").descending());
-        Page<GroupDto> groups = groupService.findByName(name, pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(groups);
+    @GetMapping
+    public ResponseEntity<Page<GroupDto>> find(@RequestParam(required = false) String name, Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(groupService.findByName(name == null ? "" : name, pageable));
+    }
+
+    @DeleteMapping("/{id}/leave")
+    public ResponseEntity<Void> leaveGroup(@PathVariable("id") Long id) {
+        groupService.leave(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/members/{userId}/role")
+    public ResponseEntity<Void> changeRole(@PathVariable Long id, @PathVariable Long userId,
+                                           @RequestParam GroupRole role) {
+        groupService.changeRole(id, userId, role);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}/members/{userId}")
+    public ResponseEntity<Void> removeMember(@PathVariable Long id, @PathVariable Long userId) {
+        groupService.removeMember(id, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/members/{userId}")
+    public ResponseEntity<Void> addMember(@PathVariable Long id, @PathVariable Long userId) {
+        groupService.addMember(id, userId);
+        return ResponseEntity.noContent().build();
     }
 }

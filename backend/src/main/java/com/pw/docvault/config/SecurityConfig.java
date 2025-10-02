@@ -30,7 +30,10 @@ public class SecurityConfig {
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final ClientRegistrationRepository clientRegistrationRepository;
 
-    public SecurityConfig(AuthenticationProvider authenticationProvider, JwtFilter jwtAuthFilter, OAuth2UserService oAuth2UserService, OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler, ClientRegistrationRepository clientRegistrationRepository) {
+    public SecurityConfig(AuthenticationProvider authenticationProvider, JwtFilter jwtAuthFilter,
+                          OAuth2UserService oAuth2UserService,
+                          OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
+                          ClientRegistrationRepository clientRegistrationRepository) {
         this.authenticationProvider = authenticationProvider;
         this.jwtAuthFilter = jwtAuthFilter;
         this.oAuth2UserService = oAuth2UserService;

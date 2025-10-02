@@ -178,7 +178,8 @@
                 baseColumnNames="group_id"
                 referencedTableName="groups"
                 referencedColumnNames="id"
-                constraintName="fk_membership_group"/>
+                constraintName="fk_membership_group"
+                onDelete="CASCADE"/>
     </changeSet>
     
     <changeSet id="12" author="Roman">
@@ -335,7 +336,8 @@
                 baseColumnNames="group_id"
                 referencedTableName="groups"
                 referencedColumnNames="id"
-                constraintName="fk_join_request_group"/>
+                constraintName="fk_join_request_group"
+                onDelete="CASCADE"/>
 
         <createSequence sequenceName="group_join_requests_seq" />
     </changeSet>

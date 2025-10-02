@@ -19,7 +19,8 @@ public class CredentialsController {
     private final RefreshTokenService refreshTokenService;
     private final JwtService jwtService;
 
-    public CredentialsController(CredentialsService credentialsService, RefreshTokenService refreshTokenService, JwtService jwtService) {
+    public CredentialsController(CredentialsService credentialsService, RefreshTokenService refreshTokenService,
+                                 JwtService jwtService) {
         this.credentialsService = credentialsService;
         this.refreshTokenService = refreshTokenService;
         this.jwtService = jwtService;
