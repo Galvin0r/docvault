@@ -1,0 +1,20 @@
+<div class="flex items-center justify-end">
+  <span class="mx-1">Items per page:</span>
+  <p-select
+    [options]="sizeOptionsFull()"
+    optionLabel="label"
+    optionValue="value"
+    [ngModel]="size()"
+    (ngModelChange)="onSizeChange($event)"
+  />
+  <p-paginator
+    [first]="first()"
+    [rows]="size()"
+    [totalRecords]="total()"
+    (onPageChange)="onPageChange($event)"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="{first} - {last} of {totalRecords}"
+    [showPageLinks]="false"
+    [showFirstLastIcon]="true"
+  ></p-paginator>
+</div>

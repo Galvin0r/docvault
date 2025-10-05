@@ -8,11 +8,27 @@ import { ThemeService } from './theme.service';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { CodePipe } from './pipes/code.pipe';
 import { FormErrorComponent } from './form-error/form-error.component';
+import { PaginatorComponent } from './search/paginator/paginator.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
-  declarations: [LogoComponent, GoogleButtonComponent, ThemeSwitchComponent, CodePipe, FormErrorComponent],
-  imports: [CommonModule, PrimeNgModule, OverlayModule],
+  declarations: [
+    LogoComponent,
+    GoogleButtonComponent,
+    ThemeSwitchComponent,
+    CodePipe,
+    FormErrorComponent,
+    PaginatorComponent,
+  ],
+  imports: [CommonModule, PrimeNgModule, OverlayModule, FormsModule],
   providers: [ThemeService],
-  exports: [LogoComponent, GoogleButtonComponent, ThemeSwitchComponent, CodePipe, FormErrorComponent],
+  exports: [
+    LogoComponent,
+    GoogleButtonComponent,
+    ThemeSwitchComponent,
+    CodePipe,
+    FormErrorComponent,
+    PaginatorComponent,
+  ],
 })
 export class UtilsModule {}

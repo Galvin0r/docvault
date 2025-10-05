@@ -41,11 +41,11 @@ export class SecurityService {
   }
 
   getUserInfo(): Observable<UserInfo> {
-    return this.httpClient.get<UserInfo>('/api/account/me');
+    return this.httpClient.get<UserInfo>('/api/accounts/me');
   }
 
   logout(): Observable<void> {
-    return this.httpClient.post<void>('/api/account/logout', null);
+    return this.httpClient.post<void>('/api/accounts/logout', null);
   }
 }
 

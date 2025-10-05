@@ -13,6 +13,8 @@ import { MessageModule } from 'primeng/message';
 import { InputOtpModule } from 'primeng/inputotp';
 import { ToastModule } from 'primeng/toast';
 import { MenubarModule } from 'primeng/menubar';
+import { PaginatorModule } from 'primeng/paginator';
+import { SelectModule } from 'primeng/select';
 
 const primeNgModules = [
   CardModule,
@@ -28,7 +30,9 @@ const primeNgModules = [
   MessageModule,
   InputOtpModule,
   ToastModule,
-  MenubarModule
+  MenubarModule,
+  PaginatorModule,
+  SelectModule,
 ];
 
 @NgModule({
