@@ -15,7 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping("document")
+@RequestMapping("documents")
 public class DocumentController {
 
     private final DocumentService documentService;

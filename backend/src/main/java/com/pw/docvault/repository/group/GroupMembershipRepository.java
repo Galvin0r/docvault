@@ -1,7 +1,7 @@
-package com.pw.docvault.repository;
+package com.pw.docvault.repository.group;
 
-import com.pw.docvault.entity.Group;
-import com.pw.docvault.entity.GroupMembership;
+import com.pw.docvault.entity.group.Group;
+import com.pw.docvault.entity.group.GroupMembership;
 import com.pw.docvault.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 

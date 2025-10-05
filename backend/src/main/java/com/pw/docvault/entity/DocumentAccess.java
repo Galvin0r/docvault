@@ -1,5 +1,6 @@
 package com.pw.docvault.entity;
 
+import com.pw.docvault.entity.group.Group;
 import com.pw.docvault.model.enums.AccessPermission;
 import jakarta.persistence.*;
 

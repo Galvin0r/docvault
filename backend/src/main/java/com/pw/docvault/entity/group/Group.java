@@ -1,5 +1,6 @@
-package com.pw.docvault.entity;
+package com.pw.docvault.entity.group;
 
+import com.pw.docvault.entity.BaseEntity;
 import com.pw.docvault.model.enums.GroupVisibility;
 import jakarta.persistence.*;
 

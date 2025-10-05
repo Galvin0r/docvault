@@ -2,7 +2,7 @@ package com.pw.docvault.controller;
 
 import com.pw.docvault.model.GroupDto;
 import com.pw.docvault.model.enums.GroupRole;
-import com.pw.docvault.service.GroupService;
+import com.pw.docvault.service.group.GroupService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("group")
+@RequestMapping("groups")
 public class GroupController {
 
     private final GroupService groupService;
@@ -69,6 +69,12 @@ public class GroupController {
     @PostMapping("/{id}/members/{userId}")
     public ResponseEntity<Void> addMember(@PathVariable Long id, @PathVariable Long userId) {
         groupService.addMember(id, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/members/me")
+    public ResponseEntity<Void> join(@PathVariable Long id) {
+        groupService.join(id);
         return ResponseEntity.noContent().build();
     }
 }

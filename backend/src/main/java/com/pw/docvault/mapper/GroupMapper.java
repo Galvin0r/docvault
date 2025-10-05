@@ -1,6 +1,6 @@
 package com.pw.docvault.mapper;
 
-import com.pw.docvault.entity.Group;
+import com.pw.docvault.entity.group.Group;
 import com.pw.docvault.model.GroupDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

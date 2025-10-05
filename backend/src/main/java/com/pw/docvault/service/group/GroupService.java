@@ -1,15 +1,14 @@
-package com.pw.docvault.service;
+package com.pw.docvault.service.group;
 
-import com.pw.docvault.entity.Group;
-import com.pw.docvault.entity.GroupMembership;
+import com.pw.docvault.entity.group.Group;
 import com.pw.docvault.exception.ForbiddenException;
 import com.pw.docvault.exception.NotFoundException;
 import com.pw.docvault.mapper.GroupMapper;
 import com.pw.docvault.model.GroupDto;
 import com.pw.docvault.model.enums.GroupRole;
 import com.pw.docvault.model.enums.GroupVisibility;
-import com.pw.docvault.repository.GroupMembershipRepository;
-import com.pw.docvault.repository.GroupRepository;
+import com.pw.docvault.repository.group.GroupMembershipRepository;
+import com.pw.docvault.repository.group.GroupRepository;
 import com.pw.docvault.service.security.CurrentUserProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,15 +25,17 @@ public class GroupService {
     private final GroupMapper groupMapper;
     private final GroupMembershipRepository groupMembershipRepository;
     private final CurrentUserProvider currentUser;
+    private final GroupJoinRequestService groupJoinRequestService;
 
     public GroupService(GroupRepository groupRepository, GroupMembershipService groupMembershipService,
                         GroupMapper groupMapper, GroupMembershipRepository groupMembershipRepository,
-                        CurrentUserProvider currentUser) {
+                        CurrentUserProvider currentUser, GroupJoinRequestService groupJoinRequestService) {
         this.groupRepository = groupRepository;
         this.groupMembershipService = groupMembershipService;
         this.groupMapper = groupMapper;
         this.groupMembershipRepository = groupMembershipRepository;
         this.currentUser = currentUser;
+        this.groupJoinRequestService = groupJoinRequestService;
     }
 
     @Transactional
@@ -44,17 +45,14 @@ public class GroupService {
         group.setDescription(description);
         group.setVisibility(visibility);
         groupRepository.save(group);
-
         groupMembershipService.createMembership(currentUser.getId(), group.getId(), GroupRole.OWNER);
-
         return group.getId();
     }
 
     @Transactional
     public void delete(Long id) {
-        Group group = retrieveGroup(id);
-        GroupMembership membership = groupMembershipService.retrieveGroupMembership(currentUser.getId(), id);
-
+        var group = getGroupOrThrow(id);
+        var membership = groupMembershipService.getMembershipOrThrow(currentUser.getId(), id);
         if (membership.getRole() != GroupRole.OWNER) {
             throw new ForbiddenException("Only owner can delete group");
         }
@@ -62,31 +60,31 @@ public class GroupService {
     }
 
     @Transactional
-    public void edit(Long id, GroupDto group) {
-        Group oldGroup = retrieveGroup(id);
-        GroupMembership membership = groupMembershipService.retrieveGroupMembership(currentUser.getId(), oldGroup.getId());
+    public void edit(Long id, GroupDto dto) { // TODO reject/accept all requests to this group on visibility change
+        var group = getGroupOrThrow(id);
+        var membership = groupMembershipService.getMembershipOrThrow(currentUser.getId(), group.getId());
 
         if (membership.getRole() == GroupRole.USER) {
             throw new ForbiddenException("You are not allowed to edit this group");
         }
 
-        if (group.description() != null) {
-            oldGroup.setDescription(group.description());
+        if (dto.description() != null) {
+            group.setDescription(dto.description());
         }
-        if (group.visibility() != null) {
-            oldGroup.setVisibility(group.visibility());
+        if (dto.visibility() != null) {
+            group.setVisibility(dto.visibility());
         }
-        if (group.name() != null) {
-            oldGroup.setName(group.name());
+        if (dto.name() != null) {
+            group.setName(dto.name());
         }
 
-        groupRepository.save(oldGroup);
+        groupRepository.save(group);
     }
 
     @Transactional(readOnly = true)
     public GroupDto get(Long id) {
-        Group group = retrieveGroup(id);
-        Optional<GroupMembership> membershipOp = groupMembershipService.findMembership(currentUser.getId(), group.getId());
+        var group = getGroupOrThrow(id);
+        var membershipOp = groupMembershipService.findMembership(currentUser.getId(), group.getId());
 
         if (membershipOp.isEmpty() && group.getVisibility() == GroupVisibility.PRIVATE) {
             throw new ForbiddenException("You are not allowed to access this group");
@@ -123,11 +121,31 @@ public class GroupService {
 
     @Transactional
     public void addMember(Long groupId, Long userId) {
-        retrieveGroup(groupId);
+        getGroupOrThrow(groupId);
         groupMembershipService.addMember(currentUser.getId(), userId, groupId);
     }
 
-    public Group retrieveGroup(Long groupId) {
-        return  groupRepository.findById(groupId).orElseThrow(() -> new NotFoundException("Group does not exist"));
+    @Transactional
+    public void join(Long groupId) {
+        var group = getGroupOrThrow(groupId);
+        if (groupMembershipService.findMembership(currentUser.getId(), groupId).isPresent()) {
+            return;
+        }
+
+        if (group.getVisibility() == GroupVisibility.PRIVATE) {
+            throw new ForbiddenException("You are not allowed to join private groups");
+        } else  if (group.getVisibility() == GroupVisibility.PUBLIC) {
+            groupMembershipService.createMembership(currentUser.getId(), groupId, GroupRole.USER);
+        } else {
+            groupJoinRequestService.create(currentUser.getId(), groupId);
+        }
+    }
+
+    public Optional<Group> findGroup(Long groupId) {
+        return groupRepository.findById(groupId);
+    }
+
+    public Group getGroupOrThrow(Long groupId) {
+        return  findGroup(groupId).orElseThrow(() -> new NotFoundException("Group does not exist"));
     }
 }
