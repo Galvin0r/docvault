@@ -46,3 +46,5 @@ export const httpErrors = [
 ];
 
 export type HttpErrorCode = (typeof httpErrors)[number]['code'];
+
+export const DEBOUNCE_MS = 250;
