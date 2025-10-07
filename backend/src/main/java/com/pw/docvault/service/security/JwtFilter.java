@@ -75,8 +75,11 @@ public class JwtFilter extends OncePerRequestFilter {
                     UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(rt.getUser().getEmail());
 
                     String newJwt = jwtService.generateToken(userDetails);
+                    RefreshToken newRt = refreshTokenService.rotateToken(rt.getId());
                     ResponseCookie jwtCookie = jwtService.generateJwtCookie(newJwt);
+                    ResponseCookie refreshCookie = jwtService.generateJwtCookie(newRt.getToken());
                     response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
+                    response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
                     setAuthentication(userDetails, request);
                 } else {

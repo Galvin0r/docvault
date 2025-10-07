@@ -3,6 +3,7 @@ package com.pw.docvault.service.security;
 import com.pw.docvault.entity.User;
 import com.pw.docvault.entity.security.RefreshToken;
 import com.pw.docvault.exception.ErrorCode;
+import com.pw.docvault.exception.NotFoundException;
 import com.pw.docvault.exception.RefreshTokenException;
 import com.pw.docvault.repository.security.RefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,13 +31,21 @@ public class RefreshTokenService {
     @Transactional
     public RefreshToken getRefreshToken(User user, String deviceInfo, boolean rememberMe) {
         return refreshTokenRepository.findByUserIdAndDeviceInfo(user.getId(), deviceInfo).orElseGet(() -> {
-            RefreshToken refreshToken = new RefreshToken();
+            var refreshToken = new RefreshToken();
             refreshToken.setUser(user);
             refreshToken.setExpiresAt(LocalDateTime.now().plusSeconds(rememberMe ? jwtRefreshTokenExpiration : jwtRefreshTokenExpirationShort));
             refreshToken.setToken(UUID.randomUUID().toString());
             refreshToken.setDeviceInfo(deviceInfo);
             return refreshTokenRepository.save(refreshToken);
         });
+    }
+
+    @Transactional
+    public RefreshToken rotateToken(Long tokenId) {
+        var token = refreshTokenRepository.findById(tokenId).orElseThrow(
+                () -> new NotFoundException(ErrorCode.AUTH_REFRESH_TOKEN_INVALID));
+        token.setToken(UUID.randomUUID().toString());
+        return token;
     }
 
     public RefreshToken verifyExpiration(RefreshToken token) {
