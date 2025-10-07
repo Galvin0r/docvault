@@ -2,9 +2,7 @@ package com.pw.docvault.service.security;
 
 import com.pw.docvault.entity.security.PasswordResetToken;
 import com.pw.docvault.entity.security.RefreshToken;
-import com.pw.docvault.exception.InvalidActivationTokenException;
-import com.pw.docvault.exception.InvalidPasswordResetTokenException;
-import com.pw.docvault.exception.UserAlreadyExistsException;
+import com.pw.docvault.exception.*;
 import com.pw.docvault.entity.security.ActivationToken;
 import com.pw.docvault.entity.User;
 import com.pw.docvault.model.enums.EmailTemplateName;
@@ -35,10 +33,6 @@ import java.util.UUID;
 @Service
 public class AuthenticationService {
 
-    private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
-    private final RefreshTokenService refreshTokenService;
-
     @Value("${app.security.jwt.expiresInMin}")
     private int activationTokenExpiresIn;
 
@@ -54,8 +48,15 @@ public class AuthenticationService {
     private final ActivationTokenRepository activationTokenRepository;
     private final EmailService emailService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
 
-    public AuthenticationService(RoleRepository roleRepository, PasswordEncoder passwordEncoder, UserRepository userRepository, ActivationTokenRepository activationTokenRepository, EmailService emailService, AuthenticationManager authenticationManager, JwtService jwtService, RefreshTokenService refreshTokenService, PasswordResetTokenRepository passwordResetTokenRepository) {
+    public AuthenticationService(RoleRepository roleRepository, PasswordEncoder passwordEncoder,
+                                 UserRepository userRepository, ActivationTokenRepository activationTokenRepository,
+                                 EmailService emailService, AuthenticationManager authenticationManager,
+                                 JwtService jwtService, RefreshTokenService refreshTokenService,
+                                 PasswordResetTokenRepository passwordResetTokenRepository) {
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
@@ -71,10 +72,12 @@ public class AuthenticationService {
         var userRole = roleRepository.findByName(RoleCode.USER.name())
                 .orElseThrow(() -> new IllegalStateException("Role USER was not initialized"));
         if (userRepository.findByEmail(request.email()).isPresent()) {
-            throw new UserAlreadyExistsException("User with email " + request.email() + " already exists");
+            throw new AlreadyExistsException(ErrorCode.USER_EMAIL_TAKEN,
+                                             "User with email " + request.email() + " already exists");
         }
         if (userRepository.findByLogin(request.login()).isPresent()) {
-            throw new UserAlreadyExistsException("User with login " + request.login() + " already exists");
+            throw new AlreadyExistsException(ErrorCode.USER_LOGIN_TAKEN,
+                                             "User with login " + request.login() + " already exists");
         }
         User user = new User();
         user.setRoles(List.of(userRole));
@@ -90,7 +93,8 @@ public class AuthenticationService {
     private void sendValidationEmail(User user) {
         try {
             String newToken = generateActivationToken(user);
-            emailService.sendEmail(user.getEmail(), user.getLogin(), EmailTemplateName.ACTIVATE_ACCOUNT, buildActivationUrl(user.getEmail()), newToken, "Account activation");
+            emailService.sendEmail(user.getEmail(), user.getLogin(), EmailTemplateName.ACTIVATE_ACCOUNT,
+                                   buildActivationUrl(user.getEmail()), newToken, "Account activation");
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
@@ -99,7 +103,8 @@ public class AuthenticationService {
     private void sendPasswordResetEmail(User user) {
         try {
             String newToken = generatePasswordResetToken(user);
-            emailService.sendEmail(user.getEmail(), user.getLogin(), EmailTemplateName.RESET_PASSWORD, buildPasswordResetUrl(newToken), newToken, "Password reset");
+            emailService.sendEmail(user.getEmail(), user.getLogin(), EmailTemplateName.RESET_PASSWORD,
+                                   buildPasswordResetUrl(newToken), newToken, "Password reset");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -162,9 +167,10 @@ public class AuthenticationService {
         String email = request.email() != null ? request.email() :
                 userRepository.getEmailByLogin(request.login())
                         .orElseThrow(() -> new BadCredentialsException("Invalid email/login or password"));
-        var user = userRepository.findByEmail(email).orElseThrow(() -> new BadCredentialsException("Invalid email or login"));
+        var user = userRepository.findByEmail(email).orElseThrow(
+                () -> new BadCredentialsException("Invalid email/login or password"));
         if (!user.isEnabled()) {
-            throw new BadCredentialsException("Account is not activated");
+            throw new ConflictException(ErrorCode.USER_NOT_ACTIVATED, "Account is not activated");
         }
 
         Authentication auth;
@@ -178,7 +184,8 @@ public class AuthenticationService {
         user = (User) auth.getPrincipal();
 
         ResponseCookie jwtCookie = jwtService.generateJwtCookie(user);
-        RefreshToken refreshToken = refreshTokenService.getRefreshToken(user, request.deviceInfo(), Optional.ofNullable(request.rememberMe()).orElse(false));
+        RefreshToken refreshToken = refreshTokenService.getRefreshToken(user, request.deviceInfo(),
+                                                                        Optional.ofNullable(request.rememberMe()).orElse(false));
         ResponseCookie jwtRefreshCookie = jwtService.generateRefreshJwtCookie(refreshToken.getToken());
 
         return new AuthenticationCookies(jwtCookie, jwtRefreshCookie);
@@ -187,12 +194,13 @@ public class AuthenticationService {
     @Transactional
     public void activateAccount(String token) {
         ActivationToken savedToken = activationTokenRepository.findByToken(token)
-                .orElseThrow(() -> new InvalidActivationTokenException("Invalid activation token"));
+                .orElseThrow(() -> new ActivationTokenException(ErrorCode.AUTH_ACTIVATION_TOKEN_INVALID));
         if (LocalDateTime.now().isAfter(savedToken.getExpiresAt())) {
-            throw new InvalidActivationTokenException("Activation token has expired");
+            throw new ActivationTokenException(ErrorCode.AUTH_ACTIVATION_TOKEN_EXPIRED,
+                                               "Activation token has expired");
         }
         var user = userRepository.findById(savedToken.getUser().getId())
-                .orElseThrow(() -> new InvalidActivationTokenException("User not found"));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, "User not found"));
         user.setEnabled(true);
         savedToken.setValidatedAt(LocalDateTime.now());
     }
@@ -200,10 +208,10 @@ public class AuthenticationService {
     @Transactional
     public void resendActivationToken(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new InvalidActivationTokenException("User not found"));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, "User not found"));
 
         if (user.isEnabled()) {
-            throw new IllegalStateException("Account is already activated");
+            throw new ConflictException(ErrorCode.USER_ALREADY_ACTIVATED, "Account is already activated");
         }
 
         activationTokenRepository.deleteByUser(user);
@@ -212,9 +220,10 @@ public class AuthenticationService {
 
     @Transactional
     public void initiatePasswordReset(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new InvalidPasswordResetTokenException("User not found"));
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new NotFoundException(ErrorCode.USER_NOT_FOUND, "User not found"));
         if (!user.isEnabled()) {
-            throw new InvalidPasswordResetTokenException("Account is not activated");
+            throw new ConflictException(ErrorCode.USER_NOT_ACTIVATED, "Account is not activated");
         }
 
         passwordResetTokenRepository.deleteByUser(user);
@@ -224,9 +233,10 @@ public class AuthenticationService {
     @Transactional
     public void setNewPassword(String token, String password) {
         PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByToken(token).orElseThrow(() ->
-                new InvalidPasswordResetTokenException("Invalid password activation token"));
+                new PasswordResetTokenException(ErrorCode.AUTH_PASSWORD_RESET_TOKEN_INVALID));
         if (LocalDateTime.now().isAfter(passwordResetToken.getExpiresAt())) {
-            throw new InvalidPasswordResetTokenException("Password reset token has expired");
+            throw new PasswordResetTokenException(ErrorCode.AUTH_PASSWORD_RESET_TOKEN_EXPIRED,
+                                                  "Password reset token has expired");
         }
         User user = passwordResetToken.getUser();
         user.setPassword(passwordEncoder.encode(password));

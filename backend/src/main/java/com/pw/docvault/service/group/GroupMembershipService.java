@@ -1,10 +1,13 @@
 package com.pw.docvault.service.group;
 
+import com.pw.docvault.entity.User;
+import com.pw.docvault.entity.group.Group;
 import com.pw.docvault.entity.group.GroupMembership;
+import com.pw.docvault.exception.ErrorCode;
 import com.pw.docvault.exception.ForbiddenException;
+import com.pw.docvault.exception.NotFoundException;
 import com.pw.docvault.model.enums.GroupRole;
 import com.pw.docvault.repository.group.GroupMembershipRepository;
-import com.pw.docvault.repository.group.GroupRepository;
 import com.pw.docvault.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,33 +19,28 @@ public class GroupMembershipService {
 
     private final GroupMembershipRepository groupMembershipRepository;
     private final UserRepository userRepository;
-    private final GroupRepository groupRepository;
 
-    public GroupMembershipService(GroupMembershipRepository groupMembershipRepository, UserRepository userRepository,
-                                  GroupRepository groupRepository) {
+    public GroupMembershipService(GroupMembershipRepository groupMembershipRepository, UserRepository userRepository) {
         this.groupMembershipRepository = groupMembershipRepository;
         this.userRepository = userRepository;
-        this.groupRepository = groupRepository;
     }
 
-    public GroupMembership createMembership(Long userId, Long groupId, GroupRole role) {
+    public GroupMembership createMembership(User user, Group group, GroupRole role) {
         var membership = new GroupMembership();
         membership.setRole(role);
-        membership.setUser(userRepository.getReferenceById(userId));
-        membership.setGroup(groupRepository.getReferenceById(groupId));
+        membership.setGroup(group);
+        membership.setUser(user);
 
         return groupMembershipRepository.save(membership);
     }
 
     public Optional<GroupMembership> findMembership(Long userId, Long groupId) {
-        var user = userRepository.getReferenceById(userId);
-        var group = groupRepository.getReferenceById(groupId);
-        return groupMembershipRepository.findByUserAndGroup(user, group);
+        return groupMembershipRepository.findByUserIdAndGroupId(userId, groupId);
     }
 
     public GroupMembership getMembershipOrThrow(Long userId, Long groupId) {
         return findMembership(userId, groupId).orElseThrow(
-                () -> new ForbiddenException("User doesn't belong to this group"));
+                () -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND, "User doesn't belong to this group"));
     }
 
     @Transactional
@@ -50,7 +48,11 @@ public class GroupMembershipService {
         var actor = getMembershipOrThrow(actorId, groupId);
 
         if (actor.getRole() != GroupRole.OWNER) {
-            throw  new ForbiddenException("Only owner can change group role");
+            throw  new ForbiddenException(ErrorCode.MEMBER_NOT_ALLOWED, "Only owner can change group role");
+        }
+
+        if (actor.getId().equals(userId)) {
+            return;
         }
 
         if (role == GroupRole.OWNER) {
@@ -65,12 +67,13 @@ public class GroupMembershipService {
         var actor = getMembershipOrThrow(actorId, groupId);
 
         if (actor.getRole() == GroupRole.USER) {
-            throw new ForbiddenException("Only owner and admins can remove users from group");
+            throw new ForbiddenException(ErrorCode.MEMBER_NOT_ALLOWED,
+                                         "Only owner and admins can remove users from group");
         }
 
         var target = getMembershipOrThrow(userId, groupId);
         if (target.getRole() != GroupRole.USER) {
-            throw new ForbiddenException("Only users can be deleted from group, consider demoting first");
+            throw new ForbiddenException(ErrorCode.MEMBER_NOT_ALLOWED, "Only users can be deleted from group");
         }
         groupMembershipRepository.delete(target);
     }
@@ -80,22 +83,24 @@ public class GroupMembershipService {
         var actor = getMembershipOrThrow(actorId, groupId);
 
         if (actor.getRole() == GroupRole.OWNER) {
-            throw new ForbiddenException("To leave group promote someone else to owner first");
+            throw new ForbiddenException(ErrorCode.MEMBER_NOT_ALLOWED, "Owner can not to leave group");
         }
 
         groupMembershipRepository.delete(actor);
     }
 
     @Transactional
-    public void addMember(Long actorId, Long userId, Long groupId) {
-        var actor = getMembershipOrThrow(actorId, groupId);
+    public void addMember(Long actorId, Long userId, Group group) {
+        var actor = getMembershipOrThrow(actorId, group.getId());
 
         if (actor.getRole() == GroupRole.USER) {
-            throw new ForbiddenException("Only owner or admins can add members");
+            throw new ForbiddenException(ErrorCode.MEMBER_NOT_ALLOWED, "Only owner or admins can add members");
         }
 
-        if (findMembership(userId, groupId).isEmpty()){
-            createMembership(userId, groupId, GroupRole.USER);
+        if (findMembership(userId, group.getId()).isEmpty()){
+            var user = userRepository.findById(userId).orElseThrow(
+                    () -> new NotFoundException(ErrorCode.USER_NOT_FOUND, "User not found."));
+            createMembership(user, group, GroupRole.USER);
         }
     }
 }

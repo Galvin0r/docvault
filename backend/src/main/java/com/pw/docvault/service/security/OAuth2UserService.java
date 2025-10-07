@@ -53,10 +53,11 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 
     private Map<String, String> extractUserInfo(OAuth2User oAuth2User, String provider) {
         Map<String, Object> attributes = oAuth2User.getAttributes();
-        String email = (String)attributes.get(Constants.ATTRIBUTE_GOOGLE_EMAIL);
+        String email;
         String login;
 
         if (provider.equals(Constants.PROVIDER_GOOGLE)) {
+            email = (String) attributes.get(Constants.ATTRIBUTE_GOOGLE_EMAIL);
             login = (String) attributes.get(Constants.ATTRIBUTE_GOOGLE_LOGIN);
         } else {
             throw new OAuth2AuthenticationException("Unsupported provider: " + provider);

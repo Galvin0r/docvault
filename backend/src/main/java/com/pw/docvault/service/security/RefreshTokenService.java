@@ -2,7 +2,8 @@ package com.pw.docvault.service.security;
 
 import com.pw.docvault.entity.User;
 import com.pw.docvault.entity.security.RefreshToken;
-import com.pw.docvault.exception.TokenRefreshException;
+import com.pw.docvault.exception.ErrorCode;
+import com.pw.docvault.exception.RefreshTokenException;
 import com.pw.docvault.repository.security.RefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,8 @@ public class RefreshTokenService {
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
             refreshTokenRepository.delete(token);
-            throw new TokenRefreshException("Refresh token was expired. Please signin again.");
+            throw new RefreshTokenException(ErrorCode.AUTH_REFRESH_TOKEN_EXPIRED,
+                                            "Refresh token expired.");
         }
         return token;
     }

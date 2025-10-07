@@ -48,7 +48,7 @@ export class EmailVerificationComponent extends BaseFormComponent implements OnI
         this.router.navigate(['/login']);
       },
       error: (e) => {
-        this.error = e.appCode;
+        this.error = e.error.code;
       },
     });
   }

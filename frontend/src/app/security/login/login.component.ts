@@ -35,7 +35,7 @@ export class LoginComponent extends BaseFormComponent {
     this.securityService.login(authRequest).subscribe({
       next: () => this.router.navigate(['/home']),
       error: (e) => {
-       this.error = e.appCode;
+       this.error = e.error.code;
       }
     });
   }

@@ -44,7 +44,7 @@ export class SignupComponent extends BaseFormComponent {
     this.securityService.register(regRequest).subscribe({
       next: () => this.router.navigate(['/emailVerification'], {queryParams: {email: email}}),
       error: (e) => {
-        this.error = e.appCode;
+        this.error = e.error.code;
       }
     });
   }

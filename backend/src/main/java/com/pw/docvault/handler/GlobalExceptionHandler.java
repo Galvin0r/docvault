@@ -1,83 +1,55 @@
 package com.pw.docvault.handler;
 
 import com.pw.docvault.exception.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.Instant;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<Map<String, String>> handleUserAlreadyExists(UserAlreadyExistsException ex) {
-        logger.error("User registration conflict: {}", ex.getMessage());
-        Map<String, String> response = new HashMap<>();
-        response.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-    }
+    public record ExceptionDetails(ErrorCode code, String message, int status, String path, Instant timestamp) {}
 
-    @ExceptionHandler(InvalidActivationTokenException.class)
-    public ResponseEntity<Map<String, String>> handleInvalidActivationToken(InvalidActivationTokenException ex) {
-        logger.error("Invalid activation token: {}", ex.getMessage());
-        Map<String, String> response = new HashMap<>();
-        response.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-    }
-
-    @ExceptionHandler(InvalidPasswordResetTokenException.class)
-    public ResponseEntity<Map<String, String>> handleInvalidPasswordResetToken(InvalidPasswordResetTokenException ex) {
-        logger.error("Invalid password reset token: {}", ex.getMessage());
-        Map<String, String> response = new HashMap<>();
-        response.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-    }
-
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<Map<String, String>> handleBadCredentials(BadCredentialsException ex) {
-        logger.error("Bad credentials: {}", ex.getMessage());
-        Map<String, String> response = new HashMap<>();
-        response.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-    }
-
-    @ExceptionHandler(TokenRefreshException.class)
-    public ResponseEntity<Map<String, String>> handleTokenRefreshException(TokenRefreshException ex) {
-        logger.error("Refresh Token exception: {}", ex.getMessage());
-        Map<String, String> response = new HashMap<>();
-        response.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-    }
-
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleNotFound(NotFoundException ex) {
-        logger.error("Not found: {}", ex.getMessage());
-        Map<String, String> response = new HashMap<>();
-        response.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-    }
-
-    @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<Map<String, String>> handleForbidden(ForbiddenException ex) {
-        logger.error("Forbidden: {}", ex.getMessage());
-        Map<String, String> response = new HashMap<>();
-        response.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    @ExceptionHandler(AppException.class)
+    public ResponseEntity<ExceptionDetails> handleAppException(AppException ex, HttpServletRequest req) {
+        var status = resolveStatus(ex);
+        logger.error(ex.getMessage(), ex);
+        var details = new ExceptionDetails(
+                ex.getErrorCode(),
+                ex.getMessage(),
+                status.value(),
+                req.getRequestURI(),
+                Instant.now()
+        );
+        return ResponseEntity.status(status).body(details);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
-        logger.error("Unexpected error: {}", ex.getMessage(), ex);
-        Map<String, String> response = new HashMap<>();
-        response.put("error", "An unexpected error occurred");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    public ResponseEntity<ExceptionDetails> handleException(Exception ex,  HttpServletRequest req) {
+        var status = resolveStatus(ex);
+        logger.error(ex.getMessage(), ex);
+        var details = new ExceptionDetails(
+            ErrorCode.UNKNOWN,
+            "An unexpected error occurred.",
+            status.value(),
+            req.getRequestURI(),
+            Instant.now()
+        );
+        return ResponseEntity.status(status).body(details);
+    }
+
+    private static HttpStatus resolveStatus(Throwable ex) {
+        var annotation = AnnotatedElementUtils.findMergedAnnotation(ex.getClass(), ResponseStatus.class);
+        return annotation != null ? annotation.value() : HttpStatus.INTERNAL_SERVER_ERROR;
     }
 }

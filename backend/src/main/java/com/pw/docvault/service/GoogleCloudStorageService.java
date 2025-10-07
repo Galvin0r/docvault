@@ -36,7 +36,8 @@ public class GoogleCloudStorageService {
                 .getService();
     }
 
-    public String upload(InputStream inputStream, String fileName, Long userId, String contentType) throws IOException {
+    public String upload(InputStream inputStream, String fileName, Long userId, String contentType)
+            throws IOException {
         String uniqueId = UUID.randomUUID().toString();
         String objectName = String.format("user_%d/%s_%s", userId, fileName, uniqueId);
 

@@ -8,39 +8,39 @@ export interface Term {
 
 export const httpErrors = [
   {
-    code: 'IC',
+    code: 'auth.bad_credentials',
     name: 'Incorrect username/email or password.',
   },
   {
-    code: 'NAA',
+    code: 'user.not_activated',
     name: 'Account is not activated.',
   },
   {
-    code: 'DE',
+    code: 'user.email_taken',
     name: 'User with this email already exists.',
   },
   {
-    code: 'DU',
+    code: 'user.login_taken',
     name: 'User with this username already exists.',
   },
   {
-    code: 'ATE',
+    code: 'auth.activation_token.expired',
     name: 'Activation token has expired.',
   },
   {
-    code: 'ATI',
+    code: 'auth.activation_token.invalid',
     name: 'Invalid activation token.',
   },
   {
-    code: 'PRTI',
+    code: 'auth.password_reset_token.invalid',
     name: 'Password reset token is invalid.',
   },
   {
-    code: 'PRTE',
+    code: 'auth.password_reset_token.expired',
     name: 'Password reset token has expired.',
   },
   {
-    code: 'UNF',
+    code: 'user.not_found',
     name: 'User not found.',
   }
 ];

@@ -1,7 +1,8 @@
 package com.pw.docvault.service.security;
 
 import com.pw.docvault.entity.security.RefreshToken;
-import com.pw.docvault.exception.TokenRefreshException;
+import com.pw.docvault.exception.ErrorCode;
+import com.pw.docvault.exception.RefreshTokenException;
 import com.pw.docvault.repository.security.RefreshTokenRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -31,7 +32,8 @@ public class JwtFilter extends OncePerRequestFilter {
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenService refreshTokenService;
 
-    public JwtFilter(JwtService jwtService, UserDetailsServiceImpl userDetailsServiceImpl, RefreshTokenRepository refreshTokenRepository, RefreshTokenService refreshTokenService) {
+    public JwtFilter(JwtService jwtService, UserDetailsServiceImpl userDetailsServiceImpl,
+                     RefreshTokenRepository refreshTokenRepository, RefreshTokenService refreshTokenService) {
         this.jwtService = jwtService;
         this.userDetailsServiceImpl = userDetailsServiceImpl;
         this.refreshTokenRepository = refreshTokenRepository;
@@ -39,7 +41,8 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
         String requestURI = request.getRequestURI();
 
         if (requestURI.startsWith("/api/auth")) {
@@ -65,7 +68,8 @@ public class JwtFilter extends OncePerRequestFilter {
             if (refreshToken != null) {
                 RefreshToken rt = refreshTokenRepository.findByToken(refreshToken)
                         .map(refreshTokenService::verifyExpiration)
-                        .orElseThrow(() -> new TokenRefreshException("Refresh token expired"));
+                        .orElseThrow(() -> new RefreshTokenException(ErrorCode.AUTH_REFRESH_TOKEN_EXPIRED,
+                                                                     "Refresh token expired"));
 
                 if (rt != null) {
                     UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(rt.getUser().getEmail());

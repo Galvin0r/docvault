@@ -1,10 +1,11 @@
 package com.pw.docvault.config;
 
+import com.pw.docvault.exception.BadCredentialsException;
+import com.pw.docvault.exception.ErrorCode;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
@@ -33,7 +34,7 @@ public class BeansConfig {
 
                 UserDetails user = userDetailsService.loadUserByUsername(username);
                 if (!passwordEncoder.matches(password, user.getPassword())) {
-                    throw new BadCredentialsException("Invalid username or password");
+                    throw new BadCredentialsException(ErrorCode.AUTH_BAD_CREDENTIALS);
                 }
                 return new UsernamePasswordAuthenticationToken(user, password, user.getAuthorities());
             }

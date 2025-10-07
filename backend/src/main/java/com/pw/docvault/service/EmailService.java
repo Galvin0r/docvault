@@ -30,7 +30,8 @@ public class EmailService {
     }
 
     @Async
-    public void sendEmail(String to, String username, EmailTemplateName emailTemplateName, String confirmationUrl, String code, String subject) throws MessagingException {
+    public void sendEmail(String to, String username, EmailTemplateName emailTemplateName, String confirmationUrl,
+                          String code, String subject) throws MessagingException {
         String templateName;
         if (emailTemplateName == null) {
             templateName = "confirm-email";
@@ -39,7 +40,8 @@ public class EmailService {
         }
 
         MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, MimeMessageHelper.MULTIPART_MODE_MIXED, StandardCharsets.UTF_8.name());
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, MimeMessageHelper.MULTIPART_MODE_MIXED,
+                                                         StandardCharsets.UTF_8.name());
         Map<String, Object> properties = new HashMap<>();
         properties.put("username", username);
         properties.put("confirmationUrl", confirmationUrl);

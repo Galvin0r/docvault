@@ -2,6 +2,8 @@ package com.pw.docvault.handler;
 
 import com.pw.docvault.entity.User;
 import com.pw.docvault.entity.security.RefreshToken;
+import com.pw.docvault.exception.ErrorCode;
+import com.pw.docvault.exception.NotFoundException;
 import com.pw.docvault.repository.UserRepository;
 import com.pw.docvault.service.security.JwtService;
 import com.pw.docvault.service.security.RefreshTokenService;
@@ -50,7 +52,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         }
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
         user.setOauth2Provider(provider);
         user.setEnabled(true);
 

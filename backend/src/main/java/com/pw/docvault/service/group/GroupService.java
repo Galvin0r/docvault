@@ -1,6 +1,7 @@
 package com.pw.docvault.service.group;
 
 import com.pw.docvault.entity.group.Group;
+import com.pw.docvault.exception.ErrorCode;
 import com.pw.docvault.exception.ForbiddenException;
 import com.pw.docvault.exception.NotFoundException;
 import com.pw.docvault.mapper.GroupMapper;
@@ -45,7 +46,7 @@ public class GroupService {
         group.setDescription(description);
         group.setVisibility(visibility);
         groupRepository.save(group);
-        groupMembershipService.createMembership(currentUser.getId(), group.getId(), GroupRole.OWNER);
+        groupMembershipService.createMembership(currentUser.get(), group, GroupRole.OWNER);
         return group.getId();
     }
 
@@ -54,7 +55,7 @@ public class GroupService {
         var group = getGroupOrThrow(id);
         var membership = groupMembershipService.getMembershipOrThrow(currentUser.getId(), id);
         if (membership.getRole() != GroupRole.OWNER) {
-            throw new ForbiddenException("Only owner can delete group");
+            throw new ForbiddenException(ErrorCode.MEMBER_NOT_ALLOWED, "Only owner can delete group");
         }
         groupRepository.delete(group);
     }
@@ -65,7 +66,7 @@ public class GroupService {
         var membership = groupMembershipService.getMembershipOrThrow(currentUser.getId(), group.getId());
 
         if (membership.getRole() == GroupRole.USER) {
-            throw new ForbiddenException("You are not allowed to edit this group");
+            throw new ForbiddenException(ErrorCode.MEMBER_NOT_ALLOWED, "Users are not allowed to edit group.");
         }
 
         if (dto.description() != null) {
@@ -87,7 +88,7 @@ public class GroupService {
         var membershipOp = groupMembershipService.findMembership(currentUser.getId(), group.getId());
 
         if (membershipOp.isEmpty() && group.getVisibility() == GroupVisibility.PRIVATE) {
-            throw new ForbiddenException("You are not allowed to access this group");
+            throw new ForbiddenException(ErrorCode.GROUP_ACCESS_FORBIDDEN, "You are not allowed to access this group.");
         }
 
         long membersCount = groupMembershipRepository.countAllByGroupId(group.getId());
@@ -122,7 +123,8 @@ public class GroupService {
     @Transactional
     public void addMember(Long groupId, Long userId) {
         getGroupOrThrow(groupId);
-        groupMembershipService.addMember(currentUser.getId(), userId, groupId);
+        var group = getGroupOrThrow(userId);
+        groupMembershipService.addMember(currentUser.getId(), userId, group);
     }
 
     @Transactional
@@ -133,9 +135,9 @@ public class GroupService {
         }
 
         if (group.getVisibility() == GroupVisibility.PRIVATE) {
-            throw new ForbiddenException("You are not allowed to join private groups");
+            throw new ForbiddenException(ErrorCode.GROUP_ACCESS_FORBIDDEN, "You are not allowed to join private groups");
         } else  if (group.getVisibility() == GroupVisibility.PUBLIC) {
-            groupMembershipService.createMembership(currentUser.getId(), groupId, GroupRole.USER);
+            groupMembershipService.createMembership(currentUser.get(), group, GroupRole.USER);
         } else {
             groupJoinRequestService.create(currentUser.getId(), groupId);
         }
@@ -146,6 +148,7 @@ public class GroupService {
     }
 
     public Group getGroupOrThrow(Long groupId) {
-        return  findGroup(groupId).orElseThrow(() -> new NotFoundException("Group does not exist"));
+        return  findGroup(groupId).orElseThrow(
+                () -> new NotFoundException(ErrorCode.GROUP_NOT_FOUND, "Group does not exist"));
     }
 }
