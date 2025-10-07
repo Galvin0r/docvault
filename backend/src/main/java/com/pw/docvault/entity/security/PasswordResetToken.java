@@ -3,7 +3,7 @@ package com.pw.docvault.entity.security;
 import com.pw.docvault.entity.User;
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "password_reset_tokens")
@@ -21,7 +21,7 @@ public class PasswordResetToken {
     private User user;
 
     @Column(name = "expires_at")
-    private LocalDateTime expiresAt;
+    private Instant expiresAt;
 
     public Long getId() {
         return id;
@@ -47,11 +47,11 @@ public class PasswordResetToken {
         this.user = user;
     }
 
-    public LocalDateTime getExpiresAt() {
+    public Instant getExpiresAt() {
         return expiresAt;
     }
 
-    public void setExpiresAt(LocalDateTime expiresAt) {
+    public void setExpiresAt(Instant expiresAt) {
         this.expiresAt = expiresAt;
     }
 }

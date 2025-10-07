@@ -3,7 +3,7 @@ package com.pw.docvault.entity.security;
 import com.pw.docvault.entity.User;
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "activation_tokens")
@@ -17,13 +17,13 @@ public class ActivationToken {
     private String token;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Column(name = "expires_at")
-    private LocalDateTime expiresAt;
+    private Instant expiresAt;
 
     @Column(name = "validated_at")
-    private LocalDateTime validatedAt;
+    private Instant validatedAt;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -45,27 +45,27 @@ public class ActivationToken {
         this.token = token;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getExpiresAt() {
+    public Instant getExpiresAt() {
         return expiresAt;
     }
 
-    public void setExpiresAt(LocalDateTime expiresAt) {
+    public void setExpiresAt(Instant expiresAt) {
         this.expiresAt = expiresAt;
     }
 
-    public LocalDateTime getValidatedAt() {
+    public Instant getValidatedAt() {
         return validatedAt;
     }
 
-    public void setValidatedAt(LocalDateTime validatedAt) {
+    public void setValidatedAt(Instant validatedAt) {
         this.validatedAt = validatedAt;
     }
 

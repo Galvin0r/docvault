@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.security.SecureRandom;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,7 +33,7 @@ import java.util.UUID;
 @Service
 public class AuthenticationService {
 
-    @Value("${app.security.jwt.expiresInMin}")
+    @Value("${app.security.jwt.expiresInSec}")
     private int activationTokenExpiresIn;
 
     @Value("${app.activation.url}")
@@ -130,8 +130,8 @@ public class AuthenticationService {
         String code = generateActivationCode(6);
         ActivationToken token = new ActivationToken();
         token.setToken(code);
-        token.setCreatedAt(LocalDateTime.now());
-        token.setExpiresAt(LocalDateTime.now().plusMinutes(activationTokenExpiresIn));
+        token.setCreatedAt(Instant.now());
+        token.setExpiresAt(Instant.now().plusSeconds(activationTokenExpiresIn));
         token.setUser(user);
 
         activationTokenRepository.save(token);
@@ -143,7 +143,7 @@ public class AuthenticationService {
         PasswordResetToken token = new PasswordResetToken();
         token.setToken(newToken);
         token.setUser(user);
-        token.setExpiresAt(LocalDateTime.now().plusMinutes(activationTokenExpiresIn));
+        token.setExpiresAt(Instant.now().plusSeconds(activationTokenExpiresIn));
 
         passwordResetTokenRepository.save(token);
         return token.getToken();
@@ -184,8 +184,8 @@ public class AuthenticationService {
         user = (User) auth.getPrincipal();
 
         ResponseCookie jwtCookie = jwtService.generateJwtCookie(user);
-        RefreshToken refreshToken = refreshTokenService.getRefreshToken(user, request.deviceInfo(),
-                                                                        Optional.ofNullable(request.rememberMe()).orElse(false));
+        RefreshToken refreshToken = refreshTokenService
+                .getRefreshToken(user, request.deviceInfo(), Optional.ofNullable(request.rememberMe()).orElse(false));
         ResponseCookie jwtRefreshCookie = jwtService.generateRefreshJwtCookie(refreshToken.getToken());
 
         return new AuthenticationCookies(jwtCookie, jwtRefreshCookie);
@@ -195,14 +195,14 @@ public class AuthenticationService {
     public void activateAccount(String token) {
         ActivationToken savedToken = activationTokenRepository.findByToken(token)
                 .orElseThrow(() -> new ActivationTokenException(ErrorCode.AUTH_ACTIVATION_TOKEN_INVALID));
-        if (LocalDateTime.now().isAfter(savedToken.getExpiresAt())) {
+        if (Instant.now().isAfter(savedToken.getExpiresAt())) {
             throw new ActivationTokenException(ErrorCode.AUTH_ACTIVATION_TOKEN_EXPIRED,
                                                "Activation token has expired");
         }
         var user = userRepository.findById(savedToken.getUser().getId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, "User not found"));
         user.setEnabled(true);
-        savedToken.setValidatedAt(LocalDateTime.now());
+        savedToken.setValidatedAt(Instant.now());
     }
 
     @Transactional
@@ -234,7 +234,7 @@ public class AuthenticationService {
     public void setNewPassword(String token, String password) {
         PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByToken(token).orElseThrow(() ->
                 new PasswordResetTokenException(ErrorCode.AUTH_PASSWORD_RESET_TOKEN_INVALID));
-        if (LocalDateTime.now().isAfter(passwordResetToken.getExpiresAt())) {
+        if (Instant.now().isAfter(passwordResetToken.getExpiresAt())) {
             throw new PasswordResetTokenException(ErrorCode.AUTH_PASSWORD_RESET_TOKEN_EXPIRED,
                                                   "Password reset token has expired");
         }

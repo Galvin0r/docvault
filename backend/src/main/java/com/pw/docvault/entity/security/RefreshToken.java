@@ -3,7 +3,7 @@ package com.pw.docvault.entity.security;
 import com.pw.docvault.entity.User;
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name="refresh_tokens")
@@ -17,7 +17,7 @@ public class RefreshToken {
     private String token;
 
     @Column(name = "expires_at")
-    private LocalDateTime expiresAt;
+    private Instant expiresAt;
 
     @OneToOne
     @JoinColumn(name = "user_id")
@@ -44,11 +44,11 @@ public class RefreshToken {
         this.token = token;
     }
 
-    public LocalDateTime getExpiresAt() {
+    public Instant getExpiresAt() {
         return expiresAt;
     }
 
-    public void setExpiresAt(LocalDateTime expiresAt) {
+    public void setExpiresAt(Instant expiresAt) {
         this.expiresAt = expiresAt;
     }
 

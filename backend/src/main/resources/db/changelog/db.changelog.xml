@@ -10,8 +10,8 @@
             <column name="id" type="BIGINT">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="created" type="TIMESTAMP"/>
-            <column name="last_modified" type="TIMESTAMP"/>
+            <column name="created" type="TIMESTAMPTZ"/>
+            <column name="last_modified" type="TIMESTAMPTZ"/>
             <column name="name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
@@ -23,8 +23,8 @@
             <column name="id" type="BIGINT">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="created" type="TIMESTAMP"/>
-            <column name="last_modified" type="TIMESTAMP"/>
+            <column name="created" type="TIMESTAMPTZ"/>
+            <column name="last_modified" type="TIMESTAMPTZ"/>
             <column name="login" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
@@ -44,11 +44,11 @@
             <column name="token" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="created_at" type="TIMESTAMP"/>
-            <column name="expires_at" type="TIMESTAMP">
+            <column name="created_at" type="TIMESTAMPTZ"/>
+            <column name="expires_at" type="TIMESTAMPTZ">
                 <constraints nullable="false"/>
             </column>
-            <column name="validated_at" type="TIMESTAMP"/>
+            <column name="validated_at" type="TIMESTAMPTZ"/>
             <column name="user_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
@@ -101,7 +101,7 @@
             <column name="token" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="expires_at" type="TIMESTAMP">
+            <column name="expires_at" type="TIMESTAMPTZ">
                 <constraints nullable="false"/>
             </column>
             <column name="user_id" type="BIGINT">
@@ -140,8 +140,8 @@
             <column name="id" type="BIGINT">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="created" type="TIMESTAMP"/>
-            <column name="last_modified" type="TIMESTAMP"/>
+            <column name="created" type="TIMESTAMPTZ"/>
+            <column name="last_modified" type="TIMESTAMPTZ"/>
             <column name="name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
@@ -153,8 +153,8 @@
             <column name="id" type="BIGINT">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="created" type="TIMESTAMP"/>
-            <column name="last_modified" type="TIMESTAMP"/>
+            <column name="created" type="TIMESTAMPTZ"/>
+            <column name="last_modified" type="TIMESTAMPTZ"/>
             <column name="user_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
@@ -187,8 +187,8 @@
             <column name="id" type="BIGINT">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="created" type="TIMESTAMP"/>
-            <column name="last_modified" type="TIMESTAMP"/>
+            <column name="created" type="TIMESTAMPTZ"/>
+            <column name="last_modified" type="TIMESTAMPTZ"/>
             <column name="title" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
@@ -223,8 +223,8 @@
             <column name="id" type="BIGINT">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="created" type="TIMESTAMP"/>
-            <column name="last_modified" type="TIMESTAMP"/>
+            <column name="created" type="TIMESTAMPTZ"/>
+            <column name="last_modified" type="TIMESTAMPTZ"/>
             <column name="document_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
@@ -272,7 +272,7 @@
             <column name="token" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="expires_at" type="TIMESTAMP">
+            <column name="expires_at" type="TIMESTAMPTZ">
                 <constraints nullable="false"/>
             </column>
             <column name="user_id" type="BIGINT">
@@ -311,8 +311,8 @@
             <column name="id" type="BIGINT">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="created" type="TIMESTAMP"/>
-            <column name="last_modified" type="TIMESTAMP"/>
+            <column name="created" type="TIMESTAMPTZ"/>
+            <column name="last_modified" type="TIMESTAMPTZ"/>
             <column name="user_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>

@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Service
@@ -33,7 +33,7 @@ public class RefreshTokenService {
         return refreshTokenRepository.findByUserIdAndDeviceInfo(user.getId(), deviceInfo).orElseGet(() -> {
             var refreshToken = new RefreshToken();
             refreshToken.setUser(user);
-            refreshToken.setExpiresAt(LocalDateTime.now().plusSeconds(rememberMe ? jwtRefreshTokenExpiration : jwtRefreshTokenExpirationShort));
+            refreshToken.setExpiresAt(Instant.now().plusSeconds(rememberMe ? jwtRefreshTokenExpiration : jwtRefreshTokenExpirationShort));
             refreshToken.setToken(UUID.randomUUID().toString());
             refreshToken.setDeviceInfo(deviceInfo);
             return refreshTokenRepository.save(refreshToken);
@@ -49,7 +49,7 @@ public class RefreshTokenService {
     }
 
     public RefreshToken verifyExpiration(RefreshToken token) {
-        if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
+        if (token.getExpiresAt().isBefore(Instant.now())) {
             refreshTokenRepository.delete(token);
             throw new RefreshTokenException(ErrorCode.AUTH_REFRESH_TOKEN_EXPIRED,
                                             "Refresh token expired.");
