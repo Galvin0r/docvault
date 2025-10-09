@@ -1,7 +1,7 @@
 package com.pw.docvault.mapper;
 
 import com.pw.docvault.entity.group.GroupMembership;
-import com.pw.docvault.model.GroupMembershipDto;
+import com.pw.docvault.model.group.GroupMembershipDto;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

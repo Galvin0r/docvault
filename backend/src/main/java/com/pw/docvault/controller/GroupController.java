@@ -1,6 +1,6 @@
 package com.pw.docvault.controller;
 
-import com.pw.docvault.model.GroupDto;
+import com.pw.docvault.model.group.GroupDto;
 import com.pw.docvault.model.enums.GroupRole;
 import com.pw.docvault.service.group.GroupService;
 import org.springframework.data.domain.Page;

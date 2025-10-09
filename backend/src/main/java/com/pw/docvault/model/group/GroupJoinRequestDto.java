@@ -1,4 +1,4 @@
-package com.pw.docvault.model;
+package com.pw.docvault.model.group;
 
 import com.pw.docvault.entity.group.Group;
 import com.pw.docvault.entity.User;

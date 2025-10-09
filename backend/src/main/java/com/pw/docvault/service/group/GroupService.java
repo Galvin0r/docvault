@@ -5,7 +5,7 @@ import com.pw.docvault.exception.ErrorCode;
 import com.pw.docvault.exception.ForbiddenException;
 import com.pw.docvault.exception.NotFoundException;
 import com.pw.docvault.mapper.GroupMapper;
-import com.pw.docvault.model.GroupDto;
+import com.pw.docvault.model.group.GroupDto;
 import com.pw.docvault.model.enums.GroupRole;
 import com.pw.docvault.model.enums.GroupVisibility;
 import com.pw.docvault.repository.group.GroupMembershipRepository;
