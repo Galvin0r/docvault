@@ -1,0 +1,19 @@
+<div class="flex flex-col">
+  <p-dataview #dc [value]="searchStore.items().content">
+    <ng-template #list let-items>
+      <div class="flex flex-col gap-1">
+        @for (item of items; track item.id) {
+        <app-group [group]="item" />
+        }
+      </div>
+    </ng-template>
+  </p-dataview>
+  <app-paginator
+    [total]="searchStore.items().totalElements"
+    [sizeOptions]="limitOptions()"
+    [page]="page()"
+    [size]="size()"
+    (pageChange)="onPageChange($event)"
+    (sizeChange)="onSizeChange($event)"
+  />
+</div>

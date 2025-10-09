@@ -1,9 +1,9 @@
-import { computed, DestroyRef, effect, inject, Signal, signal } from '@angular/core';
+import { computed, effect, Signal, signal } from '@angular/core';
 import { Page } from '../../app.model';
 import { FormGroup } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, Observable, startWith } from 'rxjs';
 import { DEBOUNCE_MS } from '../consts';
-import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { serializeForm } from '../functions';
 
 export type Fetcher<T> = (q: Record<string, any>) => Observable<Page<T>>;
@@ -16,8 +16,6 @@ export class SearchStore<T> {
   readonly error = signal<unknown | null>(null);
 
   readonly first = computed(() => (this.page() - 1) * this.size());
-
-  private destroyRef = inject(DestroyRef);
   private _tick = signal(0);
 
   refresh = () => this._tick.set(this._tick() + 1);
@@ -56,7 +54,6 @@ export class SearchStore<T> {
       this.error.set(null);
 
       this.fetcher(queryParams)
-        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (result) => {
             this.items.set(result);

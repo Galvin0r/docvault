@@ -110,3 +110,12 @@ a:hover {
 .cdk-overlay-container .theme-popup .icon-item .p-button-label {
   font-size: 0.75rem;
 }
+
+.group-dialog .p-dialog-header {
+  position: relative;
+}
+
+.group-dialog .p-dialog-title {
+  flex: 1;
+  text-align: center;
+}

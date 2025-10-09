@@ -1,0 +1,44 @@
+<p-card
+  class="w-full !rounded-xl border border-surface-700/40
+         hover:bg-surface-800/40 hover:border-primary-500/40
+         transition-colors"
+>
+  <div class="flex items-center gap-3">
+    <div class="h-9 w-9 rounded-lg flex items-center justify-center
+                bg-primary-500/15 text-primary-400">
+      <i class="pi pi-users text-sm"></i>
+    </div>
+
+    <div class="min-w-0 flex-1">
+      <div class="flex items-center gap-2">
+        <span class="font-medium truncate">{{ group().name }}</span>
+
+        @if (group().visibility !== 'PRIVATE') {
+          <span class="px-2 py-0.5 text-xs rounded-full border border-surface-600/60
+                       text-foreground/80">
+            {{ group().membersNumber }} members
+          </span>
+        }
+      </div>
+
+      <div class="mt-0.5 text-xs opacity-70 flex items-center gap-1">
+        @if (group().visibility === 'PUBLIC') {
+          <i class="pi pi-lock-open"></i><span>Public</span>
+        } @else if (group().visibility === 'PRIVATE') {
+          <i class="pi pi-shield"></i><span>Private</span>
+        } @else {
+          <i class="pi pi-user-plus"></i><span>Request only</span>
+        }
+      </div>
+    </div>
+
+    <button
+      pButton
+      type="button"
+      class="p-button-rounded p-button-text"
+      icon="pi pi-arrow-right"
+      pTooltip="Open group"
+      (click)="goToGroup()"
+    ></button>
+  </div>
+</p-card>

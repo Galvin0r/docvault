@@ -1,0 +1,32 @@
+<div class="mx-auto w-full max-w-6xl px-4 mt-8">
+
+  <div class="flex items-center justify-between mb-3">
+    <h1 class="text-2xl font-semibold tracking-tight">Groups</h1>
+
+    <button
+      pButton
+      type="button"
+      icon="pi pi-plus"
+      label="Add group"
+      class="p-button-sm"
+      (click)="onAddGroup()"
+    ></button>
+  </div>
+
+  <p-card class="rounded-2xl shadow-lg border border-surface-700/30">
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <span class="text-sm opacity-80">Browse & filter your groups</span>
+
+      <form [formGroup]="searchForm" class="w-full md:w-80">
+        <p-floatlabel variant="on">
+          <input id="group_name" pInputText type="text" formControlName="name" class="w-full" />
+          <label for="group_name">Group name</label>
+        </p-floatlabel>
+      </form>
+    </div>
+
+    <p-divider class="my-4"></p-divider>
+
+    <app-group-list [filtersForm]="searchForm"></app-group-list>
+  </p-card>
+</div>

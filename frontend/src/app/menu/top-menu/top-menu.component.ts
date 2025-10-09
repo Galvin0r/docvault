@@ -25,7 +25,8 @@ export class TopMenuComponent {
     },
     {
       label: 'Groups',
-      icon: 'pi pi-users'
+      icon: 'pi pi-users',
+      command: () => this.navigateGroups()
     },
     { separator: true },
     {
@@ -49,5 +50,9 @@ export class TopMenuComponent {
     this.securityService.logout().subscribe(() => {
       location.reload();
     })
+  }
+
+  navigateGroups() {
+    this.router.navigate(['/groups']);
   }
 }

@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
+import { Group } from '../groups.model';
 
 @Component({
   selector: 'app-group',
@@ -7,5 +8,9 @@ import { Component } from '@angular/core';
   styleUrl: './group.component.scss'
 })
 export class GroupComponent {
+  group = input.required<Group>();
 
+  goToGroup() {
+    
+  }
 }

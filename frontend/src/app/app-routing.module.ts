@@ -18,6 +18,10 @@ const routes: Routes = [
         pathMatch: 'full',
         component: HomeComponent,
       },
+      {
+        path: '',
+        loadChildren: () => import('./groups/groups.module').then((m) => m.GroupsModule),
+      }
     ],
   },
   {

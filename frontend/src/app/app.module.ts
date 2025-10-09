@@ -14,6 +14,7 @@ import { PrimeNgModule } from './primeng/primeng.module';
 import { MessageService } from 'primeng/api';
 import { InterceptorModule } from './security/interceptors/interceptor.module';
 import { MenuModule } from './menu/menu.module';
+import { DialogService } from 'primeng/dynamicdialog';
 
 @NgModule({
   declarations: [AppComponent],
@@ -38,6 +39,7 @@ import { MenuModule } from './menu/menu.module';
     }),
     provideAppInitializer(() => inject(ThemeService).init()),
     MessageService,
+    DialogService
   ],
   bootstrap: [AppComponent],
 })
