@@ -2,13 +2,18 @@
   color: var(--p-primary-600);
 }
 
+:host {
+  --p-menubar-background: color-mix(in srgb, var(--p-content-background) 52%, transparent);
+}
+
 :host ::ng-deep .p-menubar {
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--p-menubar-border-color);
-  box-shadow: 0 1px 3px var(--p-menubar-border-color);
   border-left: none;
-  border-top: none;
   border-right: none;
+  border-top: none;
+  box-shadow: 0 1px 4px var(--p-overlay-shadow);
+  position: relative;
 }
 
 .avatar {
