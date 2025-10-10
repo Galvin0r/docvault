@@ -16,7 +16,7 @@
     @if (cooldown > 0) {
     <span class="ml-1 text-gray-400">Try again in {{ cooldown }}s</span>
     } @else {
-    <a class="ml-1" (click)="onResend()">Click to resend</a>
+    <a class="ml-1 doc-link" (click)="onResend()">Click to resend</a>
     }
   </div>
 </app-auth-card>
