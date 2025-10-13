@@ -12,7 +12,7 @@ public interface GroupMapper {
 
     @Mapping(target = "description", ignore = true)
     @Mapping(target = "created", ignore = true)
-    GroupDto toSimpleDto(Group group, Long membersNumber);
+    GroupDto toSimpleDto(Group group, Long membersNumber, Boolean allowedToAccess);
 
     Group toEntity(GroupDto group);
 }

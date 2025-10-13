@@ -1,0 +1,38 @@
+<p-card
+  class="w-full !rounded-xl border border-surface-700/40 hover:bg-surface-800/40 hover:border-primary-500/40 transition-colors"
+>
+  <div class="flex items-center gap-3">
+    <div
+      class="h-9 w-9 rounded-lg flex items-center justify-center bg-primary-500/15 text-primary-400"
+    >
+      <i class="pi pi-user text-sm"></i>
+    </div>
+
+    <div class="min-w-0 flex-1">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="font-medium truncate">{{ membership().userLogin }}</span>
+
+        <span
+          class="px-2 py-0.5 text-xs rounded-full border border-surface-600/60 text-foreground/80 whitespace-nowrap"
+        >
+          @if (membership().role === 'OWNER') {
+          <i class="pi pi-crown mr-1"></i>
+          Owner } @else if (membership().role === 'ADMIN') {
+          <i class="pi pi-shield mr-1"></i>
+          Admin } @else {
+          <i class="pi pi-user mr-1"></i>
+          User }
+        </span>
+      </div>
+    </div>
+
+    <button
+      pButton
+      type="button"
+      class="p-button-rounded p-button-text"
+      icon="pi pi-ellipsis-h"
+      pTooltip="Open user profile"
+      (click)="goToUser()"
+    ></button>
+  </div>
+</p-card>

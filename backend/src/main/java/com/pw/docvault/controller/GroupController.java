@@ -2,6 +2,7 @@ package com.pw.docvault.controller;
 
 import com.pw.docvault.model.group.GroupDto;
 import com.pw.docvault.model.enums.GroupRole;
+import com.pw.docvault.model.group.GroupMembershipDto;
 import com.pw.docvault.service.group.GroupService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -72,9 +73,26 @@ public class GroupController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{id}/members")
+    public ResponseEntity<Void> addMember(@PathVariable Long id, @RequestParam String email) {
+        groupService.addMember(id, email);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/{id}/members/me")
     public ResponseEntity<Void> join(@PathVariable Long id) {
         groupService.join(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{id}/members")
+    public ResponseEntity<Page<GroupMembershipDto>> findGroupMembers(@PathVariable Long id, Pageable pageable) {
+        return ResponseEntity.ok(groupService.findGroupMembers(id, pageable));
+    }
+
+    @GetMapping("/{id}/members/me")
+    public ResponseEntity<GroupMembershipDto> getMembership(@PathVariable Long id) {
+        return ResponseEntity.ok(groupService.getMembership(id));
+    }
+
 }

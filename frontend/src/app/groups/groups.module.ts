@@ -8,9 +8,12 @@ import { UtilsModule } from '../utils/utils.module';
 import { GroupManageComponent } from './group-manage/group-manage.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GroupAddComponent } from './group-add/group-add.component';
+import { GroupViewComponent } from './group-view/group-view.component';
+import { UserModule } from '../users/user.module';
+import { GroupAddUserComponent } from './group-add-user/group-add-user.component';
 
 @NgModule({
-  declarations: [GroupComponent, GroupListComponent, GroupManageComponent, GroupAddComponent],
+  declarations: [GroupComponent, GroupListComponent, GroupManageComponent, GroupAddComponent, GroupViewComponent, GroupAddUserComponent],
   imports: [
     CommonModule,
     PrimeNgModule,
@@ -18,6 +21,7 @@ import { GroupAddComponent } from './group-add/group-add.component';
     UtilsModule,
     FormsModule,
     ReactiveFormsModule,
+    UserModule
   ]
 })
 export class GroupsModule {}

@@ -1,8 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BaseFormComponent } from '../../security/base-form.component';
-import { DynamicDialogRef } from 'primeng/dynamicdialog';
-import { Group, Visibility } from '../groups.model';
+import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { Group, Visibility, visibilityOptions } from '../groups.model';
 
 @Component({
   selector: 'app-group-add',
@@ -10,24 +10,29 @@ import { Group, Visibility } from '../groups.model';
   templateUrl: './group-add.component.html',
   styleUrl: './group-add.component.scss',
 })
-export class GroupAddComponent extends BaseFormComponent {
+export class GroupAddComponent extends BaseFormComponent implements OnInit {
   protected override buildForm(): FormGroup {
     return this.formBuilder.group({
       name: ['', [Validators.required]],
       description: [''],
-      visibility: [ 'PUBLIC', [Validators.required]],
+      visibility: ['PUBLIC', [Validators.required]],
+      id: [null],
     });
   }
+
   ref = inject(DynamicDialogRef);
-  visibilityOptions = [
-    { label: 'Public', value: 'PUBLIC' as Visibility },
-    { label: 'Private', value: 'PRIVATE' as Visibility },
-    { label: 'Request only', value: 'REQUEST_ONLY' as Visibility },
-  ];
+  private config = inject(DynamicDialogConfig);
+  initial: Partial<Group> = this.config.data?.initial ?? {};
+
+  visibilityOptions = visibilityOptions;
 
   submit() {
     if (!this.guardSubmit()) return;
 
     this.ref.close(this.form.getRawValue() as Group);
+  }
+
+  ngOnInit(): void {
+    if (this.initial) this.form.patchValue(this.initial);
   }
 }

@@ -1,0 +1,34 @@
+<div class="p-4">
+  <form [formGroup]="form" class="space-y-4" (ngSubmit)="submit()">
+    <div class="flex flex-col space-y-1">
+      <label class="font-semibold">Email</label>
+      <p-input-group>
+        <p-inputgroup-addon>
+          <i class="pi pi-at"></i>
+        </p-inputgroup-addon>
+        <input
+          pInputText
+          type="email"
+          formControlName="email"
+          [ngClass]="{
+            'p-invalid': isInvalid('email'),
+            'p-valid': isValid('email')
+          }"
+          [attr.aria-invalid]="isInvalid('email')"
+        />
+      </p-input-group>
+      <!-- prettier-ignore -->
+      @if (isInvalid('email')) { 
+          @if(hasError('email', 'required')) {
+      <p-message severity="error" variant="simple" size="small">Email is required</p-message>
+      } @else if (hasError('email', 'email')) {
+      <p-message severity="error" variant="simple" size="small">Not a valid email</p-message>
+      } }
+    </div>
+
+    <div class="flex justify-end gap-2 pt-2">
+      <button pButton type="button" class="p-button-text" (click)="ref.close()">Cancel</button>
+      <button pButton type="submit">Add</button>
+    </div>
+  </form>
+</div>

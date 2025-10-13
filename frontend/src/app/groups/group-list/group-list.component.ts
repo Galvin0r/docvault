@@ -7,7 +7,7 @@ import {
   runInInjectionContext,
   signal,
 } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { GroupService } from '../groups.service';
 import { SearchStore } from '../../utils/search/search-store';
 import { Group } from '../groups.model';

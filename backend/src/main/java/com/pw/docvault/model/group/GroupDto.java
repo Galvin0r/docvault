@@ -10,6 +10,7 @@ public record GroupDto(
         String description,
         GroupVisibility visibility,
         Instant created,
-        Long membersNumber
+        Long membersNumber,
+        Boolean allowedToAccess
 ) {
 }

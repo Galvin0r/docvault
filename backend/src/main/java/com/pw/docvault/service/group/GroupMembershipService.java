@@ -9,9 +9,12 @@ import com.pw.docvault.exception.NotFoundException;
 import com.pw.docvault.model.enums.GroupRole;
 import com.pw.docvault.repository.group.GroupMembershipRepository;
 import com.pw.docvault.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -102,5 +105,17 @@ public class GroupMembershipService {
                     () -> new NotFoundException(ErrorCode.USER_NOT_FOUND, "User not found."));
             createMembership(user, group, GroupRole.USER);
         }
+    }
+
+    public Page<GroupMembership> findGroupMembers(Long groupId, Pageable pageable) {
+        return groupMembershipRepository.findAllByGroupId(groupId, pageable);
+    }
+
+    public long countGroupMembers(Long groupId) {
+        return groupMembershipRepository.countAllByGroupId(groupId);
+    }
+
+    public List<GroupMembership> getAllMemberships(Long userId) {
+        return groupMembershipRepository.findAllByUserId(userId);
     }
 }

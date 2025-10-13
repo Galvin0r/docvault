@@ -1,0 +1,57 @@
+<div class="mx-auto w-full max-w-6xl px-4 mt-8 pb-8">
+  <p-card class="rounded-2xl shadow-lg border border-surface-700/30">
+    <div class="flex flex-col gap-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <section class="md:col-span-2 flex flex-col gap-2">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-users text-sm"></i>
+            <h1 class="text-xl font-medium leading-tight">
+              {{ group().name }}
+            </h1>
+          </div>
+          <p class="text-sm md:text-base text-muted-color">
+            {{ group().description || "—" }}
+          </p>
+        </section>
+
+        <aside class="md:col-span-1">
+          <div class="rounded-xl border border-surface-700/20 p-4 flex flex-col gap-2">
+            <div class="flex justify-between">
+              <span class="text-sm text-muted-color">Type</span>
+              <span class="font-medium">{{ group().visibility | titlecase }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-muted-color">Members</span>
+              <span class="font-medium">{{ group().membersNumber }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-muted-color">Created</span>
+              <span class="font-medium">
+                {{ group().created | date : "yyyy-MM-dd HH:mm" }}
+              </span>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end">
+        @if (!membership()) {
+        <button pButton icon="pi pi-user-plus" size="small">Join</button>
+        } @else { @if (membership().role !== 'USER') {
+        <button pButton icon="pi pi-user-plus" size="small" (click)="onAddMember()">Add</button>
+        <button pButton icon="pi pi-pencil" size="small" severity="secondary" (click)="onEdit()">
+          Edit
+        </button>
+        } @if (membership().role !== 'OWNER') {
+        <button pButton icon="pi pi-sign-out" size="small" severity="danger">Leave</button>
+        } @else {
+        <button pButton icon="pi pi-trash" size="small" severity="danger" (click)="onDelete()">
+          Delete
+        </button>
+        } }
+      </div>
+    </div>
+    <p-divider></p-divider>
+    <app-user-list [groupId]="group().id" [searchForm]="dummyForm" />
+  </p-card>
+</div>

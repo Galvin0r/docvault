@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, viewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { GroupAddComponent } from '../group-add/group-add.component';
@@ -22,7 +22,7 @@ export class GroupManageComponent implements OnDestroy {
   ref: DynamicDialogRef | undefined;
   dialogService = inject(DialogService);
 
-  @ViewChild(GroupListComponent) list!: GroupListComponent;
+  list = viewChild.required(GroupListComponent);
 
   onAddGroup() {
     this.ref = this.dialogService.open(GroupAddComponent, {
@@ -32,7 +32,7 @@ export class GroupManageComponent implements OnDestroy {
     });
 
     this.ref.onClose.subscribe((data: Group) => {
-      this.groupService.create(data).subscribe(() => this.list.refresh());
+      this.groupService.create(data).subscribe(() => this.list().refresh());
     });
   }
 
