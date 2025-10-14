@@ -11,13 +11,15 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Group, GroupMembership } from '../groups.model';
+import { Group, GroupJoinRequest, GroupMembership } from '../groups.model';
 import { FormBuilder } from '@angular/forms';
 import { GroupService } from '../groups.service';
 import { UserListComponent } from '../../users/user-list/user-list.component';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { GroupAddUserComponent } from '../group-add-user/group-add-user.component';
 import { GroupAddComponent } from '../group-add/group-add.component';
+import { isNotNil } from 'ramda';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-group-edit',
@@ -30,11 +32,13 @@ export class GroupViewComponent implements AfterViewInit {
   groupService = inject(GroupService);
   private injector = inject(Injector);
   router = inject(Router);
+  confirmationSerice = inject(ConfirmationService);
 
   dummyForm = this.formBuilder.group({});
 
   group!: WritableSignal<Group>;
-  membership!: WritableSignal<GroupMembership>;
+  membership = signal<GroupMembership | undefined>(undefined);
+  joinRequest = signal<GroupJoinRequest | null>(null);
 
   ref: DynamicDialogRef | undefined;
   dialogService = inject(DialogService);
@@ -42,12 +46,13 @@ export class GroupViewComponent implements AfterViewInit {
   list = viewChild(UserListComponent);
 
   constructor(private activatedRoute: ActivatedRoute) {
-    activatedRoute.data.subscribe(({ group, membership }) => {
+    activatedRoute.data.subscribe(({ group, membership, joinRequest }) => {
       if (group) {
         this.group = signal(group);
       }
-      if (membership) {
-        this.membership = signal(membership);
+      this.membership.set(membership);
+      if (joinRequest !== undefined) {
+        this.joinRequest.set(joinRequest);
       }
     });
   }
@@ -93,8 +98,70 @@ export class GroupViewComponent implements AfterViewInit {
   }
 
   onDelete() {
-    this.groupService.delete(this.group().id).subscribe(() => {
-      this.router.navigate(['/groups']);
+    this.confirmationSerice.confirm({
+      message: 'Are you sure that you want to delete this group?',
+      header: 'Confirmation',
+      closable: true,
+      closeOnEscape: true,
+      icon: 'pi pi-exclamation-triangle',
+      rejectButtonProps: {
+        label: 'Cancel',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Delete',
+        severity: 'danger',
+      },
+      accept: () => {
+        this.groupService.delete(this.group().id).subscribe(() => {
+          this.router.navigate(['/groups']);
+        });
+      },
+    });
+  }
+
+  onLeave() {
+    this.confirmationSerice.confirm({
+      message: 'Are you sure that you want to leave this group?',
+      header: 'Confirmation',
+      closable: true,
+      closeOnEscape: true,
+      icon: 'pi pi-exclamation-triangle',
+      rejectButtonProps: {
+        label: 'Cancel',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Leave',
+        severity: 'danger',
+      },
+      accept: () => {
+        this.groupService.leave(this.group().id).subscribe(() => {
+          if (this.group().visibility === 'PRIVATE') {
+            this.router.navigate(['/groups']);
+          } else {
+            this.list()?.refresh();
+            this.membership.set(undefined);
+          }
+        });
+      },
+    });
+  }
+
+  onJoin() {
+    this.groupService.join(this.group().id).subscribe((membership: GroupMembership | null) => {
+      this.list()?.refresh();
+      if (isNotNil(membership)) {
+        this.membership.set(membership);
+      } else {
+        this.groupService
+          .getJoinRequest(this.group().id)
+          .subscribe((joinRequest: GroupJoinRequest | null) => {
+            this.joinRequest.set(joinRequest);
+          });
+      }
     });
   }
 }

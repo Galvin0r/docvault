@@ -2,7 +2,7 @@ import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
 import { GroupManageComponent } from "./group-manage/group-manage.component";
 import { GroupViewComponent } from "./group-view/group-view.component";
-import { groupResolver, membershipResolver } from "./groups.service";
+import { groupResolver, joinRequestResolver, membershipResolver } from "./groups.service";
 
 const routes: Routes = [
   {
@@ -17,7 +17,8 @@ const routes: Routes = [
         component: GroupViewComponent,
         resolve: {
           group: groupResolver,
-          membership: membershipResolver
+          membership: membershipResolver,
+          joinRequest: joinRequestResolver,
         }
       }
     ]

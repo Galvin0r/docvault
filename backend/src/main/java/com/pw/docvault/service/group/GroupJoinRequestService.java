@@ -1,6 +1,8 @@
 package com.pw.docvault.service.group;
 
 import com.pw.docvault.entity.group.GroupJoinRequest;
+import com.pw.docvault.exception.ErrorCode;
+import com.pw.docvault.exception.NotFoundException;
 import com.pw.docvault.model.enums.GroupJoinRequestStatus;
 import com.pw.docvault.repository.UserRepository;
 import com.pw.docvault.repository.group.GroupJoinRequestRepository;
@@ -19,7 +21,8 @@ public class GroupJoinRequestService {
     private final GroupRepository groupRepository;
 
 
-    public GroupJoinRequestService(GroupJoinRequestRepository groupJoinRequestRepository, UserRepository userRepository, GroupRepository groupRepository) {
+    public GroupJoinRequestService(GroupJoinRequestRepository groupJoinRequestRepository,
+                                   UserRepository userRepository, GroupRepository groupRepository) {
         this.groupJoinRequestRepository = groupJoinRequestRepository;
         this.userRepository = userRepository;
         this.groupRepository = groupRepository;
@@ -28,8 +31,7 @@ public class GroupJoinRequestService {
     @Transactional
     public Optional<GroupJoinRequest> create(Long userId, Long groupId) {
         if (groupJoinRequestRepository.existsByUserIdAndGroupIdAndStatus(userId, groupId, GroupJoinRequestStatus.PENDING)) {
-            return groupJoinRequestRepository.findFirstByUserIdAndGroupIdAndStatusOrderByCreatedAsc(
-                    userId, groupId, GroupJoinRequestStatus.PENDING);
+            return findJoinRequest(userId, groupId, GroupJoinRequestStatus.PENDING);
         }
 
         var r = new GroupJoinRequest();
@@ -37,6 +39,16 @@ public class GroupJoinRequestService {
         r.setGroup(groupRepository.getReferenceById(groupId));
         r.setStatus(GroupJoinRequestStatus.PENDING);
         return Optional.of(groupJoinRequestRepository.save(r));
+    }
+
+    public Optional<GroupJoinRequest> findJoinRequest(Long userId, Long groupId, GroupJoinRequestStatus status) {
+        var a = groupJoinRequestRepository.findFirstByUserIdAndGroupIdAndStatusOrderByCreatedAsc(userId, groupId, status);
+        return a;
+    }
+
+    public GroupJoinRequest getJoinRequestOrThrow(Long userId, Long groupId,  GroupJoinRequestStatus status) {
+        return findJoinRequest(userId, groupId, status).orElseThrow(
+                () -> new NotFoundException(ErrorCode.JOIN_REQUEST_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)

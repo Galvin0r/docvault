@@ -11,7 +11,7 @@ import { SkyPreset } from '../presets';
 import { ThemeService } from './utils/theme.service';
 import { UtilsModule } from './utils/utils.module';
 import { PrimeNgModule } from './primeng/primeng.module';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { InterceptorModule } from './security/interceptors/interceptor.module';
 import { MenuModule } from './menu/menu.module';
 import { DialogService } from 'primeng/dynamicdialog';
@@ -39,7 +39,8 @@ import { DialogService } from 'primeng/dynamicdialog';
     }),
     provideAppInitializer(() => inject(ThemeService).init()),
     MessageService,
-    DialogService
+    DialogService,
+    ConfirmationService
   ],
   bootstrap: [AppComponent],
 })

@@ -8,6 +8,8 @@ export const visibilityOptions = [
 
 export type GroupRole = 'USER' | 'OWNER' | 'ADMIN';
 
+export type GroupJoinRequestStatus = 'ACCEPTED' | 'PENDING' | 'REJECTED';
+
 export interface Group {
   id: number;
   name: string;
@@ -25,4 +27,10 @@ export interface GroupMembership {
   groupId: number;
   groupName: string;
   role: GroupRole;
+}
+
+export interface GroupJoinRequest {
+  id: number,
+  userLogin: string
+  status: GroupJoinRequestStatus
 }

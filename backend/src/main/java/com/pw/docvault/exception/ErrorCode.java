@@ -20,6 +20,9 @@ public enum ErrorCode {
     MEMBER_NOT_ALLOWED("membership.not_allowed"),
     MEMBER_NOT_FOUND("membership.not_found"),
 
+    // join request
+    JOIN_REQUEST_NOT_FOUND("join_request.not_found"),
+
     // user
     USER_NOT_FOUND("user.not_found"),
     USER_EMAIL_TAKEN("user.email_taken"),

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { catchError, Observable, of } from 'rxjs';
 import { Page } from '../app.model';
-import { Group, GroupMembership } from './groups.model';
+import { Group, GroupJoinRequest, GroupMembership } from './groups.model';
 import { ActivatedRouteSnapshot, ResolveFn } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
@@ -45,6 +45,18 @@ export class GroupService {
   delete(id: number): Observable<void> {
     return this.httpClient.delete<void>(`/api/groups/${id}`);
   }
+
+  leave(id: number): Observable<void> {
+    return this.httpClient.delete<void>(`/api/groups/${id}/leave`);
+  }
+
+  join(id: number): Observable<GroupMembership | null> {
+    return this.httpClient.post<GroupMembership | null>(`/api/groups/${id}/members/me`, null);
+  }
+
+  getJoinRequest(id: number): Observable<GroupJoinRequest | null> {
+    return this.httpClient.get<GroupJoinRequest | null>(`/api/groups/${id}/requests/me`);
+  }
 }
 
 export const groupResolver: ResolveFn<Group> = (route: ActivatedRouteSnapshot) =>
@@ -56,3 +68,7 @@ export const membershipResolver: ResolveFn<GroupMembership | null> = (
   inject(GroupService)
     .getMembership(route.params['id'])
     .pipe(catchError(() => of(null)));
+
+export const joinRequestResolver: ResolveFn<GroupJoinRequest | null> = (
+  route: ActivatedRouteSnapshot
+) => inject(GroupService).getJoinRequest(route.params['id']);

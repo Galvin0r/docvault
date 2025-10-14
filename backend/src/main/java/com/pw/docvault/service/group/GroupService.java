@@ -4,11 +4,14 @@ import com.pw.docvault.entity.group.Group;
 import com.pw.docvault.exception.ErrorCode;
 import com.pw.docvault.exception.ForbiddenException;
 import com.pw.docvault.exception.NotFoundException;
+import com.pw.docvault.mapper.GroupJoinRequestMapper;
 import com.pw.docvault.mapper.GroupMapper;
 import com.pw.docvault.mapper.GroupMembershipMapper;
+import com.pw.docvault.model.enums.GroupJoinRequestStatus;
 import com.pw.docvault.model.group.GroupDto;
 import com.pw.docvault.model.enums.GroupRole;
 import com.pw.docvault.model.enums.GroupVisibility;
+import com.pw.docvault.model.group.GroupJoinRequestDto;
 import com.pw.docvault.model.group.GroupMembershipDto;
 import com.pw.docvault.repository.UserRepository;
 import com.pw.docvault.repository.group.GroupRepository;
@@ -26,6 +29,7 @@ import java.util.Optional;
 @Service
 public class GroupService {
 
+    private final GroupJoinRequestMapper groupJoinRequestMapper;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -39,7 +43,7 @@ public class GroupService {
 
     public GroupService(GroupRepository groupRepository, GroupMembershipService groupMembershipService,
                         GroupMapper groupMapper, CurrentUserProvider currentUser, GroupJoinRequestService groupJoinRequestService,
-                        GroupMembershipMapper groupMembershipMapper, UserRepository userRepository) {
+                        GroupMembershipMapper groupMembershipMapper, UserRepository userRepository, GroupJoinRequestMapper groupJoinRequestMapper) {
         this.groupRepository = groupRepository;
         this.groupMembershipService = groupMembershipService;
         this.groupMapper = groupMapper;
@@ -47,6 +51,7 @@ public class GroupService {
         this.groupJoinRequestService = groupJoinRequestService;
         this.groupMembershipMapper = groupMembershipMapper;
         this.userRepository = userRepository;
+        this.groupJoinRequestMapper = groupJoinRequestMapper;
     }
 
     @Transactional
@@ -148,18 +153,21 @@ public class GroupService {
     }
 
     @Transactional
-    public void join(Long groupId) {
+    public GroupMembershipDto join(Long groupId) {
         var group = getGroupOrThrow(groupId);
-        if (groupMembershipService.findMembership(currentUser.getId(), groupId).isPresent()) {
-            return;
+        var membership = groupMembershipService.findMembership(currentUser.getId(), groupId);
+        if (membership.isPresent()) {
+            return groupMembershipMapper.toDto(membership.get());
         }
 
         if (group.getVisibility() == GroupVisibility.PRIVATE) {
             throw new ForbiddenException(ErrorCode.GROUP_ACCESS_FORBIDDEN, "You are not allowed to join private groups");
         } else  if (group.getVisibility() == GroupVisibility.PUBLIC) {
-            groupMembershipService.createMembership(currentUser.get(), group, GroupRole.USER);
+            return groupMembershipMapper.toDto(groupMembershipService
+                                                       .createMembership(currentUser.get(), group, GroupRole.USER));
         } else {
             groupJoinRequestService.create(currentUser.getId(), groupId);
+            return null;
         }
     }
 
@@ -184,5 +192,13 @@ public class GroupService {
 
     public GroupMembershipDto getMembership(Long groupId) {
         return groupMembershipMapper.toDto(groupMembershipService.getMembershipOrThrow(currentUser.getId(), groupId));
+    }
+
+    public GroupJoinRequestDto getRequest(Long groupId) {
+        var a = groupJoinRequestService
+                .findJoinRequest(currentUser.getId(), groupId,
+                                 GroupJoinRequestStatus.PENDING);
+        return groupJoinRequestMapper.toDto(
+                                                    a.orElse(null));
     }
 }

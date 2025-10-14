@@ -18,7 +18,7 @@
           <div class="rounded-xl border border-surface-700/20 p-4 flex flex-col gap-2">
             <div class="flex justify-between">
               <span class="text-sm text-muted-color">Type</span>
-              <span class="font-medium">{{ group().visibility | titlecase }}</span>
+              <span class="font-medium">{{ group().visibility.replaceAll('_', ' ') | titlecase }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-sm text-muted-color">Members</span>
@@ -36,14 +36,24 @@
 
       <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end">
         @if (!membership()) {
-        <button pButton icon="pi pi-user-plus" size="small">Join</button>
-        } @else { @if (membership().role !== 'USER') {
+        <button
+          pButton
+          icon="pi pi-user-plus"
+          size="small"
+          [disabled]="joinRequest()"
+          (click)="onJoin()"
+        >
+          {{ joinRequest() ? "Request sent" : "Join" }}
+        </button>
+        } @else { @if (membership()?.role !== 'USER') {
         <button pButton icon="pi pi-user-plus" size="small" (click)="onAddMember()">Add</button>
         <button pButton icon="pi pi-pencil" size="small" severity="secondary" (click)="onEdit()">
           Edit
         </button>
-        } @if (membership().role !== 'OWNER') {
-        <button pButton icon="pi pi-sign-out" size="small" severity="danger">Leave</button>
+        } @if (membership()?.role !== 'OWNER') {
+        <button pButton icon="pi pi-sign-out" size="small" severity="danger" (click)="onLeave()">
+          Leave
+        </button>
         } @else {
         <button pButton icon="pi pi-trash" size="small" severity="danger" (click)="onDelete()">
           Delete
