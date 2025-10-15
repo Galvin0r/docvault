@@ -6,7 +6,9 @@ import com.pw.docvault.model.group.GroupJoinRequestDto;
 import com.pw.docvault.model.group.GroupMembershipDto;
 import com.pw.docvault.service.group.GroupService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -87,7 +89,9 @@ public class GroupController {
 
     @GetMapping("/{id}/members")
     public ResponseEntity<Page<GroupMembershipDto>> findGroupMembers(@PathVariable Long id, Pageable pageable) {
-        return ResponseEntity.ok(groupService.findGroupMembers(id, pageable));
+        var sorted = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC,
+                                                                                              "id"));
+        return ResponseEntity.ok(groupService.findGroupMembers(id, sorted));
     }
 
     @GetMapping("/{id}/members/me")

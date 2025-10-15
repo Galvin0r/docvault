@@ -1,6 +1,7 @@
 import {
   AfterViewInit,
   Component,
+  computed,
   effect,
   inject,
   Injector,
@@ -39,6 +40,10 @@ export class GroupViewComponent implements AfterViewInit {
   group!: WritableSignal<Group>;
   membership = signal<GroupMembership | undefined>(undefined);
   joinRequest = signal<GroupJoinRequest | null>(null);
+
+  isOwner = computed(() => !!this.membership() && this.membership()?.role === 'OWNER');
+  isAdmin = computed(() => !!this.membership() && this.membership()?.role === 'ADMIN');
+  isUser = computed(() => !this.membership() || this.membership()?.role === 'USER');
 
   ref: DynamicDialogRef | undefined;
   dialogService = inject(DialogService);
@@ -162,6 +167,12 @@ export class GroupViewComponent implements AfterViewInit {
             this.joinRequest.set(joinRequest);
           });
       }
+    });
+  }
+
+  onRoleChange() {
+    this.groupService.getMembership(this.group().id).subscribe((membership: GroupMembership) => {
+      this.membership.set(membership);
     });
   }
 }

@@ -2,7 +2,13 @@
   <ng-template #list let-items>
     <div class="flex flex-col gap-1">
       @for (item of items; track item.userId) {
-      <app-user [membership]="item" />
+      <app-user
+        [membership]="item"
+        [canManageRole]="canManageRole()"
+        [canRemove]="canRemove() && item.role === 'USER'"
+        (userRemoved)="refresh()"
+        (userChangedRole)="onRoleChange()"
+      />
       }
     </div>
   </ng-template>

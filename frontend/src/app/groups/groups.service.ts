@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { catchError, Observable, of } from 'rxjs';
 import { Page } from '../app.model';
-import { Group, GroupJoinRequest, GroupMembership } from './groups.model';
+import { Group, GroupJoinRequest, GroupMembership, GroupRole } from './groups.model';
 import { ActivatedRouteSnapshot, ResolveFn } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
@@ -56,6 +56,16 @@ export class GroupService {
 
   getJoinRequest(id: number): Observable<GroupJoinRequest | null> {
     return this.httpClient.get<GroupJoinRequest | null>(`/api/groups/${id}/requests/me`);
+  }
+
+  changeRole(id: number, userId: number, role: GroupRole): Observable<void> {
+    return this.httpClient.patch<void>(`/api/groups/${id}/members/${userId}/role`, null, {
+      params: { role },
+    });
+  }
+
+  removeUser(id: number, userId: number): Observable<void> {
+    return this.httpClient.delete<void>(`/api/groups/${id}/members/${userId}`);
   }
 }
 

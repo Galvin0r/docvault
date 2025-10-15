@@ -7,6 +7,7 @@
   --app-line-alpha: 0.35;
   --link: var(--p-primary-color);
   --link-hover: var(--p-primary-400);
+  --menu-background: var(--p-surface-800);
 }
 
 html.app-dark {
@@ -23,6 +24,7 @@ html:not(.app-dark) {
   --p-message-error-simple-color: var(--p-red-700);
   --p-message-error-color: var(--p-red-800);
   --p-message-error-close-button-hover-background: var(--p-red-400);
+  --menu-background: var(--p-surface-100);
 }
 
 html,
@@ -125,7 +127,7 @@ a.doc-link:hover {
 }
 
 .p-menu-item:not(.p-disabled) .p-menu-item-content:hover {
-  --p-menu-item-focus-background: var(--p-surface-800);
+  --p-menu-item-focus-background: var(--menu-background);
   --p-menu-item-focus-color: var(--p-text-color);
 }
 .p-menu-item:not(.p-disabled) .p-menu-item-content:hover .p-menu-item-icon {

@@ -8,6 +8,17 @@ export const visibilityOptions = [
 
 export type GroupRole = 'USER' | 'OWNER' | 'ADMIN';
 
+export const rh = new Map<GroupRole, GroupRole>([
+  ['USER', 'ADMIN'],
+  ['ADMIN', 'OWNER'],
+]);
+
+export const getRoleByKey = (k: GroupRole) => rh.get(k);
+export const getRoleByValue = (v: GroupRole) => {
+  for (const [k, val] of rh) if (Object.is(val, v)) return k;
+  return undefined;
+};
+
 export type GroupJoinRequestStatus = 'ACCEPTED' | 'PENDING' | 'REJECTED';
 
 export interface Group {
@@ -30,7 +41,7 @@ export interface GroupMembership {
 }
 
 export interface GroupJoinRequest {
-  id: number,
-  userLogin: string
-  status: GroupJoinRequestStatus
+  id: number;
+  userLogin: string;
+  status: GroupJoinRequestStatus;
 }

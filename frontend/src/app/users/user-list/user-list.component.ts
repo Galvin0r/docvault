@@ -1,4 +1,4 @@
-import { Component, inject, Injector, input, OnInit, runInInjectionContext, signal } from '@angular/core';
+import { Component, inject, Injector, input, OnInit, output, runInInjectionContext, signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { GroupMembership } from '../../groups/groups.model';
 import { SearchStore } from '../../utils/search/search-store';
@@ -17,6 +17,10 @@ export class UserListComponent implements OnInit {
   searchForm = input.required<FormGroup>();
   groupId = input.required<number>();
   limitOptions = input<number[]>([10, 20, 50]);
+  canManageRole = input(false);
+  canRemove = input(false);
+
+  userRoleChanged = output<void>();
 
   searchStore!: SearchStore<GroupMembership>;
 
@@ -44,5 +48,10 @@ export class UserListComponent implements OnInit {
 
   refresh() {
     this.searchStore.refresh();
+  }
+
+  onRoleChange() {
+    this.refresh();
+    this.userRoleChanged.emit();
   }
 }

@@ -31,8 +31,8 @@
       type="button"
       class="p-button-rounded p-button-text"
       icon="pi pi-ellipsis-h"
-      pTooltip="Open user profile"
-      (click)="goToUser()"
+      (click)="menu.toggle($event)"
     ></button>
+    <p-menu #menu [popup]="true" [model]="menuItems()" appendTo="body"></p-menu>
   </div>
 </p-card>
