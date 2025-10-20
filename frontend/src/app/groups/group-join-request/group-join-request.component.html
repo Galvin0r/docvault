@@ -1,0 +1,47 @@
+<p-card
+  class="w-full !rounded-xl border border-surface-700/40 hover:border-primary-500/40"
+>
+  <div class="flex items-center gap-3">
+    <div
+      class="h-9 w-9 rounded-lg flex items-center justify-center bg-primary-500/15 text-primary-400"
+    >
+      <i class="pi pi-user-plus text-sm" aria-hidden="true"></i>
+    </div>
+
+    <div class="min-w-0 flex-1">
+      <div class="flex items-center gap-2">
+        <span class="font-medium truncate">{{ request().userLogin }}</span>
+        <span
+          class="px-2 py-0.5 text-xs rounded-full border border-surface-600/60 text-foreground/80"
+        >
+          Pending
+        </span>
+      </div>
+
+      <div class="mt-0.5 text-xs opacity-70 flex items-center gap-1">
+        <i class="pi pi-calendar"></i>
+        <span>{{ request().created | date : "yyyy-MM-dd HH:mm" }}</span>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-1">
+      <button
+        pButton
+        type="button"
+        icon="pi pi-check"
+        severity="success"
+        class="p-button-rounded p-button-text"
+        (click)="onAccept()"
+      ></button>
+
+      <button
+        pButton
+        type="button"
+        icon="pi pi-times"
+        severity="danger"
+        class="p-button-rounded p-button-text"
+        (click)="onReject()"
+      ></button>
+    </div>
+  </div>
+</p-card>

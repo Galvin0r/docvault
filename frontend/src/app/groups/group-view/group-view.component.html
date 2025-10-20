@@ -1,5 +1,5 @@
-<div class="mx-auto w-full max-w-6xl px-4 mt-8 pb-8">
-  <p-card class="rounded-2xl shadow-lg border border-surface-700/30">
+<div class="mx-auto w-full max-w-6xl px-4 mt-8 pb-8 relative">
+  <p-card class="relative rounded-2xl shadow-lg border border-surface-700/30">
     <div class="flex flex-col gap-6 mb-6">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <section class="md:col-span-2 flex flex-col gap-2">
@@ -63,7 +63,9 @@
         } }
       </div>
     </div>
+
     <p-divider></p-divider>
+
     <app-user-list
       [groupId]="group().id"
       [searchForm]="dummyForm"
@@ -71,5 +73,38 @@
       [canRemove]="isOwner() || isAdmin()"
       (userRoleChanged)="onRoleChange()"
     />
+
+    @if ((isOwner() || isAdmin()) && group().visibility === 'REQUEST_ONLY') {
+    <div class="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 z-20">
+      <span class="relative inline-flex rounded-full border border-surface-700/30">
+        <button
+          pButton
+          pTooltip="Group Join Requests"
+          showDelay="800"
+          hideDelay="300"
+          [rounded]="true"
+          icon="pi pi-envelope"
+          severity="secondary"
+          (click)="toggleRequests()"
+          aria-label="Toggle join requests"
+        ></button>
+
+        @if (group().requestsNumber) {
+        <span
+          [ngClass]="group().requestsNumber > 99 ? 'h-3/5 w-3/5' : 'h-1/2 w-1/2'"
+          class="badge absolute -top-1 -right-3 flex items-center justify-center rounded-full text-[10px] font-medium bg-red-500 ring-1 ring-surface-700/30"
+        >
+          {{ group().requestsNumber > 99 ? "99+" : group().requestsNumber }}
+        </span>
+        }
+      </span>
+    </div>
+    }
   </p-card>
+
+  @if ((isOwner() || isAdmin()) && group().visibility === 'REQUEST_ONLY' && requestsOpen()) {
+  <div class="absolute top-0 -right-[27rem] w-[26rem]">
+    <app-group-join-requests [groupId]="group().id" (changed)="onRequestChanged()" />
+  </div>
+  }
 </div>

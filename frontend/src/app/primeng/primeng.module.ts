@@ -22,6 +22,8 @@ import { DynamicDialogModule } from 'primeng/dynamicdialog';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { TextareaModule } from 'primeng/textarea';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { BadgeModule } from 'primeng/badge';
+import { OverlayBadgeModule } from 'primeng/overlaybadge';
 
 const primeNgModules = [
   CardModule,
@@ -47,6 +49,8 @@ const primeNgModules = [
   SelectButtonModule,
   TextareaModule,
   ConfirmDialogModule,
+  BadgeModule,
+  OverlayBadgeModule,
 ];
 
 @NgModule({

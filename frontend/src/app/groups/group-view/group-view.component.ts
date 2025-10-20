@@ -50,6 +50,8 @@ export class GroupViewComponent implements AfterViewInit {
 
   list = viewChild(UserListComponent);
 
+  requestsOpen = signal(false);
+
   constructor(private activatedRoute: ActivatedRoute) {
     activatedRoute.data.subscribe(({ group, membership, joinRequest }) => {
       if (group) {
@@ -174,5 +176,16 @@ export class GroupViewComponent implements AfterViewInit {
     this.groupService.getMembership(this.group().id).subscribe((membership: GroupMembership) => {
       this.membership.set(membership);
     });
+  }
+
+  onRequestChanged() {
+    this.groupService.get(this.group().id).subscribe((group: Group) => {
+      this.group.set(group);
+    });
+    this.list()?.refresh();
+  }
+
+  toggleRequests() {
+    this.requestsOpen.update((v) => !v);
   }
 }

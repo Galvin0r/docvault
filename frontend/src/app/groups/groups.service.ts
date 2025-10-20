@@ -67,6 +67,18 @@ export class GroupService {
   removeUser(id: number, userId: number): Observable<void> {
     return this.httpClient.delete<void>(`/api/groups/${id}/members/${userId}`);
   }
+
+  getRequests(id: number, params: Record<string, any>): Observable<Page<GroupJoinRequest>> {
+    return this.httpClient.get<Page<GroupJoinRequest>>(`/api/groups/${id}/requests`, { params: params });
+  }
+
+  acceptRequest(id: number): Observable<void> {
+    return this.httpClient.post<void>(`/api/groups/requests/${id}/accept`, null);
+  }
+
+  rejectRequest(id: number): Observable<void> {
+    return this.httpClient.post<void>(`/api/groups/requests/${id}/reject`, null);
+  }
 }
 
 export const groupResolver: ResolveFn<Group> = (route: ActivatedRouteSnapshot) =>

@@ -11,9 +11,11 @@ import { GroupAddComponent } from './group-add/group-add.component';
 import { GroupViewComponent } from './group-view/group-view.component';
 import { UserModule } from '../users/user.module';
 import { GroupAddUserComponent } from './group-add-user/group-add-user.component';
+import { GroupJoinRequestsComponent } from './group-join-requests/group-join-requests.component';
+import { GroupJoinRequestComponent } from './group-join-request/group-join-request.component';
 
 @NgModule({
-  declarations: [GroupComponent, GroupListComponent, GroupManageComponent, GroupAddComponent, GroupViewComponent, GroupAddUserComponent],
+  declarations: [GroupComponent, GroupListComponent, GroupManageComponent, GroupAddComponent, GroupViewComponent, GroupAddUserComponent, GroupJoinRequestsComponent, GroupJoinRequestComponent],
   imports: [
     CommonModule,
     PrimeNgModule,

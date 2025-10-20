@@ -103,4 +103,21 @@ public class GroupController {
     public ResponseEntity<GroupJoinRequestDto> getRequest(@PathVariable Long id) {
         return ResponseEntity.ok(groupService.getRequest(id));
     }
+
+    @GetMapping("/{id}/requests")
+    public ResponseEntity<Page<GroupJoinRequestDto>> findJoinRequests(@PathVariable Long id, Pageable pageable) {
+        return ResponseEntity.ok(groupService.findPendingRequests(id, pageable));
+    }
+
+    @PostMapping("/requests/{requestId}/accept")
+    public ResponseEntity<Void> acceptRequest(@PathVariable Long requestId) {
+        groupService.acceptRequest(requestId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/requests/{requestId}/reject")
+    public ResponseEntity<Void> rejectRequest(@PathVariable Long requestId) {
+        groupService.rejectRequest(requestId);
+        return ResponseEntity.noContent().build();
+    }
 }

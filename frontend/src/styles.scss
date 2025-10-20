@@ -133,3 +133,16 @@ a.doc-link:hover {
 .p-menu-item:not(.p-disabled) .p-menu-item-content:hover .p-menu-item-icon {
   --p-menu-item-icon-focus-color: var(--p-menu-item-icon-color);
 }
+
+p-card.small-padding div.p-card-body {
+  padding: calc(var(--p-card-body-padding) / 2) var(--p-card-body-padding);
+}
+
+.p-paginator-page.p-paginator-page-selected {
+  --p-paginator-nav-button-selected-background: color-mix(in srgb, var(--p-primary-400), transparent 84%);
+}
+
+.p-paginator-page {
+  --p-paginator-nav-button-border-radius: 100px;
+  color: white;
+}

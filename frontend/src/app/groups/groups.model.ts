@@ -29,6 +29,7 @@ export interface Group {
   created: string;
   membersNumber: number;
   allowedToAccess: boolean;
+  requestsNumber: number;
 }
 
 export interface GroupMembership {
@@ -44,4 +45,5 @@ export interface GroupJoinRequest {
   id: number;
   userLogin: string;
   status: GroupJoinRequestStatus;
+  created: string;
 }

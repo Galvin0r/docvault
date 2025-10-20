@@ -22,6 +22,7 @@ public enum ErrorCode {
 
     // join request
     JOIN_REQUEST_NOT_FOUND("join_request.not_found"),
+    GROUP_REQUESTS_FORBIDDEN("join_request.access_forbidden"),
 
     // user
     USER_NOT_FOUND("user.not_found"),

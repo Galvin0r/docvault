@@ -10,6 +10,7 @@ import { PaginatorState } from 'primeng/paginator';
 export class PaginatorComponent {
   sizeOptions = input<number[]>([10, 20, 50]);
   total = input.required<number>();
+  isSimplePaginator = input(false);
 
   size = model(10);
   page = model(1);

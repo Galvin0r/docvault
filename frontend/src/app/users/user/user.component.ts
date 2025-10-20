@@ -7,6 +7,7 @@ import {
 } from '../../groups/groups.model';
 import { ConfirmationService, MenuItem, PrimeIcons } from 'primeng/api';
 import { GroupService } from '../../groups/groups.service';
+import { TitleCasePipe } from '@angular/common';
 
 @Component({
   selector: 'app-user',
@@ -23,6 +24,7 @@ export class UserComponent {
   confirmationSerice = inject(ConfirmationService);
 
   groupService = inject(GroupService);
+  titleCase = new TitleCasePipe();
 
   menuItems = computed(() => {
     const items: MenuItem[] = [
@@ -38,14 +40,14 @@ export class UserComponent {
         const prevRole = getRoleByValue(this.membership().role);
         if (nextRole) {
           items.push({
-            label: 'Promote to ' + nextRole,
+            label: 'Promote to ' + this.titleCase.transform(nextRole),
             icon: PrimeIcons.ARROW_UP,
             command: () => this.userChangeRole(nextRole),
           });
         }
         if (prevRole) {
           items.push({
-            label: 'Demote to ' + prevRole,
+            label: 'Demote to ' + this.titleCase.transform(prevRole),
             icon: PrimeIcons.ARROW_DOWN,
             command: () => this.userChangeRole(prevRole),
           });

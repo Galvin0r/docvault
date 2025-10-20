@@ -1,4 +1,5 @@
-<div class="flex items-center justify-end">
+<div class="flex items-center" [ngClass]="isSimplePaginator() ? 'justify-center' : 'justify-end'">
+  @if (!isSimplePaginator()) {
   <span class="mx-1">Items per page:</span>
   <p-select
     [options]="sizeOptionsFull()"
@@ -7,14 +8,17 @@
     [ngModel]="size()"
     (ngModelChange)="onSizeChange($event)"
   />
+  }
+
   <p-paginator
     [first]="first()"
     [rows]="size()"
     [totalRecords]="total()"
     (onPageChange)="onPageChange($event)"
-    [showCurrentPageReport]="true"
+    [showCurrentPageReport]="!isSimplePaginator()"
     currentPageReportTemplate="{first} - {last} of {totalRecords}"
-    [showPageLinks]="false"
-    [showFirstLastIcon]="true"
+    [showPageLinks]="isSimplePaginator()"
+    [showFirstLastIcon]="!isSimplePaginator()"
+    [pageLinkSize]="3"
   ></p-paginator>
 </div>

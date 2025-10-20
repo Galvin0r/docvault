@@ -106,9 +106,13 @@ public class GroupService {
         if (membershipOp.isEmpty() && group.getVisibility() == GroupVisibility.PRIVATE) {
             throw new ForbiddenException(ErrorCode.GROUP_ACCESS_FORBIDDEN, "You are not allowed to access this group.");
         }
-
         long membersCount = groupMembershipService.countGroupMembers(group.getId());
-        return groupMapper.toDto(group, membersCount);
+        long requestsCount = 0;
+        if (membershipOp.isPresent() && group.getVisibility() == GroupVisibility.REQUEST_ONLY &&
+                (membershipOp.get().getRole() == GroupRole.OWNER || membershipOp.get().getRole() == GroupRole.ADMIN)) {
+            requestsCount = groupJoinRequestService.countJoinRequests(group.getId(), GroupJoinRequestStatus.PENDING);
+        }
+        return groupMapper.toDto(group, membersCount, requestsCount);
     }
 
     @Transactional(readOnly = true)
@@ -200,5 +204,27 @@ public class GroupService {
                                  GroupJoinRequestStatus.PENDING);
         return groupJoinRequestMapper.toDto(
                                                     a.orElse(null));
+    }
+
+    public Page<GroupJoinRequestDto> findPendingRequests(Long groupId, Pageable pageable) {
+        getGroupOrThrow(groupId);
+        var membership =  groupMembershipService.getMembershipOrThrow(currentUser.getId(), groupId);
+        if (membership.getRole() == GroupRole.USER) {
+            throw new ForbiddenException(ErrorCode.GROUP_REQUESTS_FORBIDDEN,
+                                         "You are not allowed to access this group's requests.");
+        }
+        return groupJoinRequestService.findGroupJoinRequests(groupId, GroupJoinRequestStatus.PENDING, pageable)
+                                      .map(groupJoinRequestMapper::toDto);
+    }
+
+    @Transactional
+    public void acceptRequest(Long requestId) {
+        var request = groupJoinRequestService.findJoinRequestById(requestId);
+        groupMembershipService.createMembership(request.getUser(), request.getGroup(), GroupRole.USER);
+        groupJoinRequestService.changeStatus(requestId, GroupJoinRequestStatus.ACCEPTED);
+    }
+
+    public void rejectRequest(Long requestId) {
+        groupJoinRequestService.changeStatus(requestId, GroupJoinRequestStatus.REJECTED);
     }
 }
