@@ -16,6 +16,7 @@ html.app-dark {
   --app-bg-tint-alpha: 0.1;
   --app-line-alpha: 0.35;
   --p-menubar-border-color: var(--p-surface-700);
+  --highlight-color: rgba(255, 255, 255, .87);
 }
 
 html:not(.app-dark) {
@@ -25,6 +26,7 @@ html:not(.app-dark) {
   --p-message-error-color: var(--p-red-800);
   --p-message-error-close-button-hover-background: var(--p-red-400);
   --menu-background: var(--p-surface-100);
+  --highlight-color: var(--p-primary-700);
 }
 
 html,
@@ -140,9 +142,10 @@ p-card.small-padding div.p-card-body {
 
 .p-paginator-page.p-paginator-page-selected {
   --p-paginator-nav-button-selected-background: color-mix(in srgb, var(--p-primary-400), transparent 84%);
+  --p-paginator-nav-button-selected-color: var(--highlight-color);
 }
 
 .p-paginator-page {
   --p-paginator-nav-button-border-radius: 100px;
-  color: white;
+  color: rgba(255, 255, 255, .87);
 }

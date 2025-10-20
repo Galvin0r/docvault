@@ -15,7 +15,16 @@ import { GroupJoinRequestsComponent } from './group-join-requests/group-join-req
 import { GroupJoinRequestComponent } from './group-join-request/group-join-request.component';
 
 @NgModule({
-  declarations: [GroupComponent, GroupListComponent, GroupManageComponent, GroupAddComponent, GroupViewComponent, GroupAddUserComponent, GroupJoinRequestsComponent, GroupJoinRequestComponent],
+  declarations: [
+    GroupComponent,
+    GroupListComponent,
+    GroupManageComponent,
+    GroupAddComponent,
+    GroupViewComponent,
+    GroupAddUserComponent,
+    GroupJoinRequestsComponent,
+    GroupJoinRequestComponent,
+  ],
   imports: [
     CommonModule,
     PrimeNgModule,
@@ -23,7 +32,7 @@ import { GroupJoinRequestComponent } from './group-join-request/group-join-reque
     UtilsModule,
     FormsModule,
     ReactiveFormsModule,
-    UserModule
-  ]
+    UserModule,
+  ],
 })
 export class GroupsModule {}
