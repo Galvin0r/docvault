@@ -18,6 +18,7 @@ import com.pw.docvault.repository.group.GroupRepository;
 import com.pw.docvault.service.security.CurrentUserProvider;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,9 +28,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class GroupService {
 
-    private final GroupJoinRequestMapper groupJoinRequestMapper;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -40,19 +41,7 @@ public class GroupService {
     private final GroupJoinRequestService groupJoinRequestService;
     private final GroupMembershipMapper groupMembershipMapper;
     private final UserRepository userRepository;
-
-    public GroupService(GroupRepository groupRepository, GroupMembershipService groupMembershipService,
-                        GroupMapper groupMapper, CurrentUserProvider currentUser, GroupJoinRequestService groupJoinRequestService,
-                        GroupMembershipMapper groupMembershipMapper, UserRepository userRepository, GroupJoinRequestMapper groupJoinRequestMapper) {
-        this.groupRepository = groupRepository;
-        this.groupMembershipService = groupMembershipService;
-        this.groupMapper = groupMapper;
-        this.currentUser = currentUser;
-        this.groupJoinRequestService = groupJoinRequestService;
-        this.groupMembershipMapper = groupMembershipMapper;
-        this.userRepository = userRepository;
-        this.groupJoinRequestMapper = groupJoinRequestMapper;
-    }
+    private final GroupJoinRequestMapper groupJoinRequestMapper;
 
     @Transactional
     public Long create(String name, String description, GroupVisibility visibility) {

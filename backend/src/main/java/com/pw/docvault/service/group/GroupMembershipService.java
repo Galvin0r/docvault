@@ -9,6 +9,7 @@ import com.pw.docvault.exception.NotFoundException;
 import com.pw.docvault.model.enums.GroupRole;
 import com.pw.docvault.repository.group.GroupMembershipRepository;
 import com.pw.docvault.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,16 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Service
 public class GroupMembershipService {
 
     private final GroupMembershipRepository groupMembershipRepository;
     private final UserRepository userRepository;
-
-    public GroupMembershipService(GroupMembershipRepository groupMembershipRepository, UserRepository userRepository) {
-        this.groupMembershipRepository = groupMembershipRepository;
-        this.userRepository = userRepository;
-    }
 
     public GroupMembership createMembership(User user, Group group, GroupRole role) {
         var membership = new GroupMembership();

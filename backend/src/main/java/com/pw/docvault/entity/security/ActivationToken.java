@@ -2,9 +2,13 @@ package com.pw.docvault.entity.security;
 
 import com.pw.docvault.entity.User;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "activation_tokens")
 public class ActivationToken {
@@ -28,52 +32,4 @@ public class ActivationToken {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Instant getExpiresAt() {
-        return expiresAt;
-    }
-
-    public void setExpiresAt(Instant expiresAt) {
-        this.expiresAt = expiresAt;
-    }
-
-    public Instant getValidatedAt() {
-        return validatedAt;
-    }
-
-    public void setValidatedAt(Instant validatedAt) {
-        this.validatedAt = validatedAt;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
 }

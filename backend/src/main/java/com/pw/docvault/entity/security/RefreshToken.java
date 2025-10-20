@@ -2,9 +2,13 @@ package com.pw.docvault.entity.security;
 
 import com.pw.docvault.entity.User;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 
+@Getter
+@Setter
 @Entity
 @Table(name="refresh_tokens")
 public class RefreshToken {
@@ -25,46 +29,4 @@ public class RefreshToken {
 
     @Column(name = "device_info")
     private String deviceInfo;
-
-    public RefreshToken() {}
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public Instant getExpiresAt() {
-        return expiresAt;
-    }
-
-    public void setExpiresAt(Instant expiresAt) {
-        this.expiresAt = expiresAt;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getDeviceInfo() {
-        return deviceInfo;
-    }
-
-    public void setDeviceInfo(String deviceInfo) {
-        this.deviceInfo = deviceInfo;
-    }
 }

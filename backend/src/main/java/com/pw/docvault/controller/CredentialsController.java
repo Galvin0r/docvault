@@ -5,12 +5,14 @@ import com.pw.docvault.model.security.UserInfo;
 import com.pw.docvault.service.security.CredentialsService;
 import com.pw.docvault.service.security.JwtService;
 import com.pw.docvault.service.security.RefreshTokenService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/accounts")
 public class CredentialsController {
@@ -18,13 +20,6 @@ public class CredentialsController {
     private final CredentialsService credentialsService;
     private final RefreshTokenService refreshTokenService;
     private final JwtService jwtService;
-
-    public CredentialsController(CredentialsService credentialsService, RefreshTokenService refreshTokenService,
-                                 JwtService jwtService) {
-        this.credentialsService = credentialsService;
-        this.refreshTokenService = refreshTokenService;
-        this.jwtService = jwtService;
-    }
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout(String deviceInfo) {

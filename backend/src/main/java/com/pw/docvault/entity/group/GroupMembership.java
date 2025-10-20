@@ -4,7 +4,11 @@ import com.pw.docvault.entity.BaseEntity;
 import com.pw.docvault.entity.User;
 import com.pw.docvault.model.enums.GroupRole;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "group_membership")
 public class GroupMembership extends BaseEntity {
@@ -22,38 +26,4 @@ public class GroupMembership extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private GroupRole role;
-
-    public GroupMembership() {}
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Group getGroup() {
-        return group;
-    }
-
-    public void setGroup(Group group) {
-        this.group = group;
-    }
-
-    public GroupRole getRole() {
-        return role;
-    }
-
-    public void setRole(GroupRole role) {
-        this.role = role;
-    }
 }

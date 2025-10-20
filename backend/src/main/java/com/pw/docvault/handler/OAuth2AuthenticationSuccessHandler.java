@@ -11,6 +11,7 @@ import com.pw.docvault.util.Constants;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+@RequiredArgsConstructor
 @Component
 public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
@@ -31,13 +33,6 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
-
-    public OAuth2AuthenticationSuccessHandler(UserRepository userRepository, JwtService jwtService,
-                                              RefreshTokenService refreshTokenService) {
-        this.userRepository = userRepository;
-        this.jwtService = jwtService;
-        this.refreshTokenService = refreshTokenService;
-    }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,

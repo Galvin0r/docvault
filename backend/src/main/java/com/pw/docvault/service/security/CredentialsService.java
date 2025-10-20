@@ -5,17 +5,15 @@ import com.pw.docvault.exception.AlreadyExistsException;
 import com.pw.docvault.exception.ErrorCode;
 import com.pw.docvault.model.security.UserInfo;
 import com.pw.docvault.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+@RequiredArgsConstructor
 @Service
 public class CredentialsService {
 
     private final UserRepository userRepository;
-
-    public CredentialsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     public void changeLogin(String newLogin) {
         User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();

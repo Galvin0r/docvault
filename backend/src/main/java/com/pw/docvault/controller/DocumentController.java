@@ -4,6 +4,7 @@ import com.pw.docvault.entity.Document;
 import com.pw.docvault.model.enums.DocumentVisibility;
 import com.pw.docvault.repository.DocumentRepository;
 import com.pw.docvault.service.DocumentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -14,17 +15,13 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import java.util.NoSuchElementException;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("documents")
 public class DocumentController {
 
     private final DocumentService documentService;
     private final DocumentRepository documentRepository;
-
-    public DocumentController(DocumentService documentService, DocumentRepository documentRepository) {
-        this.documentService = documentService;
-        this.documentRepository = documentRepository;
-    }
 
     @PostMapping("/upload")
     public ResponseEntity<Void> upload(@RequestParam("file") MultipartFile file,

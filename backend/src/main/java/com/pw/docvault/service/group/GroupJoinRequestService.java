@@ -7,6 +7,7 @@ import com.pw.docvault.model.enums.GroupJoinRequestStatus;
 import com.pw.docvault.repository.UserRepository;
 import com.pw.docvault.repository.group.GroupJoinRequestRepository;
 import com.pw.docvault.repository.group.GroupRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,20 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Service
 public class GroupJoinRequestService {
 
     private final GroupJoinRequestRepository groupJoinRequestRepository;
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
-
-
-    public GroupJoinRequestService(GroupJoinRequestRepository groupJoinRequestRepository,
-                                   UserRepository userRepository, GroupRepository groupRepository) {
-        this.groupJoinRequestRepository = groupJoinRequestRepository;
-        this.userRepository = userRepository;
-        this.groupRepository = groupRepository;
-    }
 
     @Transactional
     public Optional<GroupJoinRequest> create(Long userId, Long groupId) {
@@ -44,8 +38,7 @@ public class GroupJoinRequestService {
     }
 
     public Optional<GroupJoinRequest> findJoinRequest(Long userId, Long groupId, GroupJoinRequestStatus status) {
-        var a = groupJoinRequestRepository.findFirstByUserIdAndGroupIdAndStatusOrderByCreatedAsc(userId, groupId, status);
-        return a;
+        return groupJoinRequestRepository.findFirstByUserIdAndGroupIdAndStatusOrderByCreatedAsc(userId, groupId, status);
     }
 
     public GroupJoinRequest findJoinRequestById(Long requestId) {

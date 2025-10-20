@@ -6,6 +6,7 @@ import com.pw.docvault.model.security.RoleCode;
 import com.pw.docvault.repository.security.RoleRepository;
 import com.pw.docvault.repository.UserRepository;
 import com.pw.docvault.util.Constants;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -16,16 +17,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @Service
 public class OAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-
-    public OAuth2UserService(UserRepository userRepository, RoleRepository roleRepository) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-    }
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {

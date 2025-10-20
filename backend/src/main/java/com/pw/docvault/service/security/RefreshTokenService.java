@@ -6,6 +6,7 @@ import com.pw.docvault.exception.ErrorCode;
 import com.pw.docvault.exception.NotFoundException;
 import com.pw.docvault.exception.RefreshTokenException;
 import com.pw.docvault.repository.security.RefreshTokenRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Service
 public class RefreshTokenService {
 
@@ -23,10 +25,6 @@ public class RefreshTokenService {
 
     @Value(value = "${app.security.jwtRefreshTokenExpirationShort}")
     private int jwtRefreshTokenExpirationShort;
-
-    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository) {
-        this.refreshTokenRepository = refreshTokenRepository;
-    }
 
     @Transactional
     public RefreshToken getRefreshToken(User user, String deviceInfo, boolean rememberMe) {

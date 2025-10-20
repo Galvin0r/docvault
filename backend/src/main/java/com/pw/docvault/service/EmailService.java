@@ -3,6 +3,7 @@ package com.pw.docvault.service;
 import com.pw.docvault.model.enums.EmailTemplateName;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -15,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @Service
 public class EmailService {
 
@@ -23,11 +25,6 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
-
-    public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine) {
-        this.mailSender = mailSender;
-        this.templateEngine = templateEngine;
-    }
 
     @Async
     public void sendEmail(String to, String username, EmailTemplateName emailTemplateName, String confirmationUrl,

@@ -5,6 +5,7 @@ import com.pw.docvault.model.enums.GroupRole;
 import com.pw.docvault.model.group.GroupJoinRequestDto;
 import com.pw.docvault.model.group.GroupMembershipDto;
 import com.pw.docvault.service.group.GroupService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,15 +14,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("groups")
 public class GroupController {
 
     private final GroupService groupService;
-
-    public GroupController(GroupService groupService) {
-        this.groupService = groupService;
-    }
 
     @PostMapping
     public ResponseEntity<Long> create(@RequestBody GroupDto dto) {

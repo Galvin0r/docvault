@@ -4,6 +4,7 @@ import com.pw.docvault.entity.Document;
 import com.pw.docvault.entity.User;
 import com.pw.docvault.model.enums.DocumentVisibility;
 import com.pw.docvault.repository.DocumentRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.NoSuchElementException;
 
+@RequiredArgsConstructor
 @Service
 public class DocumentService {
 
@@ -22,11 +24,6 @@ public class DocumentService {
 
     @Value(value = "${app.gsc.buffer.storage.space}")
     private Integer bufferStorageSpace;
-
-    public DocumentService(DocumentRepository documentRepository, GoogleCloudStorageService googleCloudStorageService) {
-        this.documentRepository = documentRepository;
-        this.googleCloudStorageService = googleCloudStorageService;
-    }
 
     public void upload(MultipartFile file, String title, String description, DocumentVisibility visibility) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

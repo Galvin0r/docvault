@@ -3,7 +3,11 @@ package com.pw.docvault.entity;
 import com.pw.docvault.entity.group.Group;
 import com.pw.docvault.model.enums.AccessPermission;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "document_access")
 public class DocumentAccess extends BaseEntity {
@@ -24,46 +28,4 @@ public class DocumentAccess extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private AccessPermission permission;
-
-    public DocumentAccess() {}
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Document getDocument() {
-        return document;
-    }
-
-    public void setDocument(Document document) {
-        this.document = document;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Group getGroup() {
-        return group;
-    }
-
-    public void setGroup(Group group) {
-        this.group = group;
-    }
-
-    public AccessPermission getPermission() {
-        return permission;
-    }
-
-    public void setPermission(AccessPermission permission) {
-        this.permission = permission;
-    }
 }

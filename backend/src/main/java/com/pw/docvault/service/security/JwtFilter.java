@@ -9,8 +9,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,23 +22,15 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class JwtFilter extends OncePerRequestFilter {
-
-    Logger logger = LoggerFactory.getLogger(JwtFilter.class);
 
     private final JwtService jwtService;
     private final UserDetailsServiceImpl userDetailsServiceImpl;
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenService refreshTokenService;
-
-    public JwtFilter(JwtService jwtService, UserDetailsServiceImpl userDetailsServiceImpl,
-                     RefreshTokenRepository refreshTokenRepository, RefreshTokenService refreshTokenService) {
-        this.jwtService = jwtService;
-        this.userDetailsServiceImpl = userDetailsServiceImpl;
-        this.refreshTokenRepository = refreshTokenRepository;
-        this.refreshTokenService = refreshTokenService;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -71,7 +63,6 @@ public class JwtFilter extends OncePerRequestFilter {
                         .orElseThrow(() -> new RefreshTokenException(ErrorCode.AUTH_REFRESH_TOKEN_EXPIRED,
                                                                      "Refresh token expired"));
 
-                if (rt != null) {
                     UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(rt.getUser().getEmail());
 
                     String newJwt = jwtService.generateToken(userDetails);
@@ -82,11 +73,8 @@ public class JwtFilter extends OncePerRequestFilter {
                     response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
                     setAuthentication(userDetails, request);
-                } else {
-                    logger.error("Refresh token not found");
-                }
             } else {
-                logger.error("JWT expired. No refresh token available.");
+                log.warn("JWT expired. No refresh token available.");
             }
         }
 

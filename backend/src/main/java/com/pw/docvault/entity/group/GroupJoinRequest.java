@@ -4,7 +4,11 @@ import com.pw.docvault.entity.BaseEntity;
 import com.pw.docvault.entity.User;
 import com.pw.docvault.model.enums.GroupJoinRequestStatus;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "group_join_requests")
 public class GroupJoinRequest extends BaseEntity {
@@ -22,36 +26,4 @@ public class GroupJoinRequest extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private GroupJoinRequestStatus status;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Group getGroup() {
-        return group;
-    }
-
-    public void setGroup(Group group) {
-        this.group = group;
-    }
-
-    public GroupJoinRequestStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(GroupJoinRequestStatus status) {
-        this.status = status;
-    }
 }

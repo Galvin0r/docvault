@@ -4,20 +4,18 @@ import com.pw.docvault.model.security.AuthenticationRequest;
 import com.pw.docvault.model.security.AuthenticationCookies;
 import com.pw.docvault.model.security.RegistrationRequest;
 import com.pw.docvault.service.security.AuthenticationService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("auth")
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
-
-    public AuthenticationController(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<Void> register(@RequestBody RegistrationRequest request) {

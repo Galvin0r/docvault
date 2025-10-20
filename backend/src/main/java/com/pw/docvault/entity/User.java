@@ -2,6 +2,8 @@ package com.pw.docvault.entity;
 
 import com.pw.docvault.entity.security.Role;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,6 +13,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
 @NamedQuery(name="User.getEmailByLogin", query = "SELECT u.email FROM User u WHERE u.login = :login")
@@ -37,65 +41,6 @@ public class User extends BaseEntity implements UserDetails, Principal {
     private String oauth2Provider;
 
     private boolean enabled;
-
-    public User() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public List<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<Role> roles) {
-        this.roles = roles;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public String getOauth2Provider() {
-        return oauth2Provider;
-    }
-
-    public void setOauth2Provider(String oauth2Provider) {
-        this.oauth2Provider = oauth2Provider;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

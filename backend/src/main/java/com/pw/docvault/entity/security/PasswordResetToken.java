@@ -2,9 +2,13 @@ package com.pw.docvault.entity.security;
 
 import com.pw.docvault.entity.User;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "password_reset_tokens")
 public class PasswordResetToken {
@@ -22,36 +26,4 @@ public class PasswordResetToken {
 
     @Column(name = "expires_at")
     private Instant expiresAt;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Instant getExpiresAt() {
-        return expiresAt;
-    }
-
-    public void setExpiresAt(Instant expiresAt) {
-        this.expiresAt = expiresAt;
-    }
 }

@@ -2,8 +2,7 @@ package com.pw.docvault.handler;
 
 import com.pw.docvault.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,17 +12,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Instant;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     public record ExceptionDetails(ErrorCode code, String message, int status, String path, Instant timestamp) {}
 
     @ExceptionHandler(AppException.class)
     public ResponseEntity<ExceptionDetails> handleAppException(AppException ex, HttpServletRequest req) {
         var status = resolveStatus(ex);
-        logger.error(ex.getMessage(), ex);
+        log.error(ex.getMessage(), ex);
         var details = new ExceptionDetails(
                 ex.getErrorCode(),
                 ex.getMessage(),
@@ -37,7 +35,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionDetails> handleException(Exception ex,  HttpServletRequest req) {
         var status = resolveStatus(ex);
-        logger.error(ex.getMessage(), ex);
+        log.error(ex.getMessage(), ex);
         var details = new ExceptionDetails(
             ErrorCode.UNKNOWN,
             "An unexpected error occurred.",

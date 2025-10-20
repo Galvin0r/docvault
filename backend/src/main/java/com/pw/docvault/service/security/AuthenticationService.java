@@ -13,6 +13,7 @@ import com.pw.docvault.repository.security.RoleRepository;
 import com.pw.docvault.repository.UserRepository;
 import com.pw.docvault.service.EmailService;
 import jakarta.mail.MessagingException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Service
 public class AuthenticationService {
 
@@ -50,22 +52,6 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
-
-    public AuthenticationService(RoleRepository roleRepository, PasswordEncoder passwordEncoder,
-                                 UserRepository userRepository, ActivationTokenRepository activationTokenRepository,
-                                 EmailService emailService, AuthenticationManager authenticationManager,
-                                 JwtService jwtService, RefreshTokenService refreshTokenService,
-                                 PasswordResetTokenRepository passwordResetTokenRepository) {
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.userRepository = userRepository;
-        this.activationTokenRepository = activationTokenRepository;
-        this.emailService = emailService;
-        this.authenticationManager = authenticationManager;
-        this.jwtService = jwtService;
-        this.refreshTokenService = refreshTokenService;
-        this.passwordResetTokenRepository = passwordResetTokenRepository;
-    }
 
     public void register(RegistrationRequest request) {
         var userRole = roleRepository.findByName(RoleCode.USER.name())
