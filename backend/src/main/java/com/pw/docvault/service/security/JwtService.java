@@ -1,6 +1,7 @@
 package com.pw.docvault.service.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -91,11 +92,16 @@ public class JwtService {
     }
 
     public boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        try {
+            return extractExpiration(token).before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true;
+        }
+
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        return isTokenUserCorrect(token, userDetails) && !isTokenExpired(token);
+        return !isTokenExpired(token) && isTokenUserCorrect(token, userDetails);
     }
 
     public boolean isTokenUserCorrect(String token, UserDetails userDetails) {

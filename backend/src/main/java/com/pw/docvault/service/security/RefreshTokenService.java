@@ -59,4 +59,11 @@ public class RefreshTokenService {
     public void deleteByUserIdAndDeviceInfo(Long userId, String deviceInfo) {
         refreshTokenRepository.deleteByUserIdAndDeviceInfo(userId, deviceInfo);
     }
+
+    public RefreshToken getRefreshTokenOrThrow(String token) {
+        return refreshTokenRepository.findByToken(token)
+                                     .map(this::verifyExpiration)
+                                     .orElseThrow(() -> new RefreshTokenException(ErrorCode.AUTH_REFRESH_TOKEN_EXPIRED,
+                                                                                  "Refresh token expired"));
+    }
 }

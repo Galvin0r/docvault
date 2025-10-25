@@ -1,9 +1,6 @@
 package com.pw.docvault.service.security;
 
 import com.pw.docvault.entity.security.RefreshToken;
-import com.pw.docvault.exception.ErrorCode;
-import com.pw.docvault.exception.RefreshTokenException;
-import com.pw.docvault.repository.security.RefreshTokenRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -29,7 +26,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsServiceImpl userDetailsServiceImpl;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenService refreshTokenService;
 
     @Override
@@ -58,10 +54,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         } catch (ExpiredJwtException e) {
             if (refreshToken != null) {
-                RefreshToken rt = refreshTokenRepository.findByToken(refreshToken)
-                        .map(refreshTokenService::verifyExpiration)
-                        .orElseThrow(() -> new RefreshTokenException(ErrorCode.AUTH_REFRESH_TOKEN_EXPIRED,
-                                                                     "Refresh token expired"));
+                RefreshToken rt = refreshTokenService.getRefreshTokenOrThrow(refreshToken);
 
                     UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(rt.getUser().getEmail());
 

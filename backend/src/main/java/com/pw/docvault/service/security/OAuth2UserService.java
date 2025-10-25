@@ -7,6 +7,7 @@ import com.pw.docvault.repository.security.RoleRepository;
 import com.pw.docvault.repository.UserRepository;
 import com.pw.docvault.util.Constants;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -23,10 +24,17 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final DefaultOAuth2UserService delegate;
+
+    @Autowired
+    public OAuth2UserService(UserRepository userRepository,
+                             RoleRepository roleRepository) {
+        this(userRepository, roleRepository, new DefaultOAuth2UserService());
+    }
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2User oAuth2User = super.loadUser(userRequest);
+        OAuth2User oAuth2User = delegate.loadUser(userRequest);
         String provider = userRequest.getClientRegistration().getRegistrationId();
         Map<String, String> userInfo = extractUserInfo(oAuth2User, provider);
 
