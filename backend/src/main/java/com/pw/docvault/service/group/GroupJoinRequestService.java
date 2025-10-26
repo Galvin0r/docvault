@@ -13,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -49,16 +48,6 @@ public class GroupJoinRequestService {
 
     public Optional<GroupJoinRequest> getJoinRequestByIdOrThrow(Long requestId) {
         return groupJoinRequestRepository.findById(requestId);
-    }
-
-    public GroupJoinRequest getJoinRequestOrThrow(Long userId, Long groupId,  GroupJoinRequestStatus status) {
-        return findJoinRequest(userId, groupId, status).orElseThrow(
-                () -> new NotFoundException(ErrorCode.JOIN_REQUEST_NOT_FOUND));
-    }
-
-    @Transactional(readOnly = true)
-    public List<GroupJoinRequest> findGroupJoinRequests(Long userId, Long groupId) {
-        return groupJoinRequestRepository.findByUserIdAndGroupId(userId, groupId);
     }
 
     public Page<GroupJoinRequest> findGroupJoinRequests(Long groupId, GroupJoinRequestStatus status, Pageable pageable) {

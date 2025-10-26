@@ -25,7 +25,7 @@ public class GroupMembershipService {
     private final GroupMembershipRepository groupMembershipRepository;
     private final UserRepository userRepository;
 
-    public GroupMembership createMembership(User user, Group group, GroupRole role) {
+    public GroupMembership create(User user, Group group, GroupRole role) {
         var membership = new GroupMembership();
         membership.setRole(role);
         membership.setGroup(group);
@@ -100,7 +100,7 @@ public class GroupMembershipService {
         if (findMembership(userId, group.getId()).isEmpty()){
             var user = userRepository.findById(userId).orElseThrow(
                     () -> new NotFoundException(ErrorCode.USER_NOT_FOUND, "User not found."));
-            createMembership(user, group, GroupRole.USER);
+            create(user, group, GroupRole.USER);
         }
     }
 

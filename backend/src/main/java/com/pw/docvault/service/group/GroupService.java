@@ -50,7 +50,7 @@ public class GroupService {
         group.setDescription(description);
         group.setVisibility(visibility);
         groupRepository.save(group);
-        groupMembershipService.createMembership(currentUser.get(), group, GroupRole.OWNER);
+        groupMembershipService.create(currentUser.get(), group, GroupRole.OWNER);
         return group.getId();
     }
 
@@ -157,7 +157,7 @@ public class GroupService {
             throw new ForbiddenException(ErrorCode.GROUP_ACCESS_FORBIDDEN, "You are not allowed to join private groups");
         } else  if (group.getVisibility() == GroupVisibility.PUBLIC) {
             return groupMembershipMapper.toDto(groupMembershipService
-                                                       .createMembership(currentUser.get(), group, GroupRole.USER));
+                                                       .create(currentUser.get(), group, GroupRole.USER));
         } else {
             groupJoinRequestService.create(currentUser.getId(), groupId);
             return null;
@@ -209,7 +209,7 @@ public class GroupService {
     @Transactional
     public void acceptRequest(Long requestId) {
         var request = groupJoinRequestService.findJoinRequestById(requestId);
-        groupMembershipService.createMembership(request.getUser(), request.getGroup(), GroupRole.USER);
+        groupMembershipService.create(request.getUser(), request.getGroup(), GroupRole.USER);
         groupJoinRequestService.changeStatus(requestId, GroupJoinRequestStatus.ACCEPTED);
     }
 
