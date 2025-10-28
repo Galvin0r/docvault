@@ -66,7 +66,7 @@ public class GroupService {
     }
 
     @Transactional
-    public void edit(Long id, GroupDto dto) { // TODO reject/accept all requests to this group on visibility change
+    public void edit(Long id, GroupDto dto) {
         var group = getGroupOrThrow(id);
         var membership = groupMembershipService.getMembershipOrThrow(currentUser.getId(), group.getId());
 
@@ -78,6 +78,14 @@ public class GroupService {
             group.setDescription(dto.description());
         }
         if (dto.visibility() != null) {
+            if (group.getVisibility() == GroupVisibility.REQUEST_ONLY && group.getVisibility() != dto.visibility()) {
+                var joinRequests = groupJoinRequestService.findAllGroupJoinRequests(id, GroupJoinRequestStatus.PENDING);
+                if (dto.visibility() == GroupVisibility.PUBLIC) {
+                    joinRequests.forEach(joinRequest -> acceptRequest(joinRequest.getId()));
+                } else if (dto.visibility() == GroupVisibility.PRIVATE) {
+                    joinRequests.forEach(joinRequest -> rejectRequest(joinRequest.getId()));
+                }
+            }
             group.setVisibility(dto.visibility());
         }
         if (dto.name() != null) {
@@ -169,7 +177,7 @@ public class GroupService {
     }
 
     public Group getGroupOrThrow(Long groupId) {
-        return  findGroup(groupId).orElseThrow(
+        return findGroup(groupId).orElseThrow(
                 () -> new NotFoundException(ErrorCode.GROUP_NOT_FOUND, "Group does not exist"));
     }
 
@@ -188,11 +196,9 @@ public class GroupService {
     }
 
     public GroupJoinRequestDto getRequest(Long groupId) {
-        var a = groupJoinRequestService
-                .findJoinRequest(currentUser.getId(), groupId,
-                                 GroupJoinRequestStatus.PENDING);
-        return groupJoinRequestMapper.toDto(
-                                                    a.orElse(null));
+        return groupJoinRequestMapper.toDto(groupJoinRequestService
+                                                    .findJoinRequest(currentUser.getId(), groupId,
+                                                                     GroupJoinRequestStatus.PENDING).orElse(null));
     }
 
     public Page<GroupJoinRequestDto> findPendingRequests(Long groupId, Pageable pageable) {

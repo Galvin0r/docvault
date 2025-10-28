@@ -15,4 +15,5 @@ public interface GroupJoinRequestRepository extends JpaRepository<GroupJoinReque
             Long userId, Long groupId, GroupJoinRequestStatus status);
     Page<GroupJoinRequest> findByGroupIdAndStatusOrderByCreatedAsc(Long groupId, GroupJoinRequestStatus status, Pageable pageable);
     long countAllByGroupIdAndStatus(Long groupId, GroupJoinRequestStatus status);
+    List<GroupJoinRequest> findAllByGroupIdAndStatus(Long groupId, GroupJoinRequestStatus status);
 }

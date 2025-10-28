@@ -166,4 +166,17 @@ public class GroupJoinRequestServiceTest {
 
         assertThat(count).isEqualTo(result);
     }
+
+    // findAllGroupJoinRequests
+
+    @Test
+    void findAllGroupJoinRequestsReturnsRequests() {
+        List<GroupJoinRequest> requests = List.of(new GroupJoinRequest());
+
+        when(groupJoinRequestRepository.findAllByGroupIdAndStatus(1L, GroupJoinRequestStatus.PENDING))
+                .thenReturn(requests);
+
+        var result = groupJoinRequestService.findAllGroupJoinRequests(1L, GroupJoinRequestStatus.PENDING);
+        assertThat(result).isSameAs(requests);
+    }
 }
