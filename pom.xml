@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.pw</groupId>
+    <artifactId>docvault</artifactId>
+    <version>0.1-SNAPSHOT</version>
+
+    <packaging>pom</packaging>
+
+    <name>docvault</name>
+    <description>Document management system with advanced search and access control</description>
+
+    <developers>
+        <developer>
+            <id>rtitov</id>
+            <name>Roman Titov</name>
+            <email>rom.tytov@gmail.com</email>
+        </developer>
+    </developers>
+
+    <modules>
+        <module>backend</module>
+        <module>frontend</module>
+    </modules>
+
+    <profiles>
+        <profile>
+            <id>prof</id>
+            <properties>
+                <build.configuration>production</build.configuration>
+                <build.baseHref>/</build.baseHref>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <build.configuration>development</build.configuration>
+                <build.baseHref>/</build.baseHref>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+    </profiles>
+</project>
