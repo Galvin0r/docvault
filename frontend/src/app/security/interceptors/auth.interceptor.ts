@@ -19,7 +19,7 @@ export class AuthInterceptor implements HttpInterceptor {
         if (
           error.status === 401 &&
           this.router.url !== '/login' &&
-          !req.url.includes('/api/account/me')
+          !req.url.includes('/api/accounts/me')
         ) {
           this.router.navigate(['/login']);
         }
