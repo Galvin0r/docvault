@@ -435,6 +435,18 @@ public class GroupServiceTest {
         verify(groupMembershipService).addMember(me.getId(), target.getId(), group);
     }
 
+    @Test
+    void addMemberByEmailThrowsNotFoundWhenUserMissing() {
+        var email = "missing@ex.com";
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> groupService.addMember(group.getId(), email))
+                .isInstanceOf(com.pw.docvault.exception.NotFoundException.class)
+                .hasMessageContaining(email);
+
+        verifyNoInteractions(groupRepository, groupMembershipService);
+    }
+
     // join
 
     @Test

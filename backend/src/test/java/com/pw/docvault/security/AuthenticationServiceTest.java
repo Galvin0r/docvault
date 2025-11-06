@@ -448,4 +448,53 @@ public class AuthenticationServiceTest {
                 .isInstanceOf(PasswordResetTokenException.class)
                 .hasMessageContaining(expired.getToken());
     }
+
+    @Test
+    void registerShouldWrapAndPropagateWhenActivationEmailFails() throws Exception {
+        var req = new RegistrationRequest("alice", "a@ex.com", "pw");
+        var role = new Role();
+        role.setName(RoleCode.USER.name());
+
+        when(roleRepository.findByName(RoleCode.USER.name())).thenReturn(Optional.of(role));
+        when(userRepository.findByEmail("a@ex.com")).thenReturn(Optional.empty());
+        when(userRepository.findByLogin("alice")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode("pw")).thenReturn("hash");
+        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
+        when(activationTokenRepository.save(any(ActivationToken.class)))
+                .thenAnswer(i -> i.getArgument(0));
+
+        doThrow(new jakarta.mail.MessagingException("fail"))
+                .when(emailService).sendEmail(any(), any(), any(), any(), any(), any());
+
+        assertThatThrownBy(() -> authenticationService.register(req))
+                .isInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    void initiatePasswordResetShouldWrapWhenEmailSendFails() throws Exception {
+        var u = new User(); u.setEmail("e@ex.com"); u.setLogin("l"); u.setEnabled(true);
+
+        when(userRepository.findByEmail(u.getEmail())).thenReturn(Optional.of(u));
+        when(passwordResetTokenRepository.save(any(PasswordResetToken.class)))
+                .thenAnswer(i -> i.getArgument(0));
+
+        doThrow(new RuntimeException("send-failed"))
+                .when(emailService).sendEmail(any(), any(), eq(EmailTemplateName.RESET_PASSWORD),
+                        any(), any(), any());
+
+        assertThatThrownBy(() -> authenticationService.initiatePasswordReset(u.getEmail()))
+                .isInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    void authenticateShouldFailWhenEmailUnknown() {
+        var email = "ghost@ex.com";
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+        var req = new AuthenticationRequest(email, "pw", null, null, false);
+
+        assertThatThrownBy(() -> authenticationService.authenticate(req))
+                .isInstanceOf(BadCredentialsException.class)
+                .hasMessageContaining("Invalid email/login or password");
+    }
 }

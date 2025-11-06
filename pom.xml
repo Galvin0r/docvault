@@ -43,5 +43,27 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
         </profile>
+        <profile>
+            <id>skip-jacoco-when-maven-test-skip</id>
+            <activation>
+                <property>
+                    <name>maven.test.skip</name>
+                </property>
+            </activation>
+            <properties>
+                <jacoco.skip>true</jacoco.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>skip-jacoco-when-skipTests</id>
+            <activation>
+                <property>
+                    <name>skipTests</name>
+                </property>
+            </activation>
+            <properties>
+                <jacoco.skip>true</jacoco.skip>
+            </properties>
+        </profile>
     </profiles>
 </project>

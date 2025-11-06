@@ -208,4 +208,15 @@ public class JwtServiceTest {
         assertThat(auth).containsExactly("ADMIN");
         assertThat(claims.getExpiration()).isAfter(claims.getIssuedAt());
     }
+
+    @Test
+    void generateJwtCookieWithValueKeepsValueAndFlags() {
+        var cookie = jwtService.generateJwtCookie("ACCESS-123");
+
+        assertThat(cookie.getName()).isEqualTo(jwtCookieName);
+        assertThat(cookie.getValue()).isEqualTo("ACCESS-123");
+        assertThat(cookie.isHttpOnly()).isTrue();
+        assertThat(cookie.getPath()).isEqualTo("/api");
+        assertThat(cookie.getMaxAge().getSeconds()).isEqualTo(cookieMaxAge);
+    }
 }

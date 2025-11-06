@@ -149,6 +149,21 @@ public class GroupMembershipServiceTest {
         assertThat(ownerMembership.getRole()).isEqualTo(GroupRole.ADMIN);
     }
 
+    @Test
+    void changeRoleThrowsForbiddenWhenActorIsNotOwner() {
+        var adminActor = membership(1L, actor, group, GroupRole.ADMIN);
+
+        when(groupMembershipRepository.findByUserIdAndGroupId(actor.getId(), group.getId()))
+                .thenReturn(Optional.of(adminActor));
+
+        assertThatThrownBy(() ->
+                groupMembershipService.changeRole(actor.getId(), user.getId(), group.getId(), GroupRole.USER))
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessageContaining("Only owner can change group role");
+
+        verify(groupMembershipRepository, never()).findByUserIdAndGroupId(user.getId(), group.getId());
+    }
+
     // removeMember
 
     @Test
