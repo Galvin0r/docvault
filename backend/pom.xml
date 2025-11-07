@@ -160,10 +160,10 @@
                 <version>${jacoco.version}</version>
                 <configuration>
                     <excludes>
+                        <exclude>**/DocvaultApplication.class</exclude>
                         <exclude>**/model/</exclude>
                         <exclude>**/mapper/</exclude>
                         <exclude>**/util/Constants.class</exclude>
-
 <!--                        Delete later-->
                         <exclude>**/DocumentService.class</exclude>
                         <exclude>**/GoogleCloudStorageService.class</exclude>
@@ -200,7 +200,7 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.50</minimum>
+                                            <minimum>0.70</minimum>
                                         </limit>
                                     </limits>
                                 </rule>
