@@ -52,7 +52,7 @@ describe('SecurityService', () => {
     });
 
     const req = http.expectOne(
-      r => r.url === 'api/auth/resendActivation' && r.params.get('email') === 'a@b.c'
+      (r) => r.url === 'api/auth/resendActivation' && r.params.get('email') === 'a@b.c'
     );
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toBeNull();
@@ -65,7 +65,7 @@ describe('SecurityService', () => {
     });
 
     const req = http.expectOne(
-      r => r.url === 'api/auth/activateAccount' && r.params.get('token') === '123456'
+      (r) => r.url === 'api/auth/activateAccount' && r.params.get('token') === '123456'
     );
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toBeNull();
@@ -78,7 +78,7 @@ describe('SecurityService', () => {
     });
 
     const req = http.expectOne(
-      r => r.url === 'api/auth/resetPassword' && r.params.get('email') === 'a@b.c'
+      (r) => r.url === 'api/auth/resetPassword' && r.params.get('email') === 'a@b.c'
     );
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toBeNull();
@@ -91,7 +91,7 @@ describe('SecurityService', () => {
     });
 
     const req = http.expectOne(
-      r =>
+      (r) =>
         r.url === 'api/auth/setNewPassword' &&
         r.params.get('token') === 'tok123' &&
         r.params.get('password') === 'Secret!1'

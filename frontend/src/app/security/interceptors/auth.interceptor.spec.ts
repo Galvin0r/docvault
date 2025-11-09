@@ -1,8 +1,13 @@
-import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
-import { AuthInterceptor } from "./auth.interceptor";
-import { HttpTestingController, provideHttpClientTesting } from "@angular/common/http/testing";
-import { TestBed } from "@angular/core/testing";
-import { Router } from "@angular/router";
+import {
+  HTTP_INTERCEPTORS,
+  HttpClient,
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
+import { AuthInterceptor } from './auth.interceptor';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
 
 describe('AuthInterceptor', () => {
   let http: HttpClient;
@@ -18,7 +23,7 @@ describe('AuthInterceptor', () => {
         provideHttpClientTesting(),
         { provide: Router, useValue: router },
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-      ]
+      ],
     });
 
     http = TestBed.inject(HttpClient);

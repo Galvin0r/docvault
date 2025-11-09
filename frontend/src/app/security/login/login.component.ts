@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormGroup, Validators } from '@angular/forms';
 import { BaseFormComponent } from '../base-form.component';
 import { getDeviceId } from '../../utils/functions';
 import { AuthenticationRequest } from '../security.model';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'app-login',
@@ -11,6 +12,8 @@ import { AuthenticationRequest } from '../security.model';
   styleUrl: './login.component.scss',
 })
 export class LoginComponent extends BaseFormComponent {
+  private doc = inject(DOCUMENT);
+
   protected buildForm(): FormGroup {
     return this.formBuilder.group({
       identifier: ['', Validators.required],
@@ -27,21 +30,19 @@ export class LoginComponent extends BaseFormComponent {
     const authRequest: AuthenticationRequest = {
       login: identifier,
       email: identifier,
-      password: password,
-      rememberMe: rememberMe,
+      password,
+      rememberMe,
       deviceInfo: deviceId,
     } as AuthenticationRequest;
 
     this.securityService.login(authRequest).subscribe({
       next: () => this.router.navigate(['/home']),
-      error: (e) => {
-       this.error = e.error.code;
-      }
+      error: (e) => { this.error = e.error.code; }
     });
   }
 
   continueWithGoogle() {
-    document.cookie = `deviceId=${getDeviceId()}; path=/`;
-    window.location.href = `/api/oauth2/authorization/google`;
+    this.doc.cookie = `deviceId=${getDeviceId()}; path=/`;
+    this.doc.location.assign('/api/oauth2/authorization/google');
   }
 }

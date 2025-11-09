@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+// signup.component.ts
+import { Component, inject } from '@angular/core';
 import { FormGroup, Validators } from '@angular/forms';
 import { BaseFormComponent } from '../base-form.component';
 import { passwordsMatchValidator } from '../../utils/validators';
 import { RegistrationRequest } from '../security.model';
 import { getDeviceId } from '../../utils/functions';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'app-signup',
@@ -12,6 +14,8 @@ import { getDeviceId } from '../../utils/functions';
   styleUrl: './signup.component.scss',
 })
 export class SignupComponent extends BaseFormComponent {
+  private readonly doc = inject(DOCUMENT) as Document;
+
   protected buildForm(): FormGroup {
     return this.formBuilder.group({
       username: ['', [Validators.required]],
@@ -34,23 +38,20 @@ export class SignupComponent extends BaseFormComponent {
 
   onSubmit() {
     if (!this.guardSubmit()) return;
-
-    const { username, email, passwords: {password, confirmPassword} } = this.form.value;
-    const regRequest: RegistrationRequest = {
-      login: username,
-      password: password,
-      email: email
-    } as RegistrationRequest;
+    const { username, email, passwords: { password, confirmPassword } } = this.form.value as any;
+    const regRequest: RegistrationRequest = { login: username, password: password, email: email } as RegistrationRequest;
     this.securityService.register(regRequest).subscribe({
-      next: () => this.router.navigate(['/emailVerification'], {queryParams: {email: email}}),
-      error: (e) => {
-        this.error = e.error.code;
-      }
+      next: () => this.router.navigate(['/emailVerification'], { queryParams: { email: email } }),
+      error: (e) => { this.error = e.error.code; }
     });
   }
 
+  protected redirect(url: string) {
+    this.doc.defaultView?.location.assign(url);
+  }
+
   continueWithGoogle() {
-    document.cookie = `deviceId=${getDeviceId()}; path=/`;
-    window.location.href = `/api/oauth2/authorization/google`;
+    this.doc.cookie = `deviceId=${getDeviceId()}; path=/`;
+    this.redirect(`/api/oauth2/authorization/google`);
   }
 }
