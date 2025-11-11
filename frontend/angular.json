@@ -92,6 +92,8 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
+            "karmaConfig": "karma.conf.js",
+            "codeCoverage": false,
             "polyfills": [
               "zone.js",
               "zone.js/testing"
@@ -108,7 +110,29 @@
               "node_modules/primeicons/primeicons.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "codeCoverageExclude": [
+              "src/main.ts",
+              "src/environments/**",
+              "**/*.spec.ts",
+              "src/app/menu/auth-layout/**",
+              "src/app/menu/main-layout/**",
+              "src/app/menu/home/**",
+              "src/app/menu/top-menu/**"
+            ]
+          },
+          "configurations": {
+            "cov": {
+              "karmaConfig": "karma.cov.conf.js",
+              "codeCoverage": true,
+              "watch": false
+            },
+            "ci": {
+              "karmaConfig": "karma.ci.conf.js",
+              "codeCoverage": true,
+              "watch": false,
+              "progress": false
+            }
           }
         }
       }

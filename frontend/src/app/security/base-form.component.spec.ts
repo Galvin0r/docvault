@@ -8,7 +8,7 @@ class TestFormCmp extends BaseFormComponent {
   protected buildForm(): FormGroup {
     return this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 }
@@ -21,8 +21,8 @@ describe('BaseFormComponent', () => {
       providers: [
         FormBuilder,
         { provide: Router, useValue: { navigate: jasmine.createSpy('navigate'), url: '/home' } },
-        { provide: SecurityService, useValue: {} },
-      ],
+        { provide: SecurityService, useValue: {} }
+      ]
     });
 
     cmp = TestBed.runInInjectionContext(() => new TestFormCmp());
