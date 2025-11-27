@@ -38,8 +38,8 @@ jobs:
 
     env:
       REGISTRY: ghcr.io
-      IMAGE_BACKEND: ghcr.io/${{ github.repository }}/backend
-      IMAGE_FRONTEND: ghcr.io/${{ github.repository }}/frontend
+      IMAGE_BACKEND: ghcr.io/galvin0r/docvault-backend
+      IMAGE_FRONTEND: ghcr.io/galvin0r/docvault-frontend
 
     steps:
       - name: Checkout
