@@ -55,7 +55,7 @@ jobs:
 
       - name: Backend - run tests
         working-directory: backend
-        run: mvn -B test
+        run: mvn -B verify
 
       - name: Backend - package app (no tests)
         working-directory: backend
