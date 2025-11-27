@@ -36,6 +36,10 @@ jobs:
     if: needs.check-tag.outputs.on_main == 'true'
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write
+
     env:
       REGISTRY: ghcr.io
       IMAGE_BACKEND: ghcr.io/galvin0r/docvault-backend
