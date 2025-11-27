@@ -3,9 +3,9 @@ package com.pw.docvault.security;
 import com.pw.docvault.entity.User;
 import com.pw.docvault.entity.security.Role;
 import com.pw.docvault.service.security.JwtService;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Encoders;
-import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +13,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Date;
@@ -144,9 +145,14 @@ public class JwtServiceTest {
         var user = user("test", null);
         var token = jwtService.generateToken(user);
 
-        var tempered = token.substring(0, token.length() - 1) + (token.endsWith("a") ? "b" : "a");
+        String[] parts = token.split("\\.");
+        assertThat(parts).hasSize(3);
 
-        assertThatThrownBy(() -> jwtService.extractClaims(tempered)).isInstanceOf(SignatureException.class);
+        String bogusSig = Encoders.BASE64URL.encode("definitely-wrong-signature".getBytes(StandardCharsets.UTF_8));
+
+        String tempered = parts[0] + "." + parts[1] + "." + bogusSig;
+
+        assertThatThrownBy(() -> jwtService.extractClaims(tempered)).isInstanceOf(JwtException.class);
     }
 
     @Test
