@@ -16,7 +16,15 @@ jobs:
           fetch-depth: 0
       - id: check
         run: |
-          if git branch --contains "$GITHUB_SHA" | grep -q "main"; then
+          # Make sure we have origin/main
+          git fetch origin main
+
+          echo "Commit: $GITHUB_SHA"
+          echo "Remote branches containing this commit:"
+          git branch -r --contains "$GITHUB_SHA" || true
+
+          if git branch -r --contains "$GITHUB_SHA" | grep -q "origin/main"; then
+            echo "Tag is on main"
             echo "on_main=true" >> "$GITHUB_OUTPUT"
           else
             echo "Tag is NOT on main, skipping pipeline."
