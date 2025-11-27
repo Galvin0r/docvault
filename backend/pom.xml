@@ -162,6 +162,7 @@
                     <excludes>
                         <exclude>**/DocvaultApplication.class</exclude>
                         <exclude>**/model/</exclude>
+                        <exclude>**/entity/</exclude>
                         <exclude>**/mapper/</exclude>
                         <exclude>**/util/Constants.class</exclude>
 <!--                        Delete later-->
