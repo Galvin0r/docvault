@@ -1,11 +1,12 @@
-package com.pw.docvault.entity;
+package com.pw.docvault.entity.document;
 
+import com.pw.docvault.entity.BaseEntity;
+import com.pw.docvault.entity.User;
+import com.pw.docvault.model.enums.DocumentStatus;
 import com.pw.docvault.model.enums.DocumentVisibility;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -35,4 +36,10 @@ public class Document extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User owner;
+
+    @Column(name = "size_bytes")
+    private Long sizeBytes;
+
+    @Enumerated(EnumType.STRING)
+    private DocumentStatus status;
 }

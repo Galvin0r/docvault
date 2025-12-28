@@ -1,6 +1,6 @@
-package com.pw.docvault.repository;
+package com.pw.docvault.repository.document;
 
-import com.pw.docvault.entity.Document;
+import com.pw.docvault.entity.document.Document;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface DocumentRepository extends JpaRepository<Document, Long> {

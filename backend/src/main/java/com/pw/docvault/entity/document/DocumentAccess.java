@@ -1,5 +1,7 @@
-package com.pw.docvault.entity;
+package com.pw.docvault.entity.document;
 
+import com.pw.docvault.entity.BaseEntity;
+import com.pw.docvault.entity.User;
 import com.pw.docvault.entity.group.Group;
 import com.pw.docvault.model.enums.AccessPermission;
 import jakarta.persistence.*;

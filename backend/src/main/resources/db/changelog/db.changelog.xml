@@ -193,20 +193,18 @@
                 <constraints nullable="false"/>
             </column>
             <column name="description" type="TEXT"/>
-            <column name="original_filename" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="path" type="VARCHAR(500)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="mime_type" type="VARCHAR(100)">
-                <constraints nullable="false"/>
-            </column>
+            <column name="original_filename" type="VARCHAR(255)" />
+            <column name="path" type="VARCHAR(500)" />
+            <column name="mime_type" type="VARCHAR(100)" />
             <column name="visibility" type="VARCHAR(20)">
                 <constraints nullable="false"/>
             </column>
             <column name="owner_id" type="BIGINT">
                 <constraints nullable="false"/>
+            </column>
+            <column name="size_bytes" type="BIGINT" />
+            <column name="status" type="VARCHAR(10)">
+                <constraints nullable="false" />
             </column>
         </createTable>
 
@@ -340,6 +338,39 @@
                 onDelete="CASCADE"/>
 
         <createSequence sequenceName="group_join_requests_seq" />
+    </changeSet>
+
+    <changeSet id="20" author="Roman">
+
+        <createTable tableName="document_index_jobs">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created" type="TIMESTAMPTZ"/>
+            <column name="last_modified" type="TIMESTAMPTZ"/>
+            <column name="document_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="locked_by" type="VARCHAR(30)" />
+            <column name="lock_until" type="TIMESTAMPTZ" />
+            <column name="attempts" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_error" type="VARCHAR(200)"/>
+            <column name="status" type="VARCHAR(10)">
+                <constraints nullable="false" />
+            </column>
+            <column name="next_attempt_at" type="TIMESTAMPTZ" />
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="document_index_jobs"
+                baseColumnNames="document_id"
+                referencedTableName="documents"
+                referencedColumnNames="id"
+                constraintName="fk_indexjobs_document"/>
+
+        <createSequence sequenceName="document_index_jobs_seq" />
     </changeSet>
 
     <include file="db.insert-data.xml" relativeToChangelogFile="true" />

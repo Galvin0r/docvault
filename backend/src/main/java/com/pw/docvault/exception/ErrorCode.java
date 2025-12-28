@@ -3,6 +3,13 @@ package com.pw.docvault.exception;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ErrorCode {
+    // document
+    DOCUMENT_NOT_FOUNT("document.not_found"),
+    DOCUMENT_UPLOAD_FAILED("document.upload_failed"),
+    DOCUMENT_FORBIDDEN("document.forbidden"),
+    DOCUMENT_INVALID_STATE("document.invalid_state"),
+    DOCUMENT_EMPTY("document.empty"),
+
     // auth
     AUTH_BAD_CREDENTIALS("auth.bad_credentials"),
     AUTH_ACTIVATION_TOKEN_INVALID("auth.activation_token.invalid"),

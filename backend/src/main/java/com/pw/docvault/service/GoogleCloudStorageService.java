@@ -5,6 +5,8 @@ import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.ReadChannel;
 import com.google.cloud.WriteChannel;
 import com.google.cloud.storage.*;
+import com.pw.docvault.exception.ErrorCode;
+import com.pw.docvault.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -68,7 +70,13 @@ public class GoogleCloudStorageService {
 
     public InputStream download(String objectName) {
         BlobId blobId = BlobId.of(bucketName, objectName);
-        ReadChannel reader = storage.get(blobId).reader();
+
+        Blob blob = storage.get(blobId);
+        if (blob == null) {
+            throw new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUNT, "GCS object not found: " + objectName);
+        }
+
+        ReadChannel reader = blob.reader();
         return Channels.newInputStream(reader);
     }
 }

@@ -1,9 +1,9 @@
 package com.pw.docvault.controller;
 
-import com.pw.docvault.entity.Document;
+import com.pw.docvault.entity.document.Document;
 import com.pw.docvault.model.enums.DocumentVisibility;
-import com.pw.docvault.repository.DocumentRepository;
-import com.pw.docvault.service.DocumentService;
+import com.pw.docvault.repository.document.DocumentRepository;
+import com.pw.docvault.service.document.DocumentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,12 +23,17 @@ public class DocumentController {
     private final DocumentService documentService;
     private final DocumentRepository documentRepository;
 
-    @PostMapping("/upload")
-    public ResponseEntity<Void> upload(@RequestParam("file") MultipartFile file,
-                                       @RequestParam("title") String title,
-                                       @RequestParam("description") String description,
-                                       @RequestParam("visibility") DocumentVisibility visibility) {
-        documentService.upload(file, title, description, visibility);
+    @PostMapping("draft")
+    public ResponseEntity<Long> uploadDraft(@RequestParam("title") String title,
+                                            @RequestParam(value = "description", required = false) String description,
+                                            @RequestParam("visibility") DocumentVisibility visibility) {
+        var documentId = documentService.createDocumentDraft(title, description, visibility);
+        return ResponseEntity.status(HttpStatus.CREATED).body(documentId);
+    }
+
+    @PostMapping("/{id}/upload")
+    public ResponseEntity<Void> uploadFile(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        documentService.upload(id, file);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

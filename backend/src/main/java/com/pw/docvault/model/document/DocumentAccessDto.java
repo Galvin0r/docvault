@@ -1,4 +1,4 @@
-package com.pw.docvault.model;
+package com.pw.docvault.model.document;
 
 import com.pw.docvault.model.enums.AccessPermission;
 

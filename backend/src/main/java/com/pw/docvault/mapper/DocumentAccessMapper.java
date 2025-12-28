@@ -1,7 +1,7 @@
 package com.pw.docvault.mapper;
 
-import com.pw.docvault.entity.DocumentAccess;
-import com.pw.docvault.model.DocumentAccessDto;
+import com.pw.docvault.entity.document.DocumentAccess;
+import com.pw.docvault.model.document.DocumentAccessDto;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
