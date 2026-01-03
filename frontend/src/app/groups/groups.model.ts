@@ -39,7 +39,7 @@ export interface GroupMembership {
   groupName: string;
   role: GroupRole;
   created: string;
-  groupVisibility: GroupRole;
+  groupVisibility: Visibility;
 }
 
 export interface GroupJoinRequest {

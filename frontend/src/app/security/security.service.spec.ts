@@ -101,14 +101,14 @@ describe('SecurityService', () => {
     req.flush(null);
   });
 
-  it('getUserInfo() -> GET "/api/accounts/me" and returns UserInfo', () => {
+  it('getUserInfo() -> GET "/api/accounts" and returns UserInfo', () => {
     const mockUser = { id: 1, username: 'john' } as any;
 
     service.getUserInfo().subscribe((u) => {
       expect(u).toEqual(mockUser);
     });
 
-    const req = http.expectOne('/api/accounts/me');
+    const req = http.expectOne('/api/accounts');
     expect(req.request.method).toBe('GET');
     req.flush(mockUser);
   });
@@ -144,12 +144,12 @@ describe('userResolver', () => {
 
     const resultPromise = firstValueFrom(obs);
 
-    const req = http.expectOne('/api/accounts/me');
+    const req = http.expectOne('/api/accounts');
     expect(req.request.method).toBe('GET');
-    req.flush({ email: 'a@b', login: 'john' });
+    req.flush({ email: 'a@b', login: 'john', created: '' });
 
     const result = await resultPromise;
-    expect(result).toEqual({ email: 'a@b', login: 'john' });
+    expect(result).toEqual({ email: 'a@b', login: 'john', created: '' });
   });
 
   it('returns null when error (catchError -> of(null))', async () => {
@@ -159,7 +159,7 @@ describe('userResolver', () => {
 
     const resultPromise = firstValueFrom(obs);
 
-    const req = http.expectOne('/api/accounts/me');
+    const req = http.expectOne('/api/accounts');
     req.flush('server error', { status: 500, statusText: 'Server Error' });
 
     const result = await resultPromise;
