@@ -13,6 +13,10 @@ export class GroupService {
     return this.httpClient.get<Page<Group>>('/api/groups', { params: params });
   }
 
+  findMemberships(params: Record<string, any>): Observable<Page<GroupMembership>> {
+    return this.httpClient.get<Page<GroupMembership>>(`/api/groups/members`, { params: params });
+  }
+
   create(group: Group): Observable<void> {
     return this.httpClient.post<void>('/api/groups', group);
   }

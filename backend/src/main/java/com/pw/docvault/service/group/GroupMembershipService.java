@@ -115,4 +115,9 @@ public class GroupMembershipService {
     public List<GroupMembership> getAllMemberships(Long userId) {
         return groupMembershipRepository.findAllByUserId(userId);
     }
+
+    public Page<GroupMembership> findMembershipsVisibleToViewer(Long userId, Long viewerId, String groupName,
+                                                                Pageable pageable) {
+        return groupMembershipRepository.findMembershipsVisibleToViewer(userId, viewerId, groupName, pageable);
+    }
 }

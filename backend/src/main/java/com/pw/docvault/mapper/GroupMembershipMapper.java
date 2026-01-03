@@ -13,6 +13,7 @@ public interface GroupMembershipMapper {
     @Mapping(source = "user.login", target = "userLogin")
     @Mapping(source = "group.id", target = "groupId")
     @Mapping(source = "group.name", target = "groupName")
+    @Mapping(source = "group.visibility", target = "groupVisibility")
     GroupMembershipDto toDto(GroupMembership entity);
 
     @InheritInverseConfiguration

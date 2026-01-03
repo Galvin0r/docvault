@@ -102,26 +102,16 @@ public class CredentialsControllerTest {
         verify(credentialsService).changeLogin("new_name");
     }
 
-    // changeEmail
-
-    @Test
-    void changeEmailReturns200() throws Exception {
-        mockMvc.perform(post("/accounts/change-email").param("newEmail", "new@example.com"))
-               .andExpect(status().isOk());
-        // no delegation yet (TODO in controller)
-        verifyNoInteractions(credentialsService);
-    }
-
     // me
 
     @Test
     void getMeReturns200AndDelegates() throws Exception {
         var info = mock(UserInfo.class);
-        when(credentialsService.getUserInfo()).thenReturn(info);
+        when(credentialsService.getUserInfo("test")).thenReturn(info);
 
-        mockMvc.perform(get("/accounts/me").accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/accounts?username=test").accept(MediaType.APPLICATION_JSON))
                .andExpect(status().isOk());
 
-        verify(credentialsService).getUserInfo();
+        verify(credentialsService).getUserInfo("test");
     }
 }

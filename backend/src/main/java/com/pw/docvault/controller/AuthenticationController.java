@@ -51,6 +51,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/setNewPassword")
+
     public ResponseEntity<Void> setNewPassword(@RequestParam String token, @RequestParam String password) {
         authenticationService.setNewPassword(token, password);
         return ResponseEntity.accepted().build();

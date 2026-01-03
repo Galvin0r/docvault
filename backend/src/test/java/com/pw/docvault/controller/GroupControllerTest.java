@@ -1,6 +1,8 @@
 package com.pw.docvault.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.pw.docvault.model.enums.GroupRole;
 import com.pw.docvault.model.group.GroupDto;
 import com.pw.docvault.model.group.GroupJoinRequestDto;
@@ -19,6 +21,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.Instant;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +42,9 @@ public class GroupControllerTest {
     @BeforeEach
     void setup() {
         var controller = new GroupController(groupService);
-        objectMapper = new ObjectMapper();
+        objectMapper = new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                                  .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                                  .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
@@ -50,7 +55,7 @@ public class GroupControllerTest {
     void createReturns201WithIdAndDelegates() throws Exception {
         var name = "groupName";
         var description = "groupDescription";
-        GroupDto dto = new GroupDto(null, name, description, null, null, null, null, null);
+        GroupDto dto = new GroupDto(null, name, description, null, null, null, null);
         when(groupService.create(eq(name), eq(description), isNull())).thenReturn(123L);
 
         mockMvc.perform(post("/groups")
@@ -74,7 +79,7 @@ public class GroupControllerTest {
     @Test
     void editReturns204AndDelegates() throws Exception {
         var groupId = 2L;
-        GroupDto dto = new GroupDto(groupId, "N", "D", null, null, null, null, null);
+        GroupDto dto = new GroupDto(groupId, "N", "D", null, null, null, null);
 
         mockMvc.perform(patch("/groups/{id}", groupId)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -87,7 +92,7 @@ public class GroupControllerTest {
     @Test
     void getReturns200AndDelegates() throws Exception {
         var groupId = 2L;
-        GroupDto dto = new GroupDto(groupId, "A", "B", null, null, null, null, null);
+        GroupDto dto = new GroupDto(groupId, "A", "B", null, null, null, null);
         when(groupService.get(groupId)).thenReturn(dto);
 
         mockMvc.perform(get("/groups/{id}", groupId))
@@ -178,7 +183,8 @@ public class GroupControllerTest {
     @Test
     void joinReturns200AndDelegates() throws Exception {
         var groupId = 2L;
-        GroupMembershipDto membership = new GroupMembershipDto(1L, 7L, "me", groupId, "G", GroupRole.USER);
+        GroupMembershipDto membership = new GroupMembershipDto(1L, 7L, "me", groupId, "G", GroupRole.USER,
+                                                               Instant.now());
         when(groupService.join(groupId)).thenReturn(membership);
 
         mockMvc.perform(post("/groups/{id}/members/me", groupId))
@@ -211,7 +217,7 @@ public class GroupControllerTest {
     @Test
     void getMembershipReturns200AndDelegates() throws Exception {
         var groupId = 2L;
-        GroupMembershipDto m = new GroupMembershipDto(1L, 7L, "me", groupId, "G", GroupRole.USER);
+        GroupMembershipDto m = new GroupMembershipDto(1L, 7L, "me", groupId, "G", GroupRole.USER, Instant.now());
         when(groupService.getMembership(groupId)).thenReturn(m);
 
         mockMvc.perform(get("/groups/{id}/members/me", groupId))

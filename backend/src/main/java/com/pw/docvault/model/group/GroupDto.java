@@ -11,7 +11,6 @@ public record GroupDto(
         GroupVisibility visibility,
         Instant created,
         Long membersNumber,
-        Boolean allowedToAccess,
         Long requestsNumber
 ) {
 }

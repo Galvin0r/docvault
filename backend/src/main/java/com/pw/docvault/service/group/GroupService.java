@@ -24,7 +24,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -114,14 +113,11 @@ public class GroupService {
 
     @Transactional(readOnly = true)
     public Page<GroupDto> findByName(String name, Pageable pageable) {
-        Page<Group> groups = groupRepository.findByNameContainingIgnoreCase(name, pageable);
-        var currentMemberships = groupMembershipService.getAllMemberships(currentUser.getId());
+        Page<Group> groups = groupRepository.searchVisibleToUser(name, currentUser.getId(), pageable);
 
         return groups.map(group -> groupMapper.toSimpleDto(
                 group,
-                group.getVisibility() != GroupVisibility.PRIVATE ? groupMembershipService.countGroupMembers(group.getId()) : null,
-                currentMemberships.stream().anyMatch(gm -> Objects.equals(group.getId(), gm.getGroup().getId()))
-                        || group.getVisibility() != GroupVisibility.PRIVATE
+                groupMembershipService.countGroupMembers(group.getId())
         ));
     }
 
@@ -189,6 +185,16 @@ public class GroupService {
         }
 
         return groupMembershipService.findGroupMembers(groupId, pageable).map(groupMembershipMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<GroupMembershipDto> findGroupMemberships(String userLogin, String groupName, Pageable pageable) {
+        var viewerId = currentUser.getId();
+        var user = userRepository.findByLogin(userLogin).orElseThrow(
+                () -> new NotFoundException(ErrorCode.USER_NOT_FOUND, "User with login " + userLogin + " not found."));
+
+        return groupMembershipService.findMembershipsVisibleToViewer(user.getId(), viewerId, groupName, pageable)
+                                        .map(groupMembershipMapper::toDto);
     }
 
     public GroupMembershipDto getMembership(Long groupId) {

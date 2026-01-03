@@ -92,6 +92,17 @@ public class GroupController {
         return ResponseEntity.ok(groupService.findGroupMembers(id, sorted));
     }
 
+    @GetMapping("/members")
+    public ResponseEntity<Page<GroupMembershipDto>> findGroupMemberships(@RequestParam(name = "userLogin") String userLogin,
+                                                                         @RequestParam(required = false) String groupName,
+                                                                         Pageable pageable) {
+        var sorted = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                Sort.by(Sort.Direction.ASC, "id")
+        );
+
+        return ResponseEntity.ok(groupService.findGroupMemberships(userLogin, groupName, sorted));
+    }
+
     @GetMapping("/{id}/members/me")
     public ResponseEntity<GroupMembershipDto> getMembership(@PathVariable Long id) {
         return ResponseEntity.ok(groupService.getMembership(id));

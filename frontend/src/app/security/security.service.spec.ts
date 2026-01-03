@@ -1,6 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { SecurityService, userResolver } from './security.service';
+import { SecurityService, currentUserResolver } from './security.service';
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom, Observable } from 'rxjs';
 import { UserInfo } from './security.model';
@@ -139,7 +139,7 @@ describe('userResolver', () => {
 
   it('returns UserInfo when 200', async () => {
     const obs = TestBed.runInInjectionContext(() =>
-      userResolver({} as any, {} as any)
+      currentUserResolver({} as any, {} as any)
     ) as Observable<UserInfo | null>;
 
     const resultPromise = firstValueFrom(obs);
@@ -154,7 +154,7 @@ describe('userResolver', () => {
 
   it('returns null when error (catchError -> of(null))', async () => {
     const obs = TestBed.runInInjectionContext(() =>
-      userResolver({} as any, {} as any)
+      currentUserResolver({} as any, {} as any)
     ) as Observable<UserInfo | null>;
 
     const resultPromise = firstValueFrom(obs);

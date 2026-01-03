@@ -31,6 +31,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -167,7 +168,7 @@ public class GroupServiceTest {
         when(groupMembershipService.getMembershipOrThrow(me.getId(), group.getId()))
                 .thenReturn(membership(me, group, GroupRole.USER));
 
-        var dto = new GroupDto(group.getId(), "New", "NewDesc", GroupVisibility.PUBLIC, null, null, null, null);
+        var dto = new GroupDto(group.getId(), "New", "NewDesc", GroupVisibility.PUBLIC, null, null, null);
 
         assertThatThrownBy(() -> groupService.edit(group.getId(), dto))
                 .isInstanceOf(ForbiddenException.class);
@@ -184,7 +185,7 @@ public class GroupServiceTest {
         when(groupMembershipService.getMembershipOrThrow(me.getId(), group.getId()))
                 .thenReturn(membership(me, group, GroupRole.ADMIN));
 
-        var dto = new GroupDto(group.getId(), newName, newDesc, null, null, null, null, null);
+        var dto = new GroupDto(group.getId(), newName, newDesc, null, null, null, null);
 
         groupService.edit(group.getId(), dto);
 
@@ -214,7 +215,7 @@ public class GroupServiceTest {
         when(groupJoinRequestService.findJoinRequestById(request1.getId())).thenReturn(request1);
         when(groupJoinRequestService.findJoinRequestById(request2.getId())).thenReturn(request2);
 
-        var dto = new GroupDto(group.getId(), null, null, GroupVisibility.PUBLIC, null, null, null, null);
+        var dto = new GroupDto(group.getId(), null, null, GroupVisibility.PUBLIC, null, null, null);
 
         groupService.edit(group.getId(), dto);
 
@@ -244,7 +245,7 @@ public class GroupServiceTest {
         when(groupJoinRequestService.findAllGroupJoinRequests(group.getId(), GroupJoinRequestStatus.PENDING))
                 .thenReturn(List.of(request1, request2));
 
-        var dto = new GroupDto(group.getId(), null, null, GroupVisibility.PRIVATE, null, null, null, null);
+        var dto = new GroupDto(group.getId(), null, null, GroupVisibility.PRIVATE, null, null, null);
 
         groupService.edit(group.getId(), dto);
 
@@ -265,7 +266,7 @@ public class GroupServiceTest {
         when(groupMembershipService.getMembershipOrThrow(me.getId(), group.getId()))
                 .thenReturn(membership(me, group, GroupRole.ADMIN));
 
-        var dto = new GroupDto(group.getId(), null, null, GroupVisibility.PRIVATE, null, null, null, null);
+        var dto = new GroupDto(group.getId(), null, null, GroupVisibility.PRIVATE, null, null, null);
 
         groupService.edit(group.getId(), dto);
 
@@ -282,7 +283,7 @@ public class GroupServiceTest {
         when(groupMembershipService.getMembershipOrThrow(me.getId(), group.getId()))
                 .thenReturn(membership(me, group, GroupRole.ADMIN));
 
-        var dto = new GroupDto(group.getId(), null, null, GroupVisibility.REQUEST_ONLY, null, null, null, null);
+        var dto = new GroupDto(group.getId(), null, null, GroupVisibility.REQUEST_ONLY, null, null, null);
 
         groupService.edit(group.getId(), dto);
 
@@ -305,7 +306,7 @@ public class GroupServiceTest {
         when(groupMembershipService.countGroupMembers(group.getId())).thenReturn(membersNumber);
 
         var mapped = new GroupDto(group.getId(), group.getName(), group.getDescription(),
-                                  group.getVisibility(), null, membersNumber, null, requestsNumber);
+                                  group.getVisibility(), null, membersNumber, requestsNumber);
         when(groupMapper.toDto(group, membersNumber, requestsNumber)).thenReturn(mapped);
 
         var dto = groupService.get(group.getId());
@@ -332,7 +333,7 @@ public class GroupServiceTest {
         var membersNumber = 3L;
         var joinRequests = 10L;
         var mapped = new GroupDto(group.getId(), group.getName(), group.getDescription(),
-                                  group.getVisibility(), null, membersNumber, null, null);
+                                  group.getVisibility(), null, membersNumber, null);
         group.setVisibility(GroupVisibility.REQUEST_ONLY);
 
         when(groupRepository.findById(group.getId())).thenReturn(Optional.of(group));
@@ -352,7 +353,7 @@ public class GroupServiceTest {
     // findByName
 
     @Test
-    void findByNameMapsResultsWithVisibilityAndMembershipFlag() {
+    void findByNameMapsResultsAndCountsMembers() {
         var searchValue = "a";
 
         var group1 = new Group();
@@ -360,26 +361,24 @@ public class GroupServiceTest {
         group1.setName("Alpha");
         group1.setVisibility(GroupVisibility.PUBLIC);
 
-        var group2 = new Group();
-        group2.setId(2L);
-        group2.setName("Beta");
-        group2.setVisibility(GroupVisibility.PRIVATE);
+        var page = new PageImpl<>(List.of(group1));
 
-        var page = new PageImpl<>(List.of(group1, group2));
+        var dto1 = new GroupDto(
+                group1.getId(), group1.getName(),
+                null, group1.getVisibility(),
+                null, null,
+                null
+        );
 
-        var dto1 = new GroupDto(group1.getId(), group1.getName(), null, group1.getVisibility(), null, null, true, null);
-        var dto2 = new GroupDto(group2.getId(), group2.getName(), null, group2.getVisibility(), null, null, true, null);
-
-        when(groupRepository.findByNameContainingIgnoreCase(eq(searchValue), any())).thenReturn(page);
-        when(groupMembershipService.getAllMemberships(me.getId()))
-                .thenReturn(List.of(membership(me, group2, GroupRole.USER)));
+        when(groupRepository.searchVisibleToUser(eq(searchValue), eq(me.getId()), any()))
+                .thenReturn(page);
         when(groupMembershipService.countGroupMembers(group1.getId())).thenReturn(7L);
-        when(groupMapper.toSimpleDto(eq(group1), eq(7L), eq(true))).thenReturn(dto1);
-        when(groupMapper.toSimpleDto(eq(group2), isNull(), eq(true))).thenReturn(dto2);
+        when(groupMapper.toSimpleDto(eq(group1), eq(7L))).thenReturn(dto1);
 
         var result = groupService.findByName(searchValue, PageRequest.of(0, 10));
 
-        assertThat(result.getContent()).containsExactly(dto1, dto2);
+        assertThat(result.getContent()).containsExactly(dto1);
+        verify(groupMembershipService, never()).getAllMemberships(anyLong());
     }
 
     // leave
@@ -452,7 +451,9 @@ public class GroupServiceTest {
     @Test
     void joinReturnsDtoWhenAlreadyMember() {
         var m = membership(me, group, GroupRole.USER);
-        var mapped = new GroupMembershipDto(1L, me.getId(), me.getLogin(), group.getId(), group.getName(), GroupRole.USER);
+        var mapped = new GroupMembershipDto(1L, me.getId(), me.getLogin(), group.getId(), group.getName(),
+                                            GroupRole.USER, Instant.now()
+        );
 
         when(groupRepository.findById(group.getId())).thenReturn(Optional.of(group));
         when(groupMembershipService.findMembership(me.getId(), group.getId())).thenReturn(Optional.of(m));
@@ -479,7 +480,8 @@ public class GroupServiceTest {
     void joinPublicCreatesMembershipAndReturnsDto() {
         group.setVisibility(GroupVisibility.PUBLIC);
         var created = membership(me, group, GroupRole.USER);
-        var mapped = new GroupMembershipDto(1L, me.getId(), me.getLogin(), group.getId(), group.getName(), GroupRole.USER);
+        var mapped = new GroupMembershipDto(1L, me.getId(), me.getLogin(), group.getId(), group.getName(),
+                                            GroupRole.USER, Instant.now());
 
         when(groupRepository.findById(group.getId())).thenReturn(Optional.of(group));
         when(groupMembershipService.findMembership(me.getId(), group.getId())).thenReturn(Optional.empty());
@@ -572,7 +574,8 @@ public class GroupServiceTest {
         groupMembership.setGroup(group);
         groupMembership.setRole(GroupRole.USER);
         var page = new PageImpl<>(List.of(groupMembership));
-        var mapped = new GroupMembershipDto(1L, me.getId(), me.getLogin(), group.getId(), group.getName(), GroupRole.USER);
+        var mapped = new GroupMembershipDto(1L, me.getId(), me.getLogin(), group.getId(), group.getName(),
+                                            GroupRole.USER, Instant.now());
 
         when(groupRepository.findById(group.getId())).thenReturn(Optional.of(group));
         when(groupMembershipService.findMembership(me.getId(), group.getId()))
@@ -590,7 +593,8 @@ public class GroupServiceTest {
     @Test
     void getMembershipReturnsMappedDto() {
         var groupMembership = membership(me, group, GroupRole.ADMIN);
-        var mapped = new GroupMembershipDto(1L, me.getId(), me.getLogin(), group.getId(), group.getName(), GroupRole.USER);
+        var mapped = new GroupMembershipDto(1L, me.getId(), me.getLogin(), group.getId(), group.getName(),
+                                            GroupRole.USER, Instant.now());
 
         when(groupMembershipService.getMembershipOrThrow(me.getId(), group.getId())).thenReturn(groupMembership);
         when(groupMembershipMapper.toDto(groupMembership)).thenReturn(mapped);

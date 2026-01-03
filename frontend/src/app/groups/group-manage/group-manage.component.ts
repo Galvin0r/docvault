@@ -5,6 +5,7 @@ import { GroupAddComponent } from '../group-add/group-add.component';
 import { Group } from '../groups.model';
 import { GroupService } from '../groups.service';
 import { GroupListComponent } from '../group-list/group-list.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-group-manage',
@@ -15,6 +16,8 @@ import { GroupListComponent } from '../group-list/group-list.component';
 export class GroupManageComponent implements OnDestroy {
   formBuilder = inject(FormBuilder);
   groupService = inject(GroupService);
+  router = inject(Router);
+
   searchForm = this.formBuilder.group({
     name: ['']
   });
@@ -32,7 +35,7 @@ export class GroupManageComponent implements OnDestroy {
     });
 
     this.ref.onClose.subscribe((data: Group) => {
-      this.groupService.create(data).subscribe(() => this.list().refresh());
+      this.groupService.create(data).subscribe(groupId => this.router.navigate(['/groups/edit/', groupId]));
     });
   }
 
