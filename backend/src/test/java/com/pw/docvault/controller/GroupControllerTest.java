@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.pw.docvault.model.enums.GroupRole;
+import com.pw.docvault.model.enums.GroupVisibility;
 import com.pw.docvault.model.group.GroupDto;
 import com.pw.docvault.model.group.GroupJoinRequestDto;
 import com.pw.docvault.model.group.GroupMembershipDto;
@@ -131,6 +132,20 @@ public class GroupControllerTest {
     }
 
     @Test
+    void findGroupMembershipsForwardsValue() throws Exception {
+        Page<GroupMembershipDto> page = new PageImpl<>(List.of(), PageRequest.of(0, 5), 0);
+        when(groupService.findGroupMemberships(eq("abc"), eq(null), any(Pageable.class))).thenReturn(page);
+
+        mockMvc.perform(get("/groups/members")
+                                .param("userLogin", "abc")
+                                .param("page", "1")
+                                .param("size", "3"))
+               .andExpect(status().isOk());
+
+        verify(groupService).findGroupMemberships(eq("abc"), eq(null), any(Pageable.class));
+    }
+
+    @Test
     void leaveGroupReturns204AndDelegates() throws Exception {
         var groupId = 2L;
         mockMvc.perform(delete("/groups/{id}/leave", groupId))
@@ -184,7 +199,7 @@ public class GroupControllerTest {
     void joinReturns200AndDelegates() throws Exception {
         var groupId = 2L;
         GroupMembershipDto membership = new GroupMembershipDto(1L, 7L, "me", groupId, "G", GroupRole.USER,
-                                                               Instant.now());
+                                                               Instant.now(), GroupVisibility.PUBLIC);
         when(groupService.join(groupId)).thenReturn(membership);
 
         mockMvc.perform(post("/groups/{id}/members/me", groupId))
@@ -217,7 +232,8 @@ public class GroupControllerTest {
     @Test
     void getMembershipReturns200AndDelegates() throws Exception {
         var groupId = 2L;
-        GroupMembershipDto m = new GroupMembershipDto(1L, 7L, "me", groupId, "G", GroupRole.USER, Instant.now());
+        GroupMembershipDto m = new GroupMembershipDto(1L, 7L, "me", groupId, "G", GroupRole.USER, Instant.now(),
+                                                      GroupVisibility.PUBLIC);
         when(groupService.getMembership(groupId)).thenReturn(m);
 
         mockMvc.perform(get("/groups/{id}/members/me", groupId))

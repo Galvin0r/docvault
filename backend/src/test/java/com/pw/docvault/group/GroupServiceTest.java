@@ -452,7 +452,7 @@ public class GroupServiceTest {
     void joinReturnsDtoWhenAlreadyMember() {
         var m = membership(me, group, GroupRole.USER);
         var mapped = new GroupMembershipDto(1L, me.getId(), me.getLogin(), group.getId(), group.getName(),
-                                            GroupRole.USER, Instant.now()
+                                            GroupRole.USER, Instant.now(), GroupVisibility.PUBLIC
         );
 
         when(groupRepository.findById(group.getId())).thenReturn(Optional.of(group));
@@ -481,7 +481,7 @@ public class GroupServiceTest {
         group.setVisibility(GroupVisibility.PUBLIC);
         var created = membership(me, group, GroupRole.USER);
         var mapped = new GroupMembershipDto(1L, me.getId(), me.getLogin(), group.getId(), group.getName(),
-                                            GroupRole.USER, Instant.now());
+                                            GroupRole.USER, Instant.now(), GroupVisibility.PUBLIC);
 
         when(groupRepository.findById(group.getId())).thenReturn(Optional.of(group));
         when(groupMembershipService.findMembership(me.getId(), group.getId())).thenReturn(Optional.empty());
@@ -575,7 +575,7 @@ public class GroupServiceTest {
         groupMembership.setRole(GroupRole.USER);
         var page = new PageImpl<>(List.of(groupMembership));
         var mapped = new GroupMembershipDto(1L, me.getId(), me.getLogin(), group.getId(), group.getName(),
-                                            GroupRole.USER, Instant.now());
+                                            GroupRole.USER, Instant.now(), GroupVisibility.PUBLIC);
 
         when(groupRepository.findById(group.getId())).thenReturn(Optional.of(group));
         when(groupMembershipService.findMembership(me.getId(), group.getId()))
@@ -594,7 +594,7 @@ public class GroupServiceTest {
     void getMembershipReturnsMappedDto() {
         var groupMembership = membership(me, group, GroupRole.ADMIN);
         var mapped = new GroupMembershipDto(1L, me.getId(), me.getLogin(), group.getId(), group.getName(),
-                                            GroupRole.USER, Instant.now());
+                                            GroupRole.USER, Instant.now(), GroupVisibility.PUBLIC);
 
         when(groupMembershipService.getMembershipOrThrow(me.getId(), group.getId())).thenReturn(groupMembership);
         when(groupMembershipMapper.toDto(groupMembership)).thenReturn(mapped);
