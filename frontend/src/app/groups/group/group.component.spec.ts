@@ -155,26 +155,6 @@ describe('GroupComponent', () => {
     expect(icon).toBeTruthy();
   });
 
-  it('shows open button only when allowedToAccess is true', () => {
-    render({
-      id: 6,
-      name: 'Beta',
-      visibility: 'PUBLIC',
-      membersNumber: 4,
-      allowedToAccess: false,
-    });
-    expect(fixture.debugElement.query(By.css('button'))).toBeNull();
-
-    render({
-      id: 6,
-      name: 'Beta',
-      visibility: 'PUBLIC',
-      membersNumber: 4,
-      allowedToAccess: true,
-    });
-    expect(fixture.debugElement.query(By.css('button'))).toBeTruthy();
-  });
-
   it('navigates to edit page on open button click', () => {
     render({
       id: 9,

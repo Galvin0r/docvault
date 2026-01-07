@@ -8,22 +8,20 @@ import { GroupManageComponent } from './group-manage.component';
 import { GroupAddComponent } from '../group-add/group-add.component';
 import { GroupService } from '../groups.service';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { Router } from '@angular/router';
+import { provideRouter } from '@angular/router';
 
 @Component({
   selector: 'p-card',
   standalone: true,
-  template: `
-    <ng-content></ng-content>
-  `,
+  template: `<ng-content></ng-content>`,
 })
 class PCardStub {}
 
 @Component({
   selector: 'p-floatlabel',
   standalone: true,
-  template: `
-    <ng-content></ng-content>
-  `,
+  template: `<ng-content></ng-content>`,
 })
 class PFloatLabelStub {
   @Input() variant?: string;
@@ -56,9 +54,7 @@ class PButtonStub {
 @Component({
   selector: 'app-group-list',
   standalone: true,
-  template: `
-    <div class="group-list"></div>
-  `,
+  template: `<div class="group-list"></div>`,
 })
 class GroupListStub {
   @Input() filtersForm: any;
@@ -66,7 +62,7 @@ class GroupListStub {
 }
 
 class GroupServiceStub {
-  create = jasmine.createSpy('create').and.returnValue(of(void 0));
+  create = jasmine.createSpy('create').and.returnValue(of(123));
 }
 
 class RefStub {
@@ -83,11 +79,16 @@ class DialogServiceStub {
   }
 }
 
+class RouterStub {
+  navigate = jasmine.createSpy('navigate');
+}
+
 describe('GroupManageComponent', () => {
   let fixture: ComponentFixture<GroupManageComponent>;
   let component: GroupManageComponent;
   let dialog: DialogServiceStub;
   let groups: GroupServiceStub;
+  let router: RouterStub;
 
   function create() {
     TestBed.resetTestingModule();
@@ -107,6 +108,8 @@ describe('GroupManageComponent', () => {
         FormBuilder,
         { provide: GroupService, useClass: GroupServiceStub },
         { provide: DialogService, useClass: DialogServiceStub },
+        { provide: Router, useClass: RouterStub },
+        provideRouter([]),
       ],
     });
 
@@ -114,18 +117,14 @@ describe('GroupManageComponent', () => {
     component = fixture.componentInstance;
     dialog = TestBed.inject(DialogService) as any;
     groups = TestBed.inject(GroupService) as any;
+    router = TestBed.inject(Router) as any;
 
     fixture.detectChanges();
-
-    const listInstance = fixture.debugElement.query(By.directive(GroupListStub))
-      .componentInstance as GroupListStub;
-    (component as any).list = () => listInstance;
   }
 
   it('opens dialog on button click with correct config', () => {
     create();
-    const btn = fixture.debugElement.query(By.css('button[pButton]'))
-      .nativeElement as HTMLButtonElement;
+    const btn = fixture.debugElement.query(By.css('button[pButton]')).nativeElement as HTMLButtonElement;
     btn.click();
     expect(dialog.openCalls.length).toBe(1);
     expect(dialog.openCalls[0].comp).toBe(GroupAddComponent);
@@ -134,13 +133,13 @@ describe('GroupManageComponent', () => {
     expect(dialog.openCalls[0].cfg.styleClass).toBe('group-dialog');
   });
 
-  it('after dialog close creates group and refreshes list', () => {
+  it('after dialog close creates group and navigates to edit', () => {
     create();
     component.onAddGroup();
     const payload = { id: null, name: 'G', description: 'D', visibility: 'PUBLIC' };
     dialog.ref.onClose.next(payload);
     expect(groups.create).toHaveBeenCalledWith(payload);
-    expect((component as any).list().refresh).toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledWith(['/groups/edit/', 123]);
   });
 
   it('ngOnDestroy closes dialog if open', () => {

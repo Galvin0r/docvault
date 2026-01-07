@@ -21,7 +21,8 @@ export class TopMenuComponent {
     {
       label: 'Profile',
       icon: 'pi  pi-user',
-      // command:
+      command: () => this.router.navigate(['/user', this.userInfo?.login])
+      
     },
     {
       label: 'Groups',

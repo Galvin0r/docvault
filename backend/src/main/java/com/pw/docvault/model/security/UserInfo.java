@@ -1,4 +1,6 @@
 package com.pw.docvault.model.security;
 
-public record UserInfo(String login, String email) {
+import java.time.Instant;
+
+public record UserInfo(String login, String email, Instant created) {
 }

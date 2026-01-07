@@ -39,7 +39,8 @@ public enum ErrorCode {
     USER_NOT_ACTIVATED("user.not_activated"),
 
     // generic
-    UNKNOWN("unknown");
+    UNKNOWN("unknown"),
+    RESOURCE_NOT_FOUND("resource.not_found"),;
 
     private final String value;
     ErrorCode(String value) {

@@ -28,7 +28,6 @@ export interface Group {
   visibility: Visibility;
   created: string;
   membersNumber: number;
-  allowedToAccess: boolean;
   requestsNumber: number;
 }
 
@@ -39,6 +38,8 @@ export interface GroupMembership {
   groupId: number;
   groupName: string;
   role: GroupRole;
+  created: string;
+  groupVisibility: Visibility;
 }
 
 export interface GroupJoinRequest {
