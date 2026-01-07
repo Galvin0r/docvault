@@ -1,6 +1,9 @@
 package com.pw.docvault.model.group;
 
 import com.pw.docvault.model.enums.GroupRole;
+import com.pw.docvault.model.enums.GroupVisibility;
+
+import java.time.Instant;
 
 public record GroupMembershipDto(
         Long id,
@@ -8,5 +11,7 @@ public record GroupMembershipDto(
         String userLogin,
         Long groupId,
         String groupName,
-        GroupRole role
+        GroupRole role,
+        Instant created,
+        GroupVisibility groupVisibility
 ) {}

@@ -4,6 +4,7 @@ import com.pw.docvault.entity.User;
 import com.pw.docvault.exception.AlreadyExistsException;
 import com.pw.docvault.repository.UserRepository;
 import com.pw.docvault.service.security.CredentialsService;
+import com.pw.docvault.service.security.CurrentUserProvider;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,9 @@ public class CredentialsServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private CurrentUserProvider currentUserProvider;
+
     @InjectMocks
     private CredentialsService credentialsService;
 
@@ -33,7 +37,7 @@ public class CredentialsServiceTest {
 
     @BeforeEach
     public void setUp() {
-        credentialsService = new CredentialsService(userRepository);
+        credentialsService = new CredentialsService(userRepository, currentUserProvider);
 
         authenticatedUser = new User();
         authenticatedUser.setId(42L);
@@ -58,6 +62,7 @@ public class CredentialsServiceTest {
         var newLogin = "newLogin";
         when(userRepository.findByLogin(newLogin)).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(currentUserProvider.get()).thenReturn(authenticatedUser);
 
         credentialsService.changeLogin(newLogin);
 
@@ -84,10 +89,11 @@ public class CredentialsServiceTest {
     // get user info
     @Test
     void getUserInfo_returnsDataFromCurrentPrincipal() {
-        var info = credentialsService.getUserInfo();
+        when(userRepository.findByLogin("currentLogin")).thenReturn(Optional.of(authenticatedUser));
+
+        var info = credentialsService.getUserInfo("currentLogin");
 
         assertThat(info.login()).isEqualTo(authenticatedUser.getLogin());
         assertThat(info.email()).isEqualTo(authenticatedUser.getUsername());
-        verifyNoInteractions(userRepository);
     }
 }

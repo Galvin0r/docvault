@@ -31,7 +31,7 @@ export class UserComponent {
       {
         label: 'Profile',
         icon: PrimeIcons.USER,
-        // TODO add profile navigate link
+        routerLink: ['/user/', this.membership().userLogin]
       },
     ];
     if (this.membership().role !== 'OWNER') {
@@ -67,7 +67,7 @@ export class UserComponent {
 
   userRemove() {
     this.confirmationSerice.confirm({
-      message: 'Are you sure that you want to remove this user from group?',
+      message: 'Are you sure you want to remove this user from group?',
       header: 'Confirmation',
       closable: true,
       closeOnEscape: true,
@@ -92,10 +92,33 @@ export class UserComponent {
   }
 
   userChangeRole(newRole: GroupRole) {
-    this.groupService
+    var accept = () => {
+      this.groupService
       .changeRole(this.membership().groupId, this.membership().userId, newRole)
       .subscribe(() => {
         this.userChangedRole.emit();
       });
+    }
+    if (newRole === 'OWNER') {
+      this.confirmationSerice.confirm({
+        message: 'Are you sure you want to promote this user to Owner? You will be demoted to Admin.',
+        header: 'Confirmation',
+        closable: true,
+        closeOnEscape: true,
+        icon: 'pi pi-exclamation-triangle',
+        rejectButtonProps: {
+          label: 'Cancel',
+          severity: 'secondary',
+          outlined: true,
+        },
+        acceptButtonProps: {
+          label: 'Accept',
+          severity: 'danger',
+        },
+        accept: accept,
+      });
+    } else {
+      accept();
+    }
   }
 }

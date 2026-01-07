@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.Instant;
 
@@ -42,6 +43,19 @@ public class GlobalExceptionHandler {
             status.value(),
             req.getRequestURI(),
             Instant.now()
+        );
+        return ResponseEntity.status(status).body(details);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ExceptionDetails> handleNoResource(NoResourceFoundException ex, HttpServletRequest req) {
+        var status = HttpStatus.NOT_FOUND;
+        var details = new ExceptionDetails(
+                ErrorCode.RESOURCE_NOT_FOUND,
+                "Not found.",
+                status.value(),
+                req.getRequestURI(),
+                Instant.now()
         );
         return ResponseEntity.status(status).body(details);
     }

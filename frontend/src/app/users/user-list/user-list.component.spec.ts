@@ -4,7 +4,7 @@ import { FormBuilder } from '@angular/forms';
 import { of } from 'rxjs';
 import { UserListComponent } from './user-list.component';
 import { GroupService } from '../../groups/groups.service';
-import { GroupMembership, GroupRole } from '../../groups/groups.model';
+import { GroupMembership, GroupRole, Visibility } from '../../groups/groups.model';
 import { Page } from '../../app.model';
 
 type QueryParams = { page: number; size: number } & Record<string, any>;
@@ -35,8 +35,10 @@ describe('UserListComponent', () => {
       userId: 11,
       userLogin: 'alice',
       role: 'USER' as GroupRole,
+      created: '',
+      groupVisibility: 'PUBLIC' as Visibility
     },
-    { id: 2, groupId: 5, groupName: 'G', userId: 12, userLogin: 'bob', role: 'ADMIN' as GroupRole },
+    { id: 2, groupId: 5, groupName: 'G', userId: 12, userLogin: 'bob', role: 'ADMIN' as GroupRole, created: '', groupVisibility: 'PUBLIC'},
   ];
 
   beforeEach(() => {

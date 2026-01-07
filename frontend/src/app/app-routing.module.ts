@@ -3,20 +3,27 @@ import { RouterModule, Routes } from '@angular/router';
 import { MainLayoutComponent } from './menu/main-layout/main-layout.component';
 import { AuthLayoutComponent } from './menu/auth-layout/auth-layout.component';
 import { HomeComponent } from './menu/home/home.component';
-import { userResolver } from './security/security.service';
+import { currentUserResolver } from './security/security.service';
+import { mainLayoutCanMatch } from './utils/consts';
 
 const routes: Routes = [
   {
     path: '',
     component: MainLayoutComponent,
+    canMatch: [mainLayoutCanMatch],
     resolve: {
-      userInfo: userResolver,
+      userInfo: currentUserResolver,
     },
     children: [
       {
         path: '',
         pathMatch: 'full',
         component: HomeComponent,
+      },
+      { 
+        path: 'home', 
+        redirectTo: '', 
+        pathMatch: 'full' 
       },
       {
         path: '',
@@ -27,7 +34,12 @@ const routes: Routes = [
   {
     path: '',
     component: AuthLayoutComponent,
-    loadChildren: () => import('./security/security.module').then((m) => m.SecurityModule),
+    children: [
+      {
+        path: '',
+        loadChildren: () => import('./security/security.module').then((m) => m.SecurityModule),
+      },
+    ],
   },
   {
     path: '**',

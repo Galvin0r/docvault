@@ -40,21 +40,15 @@ public class CredentialsController {
                 .build();
     }
 
-    @PostMapping("/change-login")
-    public ResponseEntity<Void> changeLogin(@RequestParam String newLogin) {
-        credentialsService.changeLogin(newLogin);
-        return ResponseEntity.ok().build();
+    @PatchMapping("/change-login")
+    public ResponseEntity<UserInfo> changeLogin(@RequestParam String newLogin) {
+        var newInfo = credentialsService.changeLogin(newLogin);
+        return ResponseEntity.ok(newInfo);
     }
 
-    @PostMapping("/change-email")
-    public ResponseEntity<?> changeEmail(@RequestParam String newEmail) {
-        //TODO
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/me")
-    public ResponseEntity<UserInfo> getMe() {
-        UserInfo info = credentialsService.getUserInfo();
+    @GetMapping
+    public ResponseEntity<UserInfo> getUserInfo(@RequestParam(required = false) String username) {
+        var info = credentialsService.getUserInfo(username);
         return ResponseEntity.ok().body(info);
     }
 }

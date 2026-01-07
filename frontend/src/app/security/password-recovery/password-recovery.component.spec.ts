@@ -207,7 +207,7 @@ describe('PasswordRecoveryComponent', () => {
     fixture.debugElement.query(By.css('form')).triggerEventHandler('ngSubmit', {});
     expect(security.setNewPassword).toHaveBeenCalledWith('ZzT0k', 'password123');
     expect(messages.add).toHaveBeenCalledWith(jasmine.objectContaining({ severity: 'success' }));
-    expect(router.navigate).toHaveBeenCalledWith(['/login']);
+    expect(router.navigate).toHaveBeenCalledWith(['/home']);
   });
 
   it('sets error on submit failure and passes it to form error', () => {

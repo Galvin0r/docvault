@@ -283,6 +283,21 @@ public class GroupMembershipServiceTest {
         assertThat(result).isSameAs(page);
     }
 
+    // findGroupMemberships
+
+    @Test
+    void findGroupMembershipsDelegatesAndReturnsMembers() {
+        Pageable pageable = PageRequest.of(0, 5);
+        Page<GroupMembership> page = new PageImpl<>(List.of(new GroupMembership()));
+
+        when(groupMembershipRepository.findMembershipsVisibleToViewer(1L, 2L, group.getName(), pageable))
+                .thenReturn(page);
+
+        var result = groupMembershipService.findMembershipsVisibleToViewer(1L, 2L, group.getName(), pageable);
+
+        assertThat(result).isSameAs(page);
+    }
+
     // countGroupMembers
 
     @Test

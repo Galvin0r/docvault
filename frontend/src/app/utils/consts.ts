@@ -1,3 +1,5 @@
+import { CanMatchFn, UrlSegment } from "@angular/router";
+
 export const RESEND_KEY = "lastResendTimestamp";
 export const RESEND_COOLDOWN_SECONDS = 60;
 
@@ -48,3 +50,16 @@ export const httpErrors = [
 export type HttpErrorCode = (typeof httpErrors)[number]['code'];
 
 export const DEBOUNCE_MS = 250;
+
+const AUTH_PATHS = new Set([
+  'login',
+  'register',
+  'initiatePasswordReset',
+  'emailVerification',
+  'setNewPassword',
+]);
+
+export const mainLayoutCanMatch: CanMatchFn = (route, segments: UrlSegment[]) => {
+  const first = segments[0]?.path;
+  return !first || !AUTH_PATHS.has(first);
+};

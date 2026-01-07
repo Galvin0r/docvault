@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { of, EMPTY } from 'rxjs';
+import { of } from 'rxjs';
 
 import { UserComponent } from './user.component';
 import { GroupService } from '../../groups/groups.service';
@@ -21,6 +21,8 @@ describe('UserComponent', () => {
     userId: 2,
     userLogin: 'john',
     role: 'ADMIN' as GroupRole,
+    created: '',
+    groupVisibility: 'PUBLIC',
   };
 
   const membershipOwner: GroupMembership = {
@@ -30,11 +32,12 @@ describe('UserComponent', () => {
     userId: 3,
     userLogin: 'alice',
     role: 'OWNER' as GroupRole,
+    created: '',
+    groupVisibility: 'PUBLIC',
   };
 
   beforeEach(() => {
     groupService = jasmine.createSpyObj<GroupService>('GroupService', ['removeUser', 'changeRole']);
-
     confirmation = jasmine.createSpyObj<ConfirmationService>('ConfirmationService', ['confirm']);
 
     groupService.removeUser.and.returnValue(of(void 0));
@@ -87,6 +90,12 @@ describe('UserComponent', () => {
     fixture.detectChanges();
 
     const nextRole: GroupRole = 'OWNER' as GroupRole;
+
+    // Confirm the promotion to OWNER to trigger the "accept" branch.
+    confirmation.confirm.and.callFake((cfg: Confirmation) => {
+      cfg.accept?.();
+      return confirmation;
+    });
 
     component.userChangedRole.subscribe(() => {
       expect(groupService.changeRole).toHaveBeenCalledWith(1, 2, nextRole);

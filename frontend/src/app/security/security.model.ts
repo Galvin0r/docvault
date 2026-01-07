@@ -14,5 +14,6 @@ export interface RegistrationRequest {
 
 export interface UserInfo {
   login: string,
-  email: string
+  email: string,
+  created: string
 }

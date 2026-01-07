@@ -8,7 +8,6 @@ import {
   runInInjectionContext,
   signal,
   viewChild,
-  ViewChild,
   WritableSignal,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';

@@ -41,7 +41,7 @@ export class PasswordRecoveryComponent extends BaseFormComponent implements OnIn
           summary: 'Success',
           detail: 'Password changed successfully',
         });
-        this.router.navigate(['/login']);
+        this.router.navigate(['/home']);
       },
       error: (e) => {
         this.error = e.error.code;

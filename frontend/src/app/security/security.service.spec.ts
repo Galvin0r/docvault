@@ -1,6 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { SecurityService, userResolver } from './security.service';
+import { SecurityService, currentUserResolver } from './security.service';
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom, Observable } from 'rxjs';
 import { UserInfo } from './security.model';
@@ -101,14 +101,14 @@ describe('SecurityService', () => {
     req.flush(null);
   });
 
-  it('getUserInfo() -> GET "/api/accounts/me" and returns UserInfo', () => {
+  it('getUserInfo() -> GET "/api/accounts" and returns UserInfo', () => {
     const mockUser = { id: 1, username: 'john' } as any;
 
     service.getUserInfo().subscribe((u) => {
       expect(u).toEqual(mockUser);
     });
 
-    const req = http.expectOne('/api/accounts/me');
+    const req = http.expectOne('/api/accounts');
     expect(req.request.method).toBe('GET');
     req.flush(mockUser);
   });
@@ -139,27 +139,27 @@ describe('userResolver', () => {
 
   it('returns UserInfo when 200', async () => {
     const obs = TestBed.runInInjectionContext(() =>
-      userResolver({} as any, {} as any)
+      currentUserResolver({} as any, {} as any)
     ) as Observable<UserInfo | null>;
 
     const resultPromise = firstValueFrom(obs);
 
-    const req = http.expectOne('/api/accounts/me');
+    const req = http.expectOne('/api/accounts');
     expect(req.request.method).toBe('GET');
-    req.flush({ email: 'a@b', login: 'john' });
+    req.flush({ email: 'a@b', login: 'john', created: '' });
 
     const result = await resultPromise;
-    expect(result).toEqual({ email: 'a@b', login: 'john' });
+    expect(result).toEqual({ email: 'a@b', login: 'john', created: '' });
   });
 
   it('returns null when error (catchError -> of(null))', async () => {
     const obs = TestBed.runInInjectionContext(() =>
-      userResolver({} as any, {} as any)
+      currentUserResolver({} as any, {} as any)
     ) as Observable<UserInfo | null>;
 
     const resultPromise = firstValueFrom(obs);
 
-    const req = http.expectOne('/api/accounts/me');
+    const req = http.expectOne('/api/accounts');
     req.flush('server error', { status: 500, statusText: 'Server Error' });
 
     const result = await resultPromise;
