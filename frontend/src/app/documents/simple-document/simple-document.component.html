@@ -1,0 +1,40 @@
+<p-card
+    class="w-full !rounded-xl border border-surface-700/40 hover:bg-surface-800/40 hover:border-primary-500/40 transition-colors">
+    <div class="flex items-center gap-3">
+        <div class="h-9 w-9 rounded-lg flex items-center justify-center bg-primary-500/15 text-primary-400">
+            <i class="pi text-sm" [ngClass]="getFileIcon()"></i>
+        </div>
+
+        <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+                <span class="font-medium truncate">{{ document().title }}</span>
+
+                <span class="px-2 py-0.5 text-xs rounded-full border border-surface-600/60 text-foreground/80">
+                    {{ formatSize(document().size) }}
+                </span>
+            </div>
+
+            <div class="mt-0.5 text-xs opacity-70 flex items-center gap-2">
+                <span class="flex items-center gap-1">
+                    <i class="pi pi-user"></i>
+                    {{ document().ownerLogin }}
+                </span>
+
+                @if (document().visibility === 'PUBLIC') {
+                <span class="flex items-center gap-1">
+                    <i class="pi pi-lock-open"></i>
+                    Public
+                </span>
+                } @else if (document().visibility === 'PRIVATE') {
+                <span class="flex items-center gap-1">
+                    <i class="pi pi-shield"></i>
+                    Private
+                </span>
+                }
+            </div>
+        </div>
+
+        <a pButton type="button" class="p-button-rounded p-button-text" icon="pi pi-download"
+            pTooltip="Download document" [href]="'/api/documents/download/' + document().id" target="_blank"></a>
+    </div>
+</p-card>

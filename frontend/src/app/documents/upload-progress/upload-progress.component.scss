@@ -1,0 +1,38 @@
+/* Progress Bar Color Overrides */
+:host ::ng-deep .upload-progress-bar {
+    .p-progressbar {
+        height: 8px;
+        background: var(--surface-200);
+
+        .p-progressbar-value {
+            background: #3b82f6;
+            transition: width 0.1s linear !important;
+        }
+    }
+
+    &.progress-success {
+        .p-progressbar-value {
+            background: #22c55e !important;
+        }
+    }
+
+    &.progress-cancelled {
+        .p-progressbar-value {
+            background: #94a3b8 !important;
+        }
+    }
+
+    &.progress-failed {
+        .p-progressbar-value {
+            background: var(--p-red-500) !important;
+        }
+    }
+}
+
+:host ::ng-deep .upload-progress-bar .p-progressbar-value {
+    transition: width 80ms linear !important;
+}
+
+:host ::ng-deep .p-card .p-card-body {
+    padding: 0;
+}

@@ -1,0 +1,66 @@
+@if (uploads().length > 0) {
+<p-card styleClass="fixed bottom-4 right-4 z-50 w-96 shadow-lg overflow-hidden border-none"
+    [style]="{'border-radius': '0.75rem'}">
+    <div class="flex items-center justify-between p-3 cursor-pointer transition-colors bg-primary text-primary-contrast hover:bg-primary-600"
+        (click)="toggleMinimize()">
+        <div class="flex items-center gap-2 font-medium">
+            <i class="pi pi-cloud-upload"></i>
+            <span>Uploads ({{ uploads().length }})</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <i class="pi" [class.pi-chevron-down]="!isMinimized()" [class.pi-chevron-up]="isMinimized()"></i>
+        </div>
+    </div>
+
+    <div class="transition-all duration-300 ease-in-out" [class.max-h-0]="isMinimized()"
+        [class.max-h-96]="!isMinimized()" [class.overflow-y-auto]="!isMinimized()">
+
+        <div class="flex flex-col">
+            @for (upload of uploads(); track upload.id) {
+            <div
+                class="p-4 border-b border-surface-200 dark:border-surface-700 last:border-0 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium truncate flex-1 pr-2">{{ upload.filename }}</span>
+                    <div class="flex items-center gap-3">
+                        @if (upload.state !== 'CANCELLED') {
+                        <span class="text-xs font-medium text-muted-color">{{ upload.progress }}%</span>
+                        }
+                        @if (upload.state === 'UPLOADING' && upload.progress < 100) { <button pButton type="button"
+                            icon="pi pi-times"
+                            class="p-button-rounded p-button-text p-button-sm text-muted-color hover:text-color"
+                            (click)="cancelUpload(upload.id, $event)" pTooltip="Cancel upload">
+                            </button>
+                            } @else {
+                            <button pButton type="button" icon="pi pi-times"
+                                class="p-button-rounded p-button-text p-button-sm text-muted-color hover:text-color"
+                                (click)="removeUpload(upload.id, $event)" pTooltip="Dismiss">
+                            </button>
+                            }
+                    </div>
+                </div>
+
+                <p-progressBar [value]="upload.state === 'CANCELLED' ? 100 : upload.progress" [showValue]="false"
+                    class="upload-progress-bar"
+                    [class.progress-success]="upload.state === 'UPLOADED' || upload.progress === 100"
+                    [class.progress-failed]="upload.state === 'FAILED'"
+                    [class.progress-cancelled]="upload.state === 'CANCELLED'"></p-progressBar>
+
+                @if (upload.error) {
+                <small class="text-red-400 block mt-1 text-xs">{{ upload.error }}</small>
+                } @else if (upload.state === 'UPLOADED' || upload.progress === 100) {
+                <small class="text-green-500 block mt-1 text-xs">Complete</small>
+                } @else if (upload.state === 'CANCELLED') {
+                <small class="text-surface-400 block mt-1 text-xs">Cancelled</small>
+                }
+            </div>
+            }
+        </div>
+
+        @if (hasCompletedUploads()) {
+        <div class="p-2 border-t border-surface-200 dark:border-surface-700 flex justify-end">
+            <button pButton label="Clear all" class="p-button-text p-button-sm" (click)="clearAll()"></button>
+        </div>
+        }
+    </div>
+</p-card>
+}

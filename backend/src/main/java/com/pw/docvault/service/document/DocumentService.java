@@ -124,7 +124,7 @@ public class DocumentService {
     private void cleanupStaleDrafts(Long userId) {
         try {
             var oneHourAgo = Instant.now().minus(1, java.time.temporal.ChronoUnit.HOURS);
-            var staleDrafts = documentRepository.findByOwnerIdAndStatusAndCreatedAtBefore(
+            var staleDrafts = documentRepository.findByOwnerIdAndStatusAndCreatedBefore(
                     userId, DocumentStatus.UPLOADING, oneHourAgo);
             
             staleDrafts.forEach(draft -> {

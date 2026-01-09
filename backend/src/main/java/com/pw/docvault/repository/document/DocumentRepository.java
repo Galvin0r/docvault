@@ -12,7 +12,7 @@ import java.time.Instant;
 import java.util.List;
 
 public interface DocumentRepository extends JpaRepository<Document, Long> {
-    List<Document> findByOwnerIdAndStatusAndCreatedAtBefore(Long ownerId, DocumentStatus status, Instant createdAt);
+    List<Document> findByOwnerIdAndStatusAndCreatedBefore(Long ownerId, DocumentStatus status, Instant created);
 
     @Query(value = """
         SELECT DISTINCT d.*
@@ -73,4 +73,3 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
         Pageable pageable
     );
 }
-

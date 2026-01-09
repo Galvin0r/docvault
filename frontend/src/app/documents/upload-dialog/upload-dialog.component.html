@@ -1,0 +1,45 @@
+<div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-2">
+        <label for="file" class="font-medium">File *</label>
+        <div class="flex items-center gap-2 overflow-hidden">
+            <button pButton type="button" label="Choose File" icon="pi pi-upload" (click)="fileInput.click()"
+                class="p-button-outlined whitespace-nowrap flex-shrink-0"></button>
+            @if (fileControl.value) {
+            <span class="text-foreground/70 text-sm truncate min-w-0" [pTooltip]="fileControl.value.name">{{
+                fileControl.value.name }} ({{
+                formatSize(fileControl.value.size) }})</span>
+            }
+        </div>
+
+        @if (fileControl.errors?.['required'] && (fileControl.touched || fileControl.dirty)) {
+        <small class="text-red-400 block mt-1">File is required</small>
+        }
+    </div>
+
+    <input #fileInput id="file" type="file" (change)="onFileSelect($event)" class="hidden" style="display: none;">
+
+    <div class="flex flex-col gap-2">
+        <label for="title" class="font-medium">Title *</label>
+        <input pInputText id="title" [formControl]="titleControl" placeholder="Enter document title" class="w-full" />
+        @if (titleControl.errors?.['required'] && titleControl.touched) {
+        <small class="text-red-400">Title is required</small>
+        }
+    </div>
+
+    <div class="flex flex-col gap-2">
+        <label for="description" class="font-medium">Description</label>
+        <textarea pInputTextarea id="description" [formControl]="descriptionControl" placeholder="Optional description"
+            rows="3" class="w-full"></textarea>
+    </div>
+
+    <div class="flex flex-col gap-2">
+        <label class="font-medium">Visibility</label>
+        <p-selectButton [options]="visibilityOptions" [formControl]="visibilityControl" optionLabel="label"
+            optionValue="value" class="w-full"></p-selectButton>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-4">
+        <button pButton type="button" label="Cancel" class="p-button-outlined" (click)="cancel()"></button>
+        <button pButton type="button" label="Upload" [disabled]="!form.valid" (click)="submit()"></button>
+    </div>
+</div>
