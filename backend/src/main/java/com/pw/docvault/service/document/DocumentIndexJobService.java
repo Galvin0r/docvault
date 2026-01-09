@@ -16,6 +16,7 @@ public class DocumentIndexJobService {
     public DocumentIndexJob create(Document document) {
         var docIndexJob = new DocumentIndexJob();
         docIndexJob.setDocument(document);
+        docIndexJob.setAttempts((short) 0);
         docIndexJob.setStatus(DocumentIndexJobStatus.PENDING);
         return documentIndexJobRepository.save(docIndexJob);
     }

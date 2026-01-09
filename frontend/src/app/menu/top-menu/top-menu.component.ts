@@ -3,6 +3,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { UserInfo } from '../../security/security.model';
 import { MenuItem } from 'primeng/api';
 import { SecurityService } from '../../security/security.service';
+import { DialogService } from 'primeng/dynamicdialog';
+import { MessageService } from 'primeng/api';
+import { UploadDialogComponent } from '../../documents/upload-dialog/upload-dialog.component';
 
 @Component({
   selector: 'app-top-menu',
@@ -22,7 +25,7 @@ export class TopMenuComponent {
       label: 'Profile',
       icon: 'pi  pi-user',
       command: () => this.router.navigate(['/user', this.userInfo?.login])
-      
+
     },
     {
       label: 'Groups',
@@ -51,5 +54,29 @@ export class TopMenuComponent {
     this.securityService.logout().subscribe(() => {
       location.reload();
     })
+  }
+
+  private dialogService = inject(DialogService);
+  private messageService = inject(MessageService);
+
+  openUploadDialog() {
+    if (!this.userInfo) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Authentication Required',
+        detail: 'Please sign in to upload documents.',
+      });
+      return;
+    }
+
+    this.dialogService.open(UploadDialogComponent, {
+      header: 'Upload Document',
+      width: '500px',
+      modal: true,
+      breakpoints: {
+        '960px': '75vw',
+        '640px': '90vw'
+      },
+    });
   }
 }

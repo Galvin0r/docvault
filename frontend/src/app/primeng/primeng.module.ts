@@ -24,6 +24,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { BadgeModule } from 'primeng/badge';
 import { OverlayBadgeModule } from 'primeng/overlaybadge';
+import { ProgressBarModule } from 'primeng/progressbar';
 
 const primeNgModules = [
   CardModule,
@@ -51,10 +52,65 @@ const primeNgModules = [
   ConfirmDialogModule,
   BadgeModule,
   OverlayBadgeModule,
+  ProgressBarModule
 ];
 
 @NgModule({
-  imports: [primeNgModules],
-  exports: [primeNgModules]
+  imports: [
+    CardModule,
+    InputTextModule,
+    InputGroupModule,
+    InputGroupAddonModule,
+    PasswordModule,
+    CheckboxModule,
+    ButtonModule,
+    DividerModule,
+    MenuModule,
+    TooltipModule,
+    MessageModule,
+    InputOtpModule,
+    ToastModule,
+    MenubarModule,
+    PaginatorModule,
+    SelectModule,
+    DataViewModule,
+    FloatLabelModule,
+    DialogModule,
+    DynamicDialogModule,
+    SelectButtonModule,
+    TextareaModule,
+    ConfirmDialogModule,
+    BadgeModule,
+    OverlayBadgeModule,
+    ProgressBarModule
+  ],
+  exports: [
+    CardModule,
+    InputTextModule,
+    InputGroupModule,
+    InputGroupAddonModule,
+    PasswordModule,
+    CheckboxModule,
+    ButtonModule,
+    DividerModule,
+    MenuModule,
+    TooltipModule,
+    MessageModule,
+    InputOtpModule,
+    ToastModule,
+    MenubarModule,
+    PaginatorModule,
+    SelectModule,
+    DataViewModule,
+    FloatLabelModule,
+    DialogModule,
+    DynamicDialogModule,
+    SelectButtonModule,
+    TextareaModule,
+    ConfirmDialogModule,
+    BadgeModule,
+    OverlayBadgeModule,
+    ProgressBarModule
+  ]
 })
-export class PrimeNgModule {}
+export class PrimeNgModule { }

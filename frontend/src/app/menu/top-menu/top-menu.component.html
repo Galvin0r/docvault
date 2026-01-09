@@ -10,29 +10,19 @@
   </ng-template>
 
   <ng-template #end>
-    <div class="flex mr-2">
+    <div class="flex mr-2 items-center">
+      <p-button icon="pi pi-upload" [rounded]="true" [text]="true" severity="secondary" (click)="openUploadDialog()"
+        pTooltip="Upload Document" tooltipPosition="bottom"></p-button>
       <p-divider layout="vertical" />
       @if(userInfo) {
-      <button
-        type="button"
-        class="rounded-full overflow-hidden avatar cursor-pointer"
-        (click)="menu.toggle($event)"
-      >
-        <img
-          src="assets/blank-user-circles.png"
-          alt="avatar"
-          class="w-full h-full object-cover rounded-full"
-        />
+      <button type="button" class="rounded-full overflow-hidden avatar cursor-pointer" (click)="menu.toggle($event)">
+        <img src="assets/blank-user-circles.png" alt="avatar" class="w-full h-full object-cover rounded-full" />
       </button>
       <p-menu #menu [popup]="true" [model]="menuItems">
         <ng-template #start>
           <div class="flex items-center mt-1 ml-2 p-1 gap-2">
             <div class="rounded-full overflow-hidden avatar-small">
-              <img
-                src="assets/blank-user-circles.png"
-                alt="avatar"
-                class="w-full h-full object-cover rounded-full"
-              />
+              <img src="assets/blank-user-circles.png" alt="avatar" class="w-full h-full object-cover rounded-full" />
             </div>
             <label class="font-semibold text-lg">{{ userInfo.login }}</label>
           </div>

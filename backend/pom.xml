@@ -166,6 +166,7 @@
                         <exclude>**/config/</exclude>
                         <exclude>**/util/Constants.class</exclude>
 <!--                        Delete later-->
+                        <exclude>**/DocumentIndexJobService.class</exclude>
                         <exclude>**/DocumentService.class</exclude>
                         <exclude>**/GoogleCloudStorageService.class</exclude>
                     </excludes>

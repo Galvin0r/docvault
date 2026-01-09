@@ -14,6 +14,7 @@ import { PrimeNgModule } from './primeng/primeng.module';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { InterceptorModule } from './security/interceptors/interceptor.module';
 import { MenuModule } from './menu/menu.module';
+import { DocumentsModule } from './documents/documents.module';
 import { DialogService } from 'primeng/dynamicdialog';
 
 @NgModule({
@@ -25,6 +26,7 @@ import { DialogService } from 'primeng/dynamicdialog';
     PrimeNgModule,
     InterceptorModule,
     MenuModule,
+    DocumentsModule
   ],
   providers: [
     provideHttpClient(withInterceptorsFromDi()),
@@ -44,4 +46,4 @@ import { DialogService } from 'primeng/dynamicdialog';
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

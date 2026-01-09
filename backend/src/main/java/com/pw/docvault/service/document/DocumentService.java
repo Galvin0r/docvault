@@ -2,20 +2,26 @@ package com.pw.docvault.service.document;
 
 import com.pw.docvault.entity.document.Document;
 import com.pw.docvault.exception.*;
+import com.pw.docvault.mapper.DocumentMapper;
+import com.pw.docvault.model.document.DocumentDto;
 import com.pw.docvault.model.enums.DocumentStatus;
 import com.pw.docvault.model.enums.DocumentVisibility;
 import com.pw.docvault.repository.document.DocumentRepository;
-import com.pw.docvault.service.GoogleCloudStorageService;
 import com.pw.docvault.service.security.CurrentUserProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.InputStream;
+import java.time.Instant;
 import java.util.Objects;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class DocumentService {
@@ -24,6 +30,7 @@ public class DocumentService {
     private final GoogleCloudStorageService googleCloudStorageService;
     private final CurrentUserProvider currentUser;
     private final DocumentIndexJobService documentIndexJobService;
+    private final DocumentMapper documentMapper;
 
     @Value(value = "${app.gsc.buffer.storage.space}")
     private Integer bufferStorageSpace;
@@ -41,46 +48,54 @@ public class DocumentService {
         return documentRepository.save(document).getId();
     }
 
-    public void upload(Long id, MultipartFile file) {
+    public String initiateUpload(Long id, String contentType, String originalFilename) {
         var user = currentUser.get();
+        
+        cleanupStaleDrafts(user.getId());
+        
         var draft = documentRepository.findById(id).orElseThrow(
                 () -> new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUNT, "Document with id: " + id + " not found"));
         if (draft.getStatus() != DocumentStatus.UPLOADING) {
             throw new ConflictException(ErrorCode.DOCUMENT_INVALID_STATE,
-                                        "Document for id " + id + " is already loaded. Please, try again.");
+                    "Document for id " + id + " is already loaded. Please, try again.");
         }
         if (!Objects.equals(draft.getOwner().getId(), user.getId())) {
             throw new ForbiddenException(ErrorCode.DOCUMENT_FORBIDDEN,
-                                         "Uploading document for other user is forbidden");
-        }
-        if (file == null || file.isEmpty()) {
-            throw new BadRequestException(ErrorCode.DOCUMENT_EMPTY, "Empty file");
+                    "Uploading document for other user is forbidden");
         }
 
-        String key = null;
-        try (InputStream in = file.getInputStream()) {
-            String safeName = safeFilename(file.getOriginalFilename());
-            String contentType = safeContentType(file.getContentType());
+        String safeName = safeFilename(draft.getTitle());
+        String safeContentType = safeContentType(contentType);
+        String uniqueId = java.util.UUID.randomUUID().toString();
+        String objectName = String.format("user_%d/%s_%s", user.getId(), safeName, uniqueId);
 
-            key = googleCloudStorageService.upload(in, safeName, user.getId(), contentType);
+        draft.setPath(objectName);
+        draft.setMimeType(safeContentType);
+        draft.setOriginalFilename(originalFilename);
+        documentRepository.save(draft);
 
-            draft.setMimeType(contentType);
-            draft.setPath(key);
-            draft.setOriginalFilename(safeName);
-            draft.setStatus(DocumentStatus.UPLOADED);
-            draft.setSizeBytes(file.getSize());
+        return googleCloudStorageService.generatePutSignedUrl(objectName, safeContentType);
+    }
 
-            documentRepository.save(draft);
-            documentIndexJobService.create(draft);
-        } catch (Exception e) {
-            if (key != null) {
-                try {
-                    googleCloudStorageService.delete(key);
-                } catch (Exception ignored) {}
-            }
-            documentRepository.deleteById(id);
-            throw new DocumentException(ErrorCode.DOCUMENT_UPLOAD_FAILED, "Document upload failed");
+    public void completeUpload(Long id) {
+        var user = currentUser.get();
+        var draft = documentRepository.findById(id).orElseThrow(
+                () -> new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUNT, "Document with id: " + id + " not found"));
+
+        if (!Objects.equals(draft.getOwner().getId(), user.getId())) {
+            throw new ForbiddenException(ErrorCode.DOCUMENT_FORBIDDEN, "Completing upload for other user is forbidden");
         }
+
+        var blob = googleCloudStorageService.getMetadata(draft.getPath());
+        if (blob == null || !blob.exists()) {
+             throw new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUNT, "File not found in storage");
+        }
+
+        draft.setStatus(DocumentStatus.UPLOADED);
+        draft.setSizeBytes(blob.getSize());
+
+        documentRepository.save(draft);
+        documentIndexJobService.create(draft);
     }
 
     private String safeContentType(String ct) {
@@ -96,7 +111,32 @@ public class DocumentService {
         Document document = documentRepository.findById(id).orElseThrow(
                 () -> new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUNT, "Document with id " + id + " not found"));
         documentRepository.delete(document);
-        googleCloudStorageService.delete(document.getPath());
+        
+        if (document.getPath() != null && !document.getPath().isBlank()) {
+            try {
+                googleCloudStorageService.delete(document.getPath());
+            } catch (Exception e) {
+                log.warn("Failed to delete GCS file for document {}: {}", id, e.getMessage());
+            }
+        }
+    }
+
+    private void cleanupStaleDrafts(Long userId) {
+        try {
+            var oneHourAgo = Instant.now().minus(1, java.time.temporal.ChronoUnit.HOURS);
+            var staleDrafts = documentRepository.findByOwnerIdAndStatusAndCreatedAtBefore(
+                    userId, DocumentStatus.UPLOADING, oneHourAgo);
+            
+            staleDrafts.forEach(draft -> {
+                try {
+                    delete(draft.getId());
+                } catch (Exception e) {
+                    log.warn("Failed to delete stale draft {}: {}", draft.getId(), e.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            log.error("Error during stale draft cleanup for user {}: {}", userId, e.getMessage());
+        }
     }
 
     public StreamingResponseBody download(Document document) {
@@ -111,5 +151,24 @@ public class DocumentService {
                 }
             }
         };
+    }
+
+    public Page<DocumentDto> listUserDocuments(
+            String titleSearch,
+            String ownerName,
+            Instant dateFrom,
+            Instant dateTo,
+            Pageable pageable
+    ) {
+        var user = currentUser.get();
+        Page<Document> documents = documentRepository.findDocumentsWithAccess(
+                user.getId(),
+                titleSearch,
+                ownerName,
+                dateFrom,
+                dateTo,
+                pageable
+        );
+        return documents.map(documentMapper::toDto);
     }
 }

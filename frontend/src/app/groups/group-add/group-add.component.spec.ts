@@ -37,10 +37,10 @@ class PMessageStub {
 }
 
 @Directive({ selector: '[pTextarea]', standalone: true })
-class PTextareaStub {}
+class PTextareaStub { }
 
 @Directive({ selector: '[pInputText]', standalone: true })
-class PInputTextStub {}
+class PInputTextStub { }
 
 @Directive({ selector: '[pButton]', standalone: true })
 class PButtonStub {
@@ -59,9 +59,11 @@ class PButtonStub {
   ],
   template: `
     <div class="selectbutton">
-      <button class="opt" *ngFor="let o of options" type="button" (click)="choose(o)">
+      @for (o of options; track $index) {
+      <button class="opt" type="button" (click)="choose(o)">
         {{ optionLabel ? o[optionLabel] : o?.label ?? o }}
       </button>
+      }
     </div>
   `,
 })
@@ -69,16 +71,16 @@ class PSelectButtonStub implements ControlValueAccessor {
   @Input() options: any[] = [];
   @Input() optionLabel?: string;
   @Input() optionValue?: string;
-  private onChange = (_: any) => {};
-  private onTouched = () => {};
-  writeValue(_: any): void {}
+  private onChange = (_: any) => { };
+  private onTouched = () => { };
+  writeValue(_: any): void { }
   registerOnChange(fn: any): void {
     this.onChange = fn;
   }
   registerOnTouched(fn: any): void {
     this.onTouched = fn;
   }
-  setDisabledState(_: boolean): void {}
+  setDisabledState(_: boolean): void { }
   choose(o: any) {
     const val = this.optionValue ? o?.[this.optionValue] : o?.value ?? o;
     this.onChange(val);
@@ -89,7 +91,7 @@ class PSelectButtonStub implements ControlValueAccessor {
 class RefStub {
   close = jasmine.createSpy('close');
 }
-class SecurityServiceStub {}
+class SecurityServiceStub { }
 
 describe('GroupAddComponent', () => {
   let fixture: ComponentFixture<GroupAddComponent>;

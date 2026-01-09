@@ -163,7 +163,7 @@ public class AuthenticationService {
         try {
             auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, request.password()));
         } catch (Exception e) {
-            throw new BadCredentialsException(ErrorCode.AUTH_BAD_CREDENTIALS, "Invalid email/login or password");
+            throw new BadCredentialsException(ErrorCode.AUTH_BAD_CREDENTIALS, "Invalid email/login or password", e);
         }
 
 

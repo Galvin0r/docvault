@@ -33,9 +33,9 @@ class GroupStub {
   standalone: true,
   imports: [CommonModule],
   template: `
-    <ng-container *ngIf="listTpl">
+    @if (listTpl) {
       <ng-container *ngTemplateOutlet="listTpl; context: ctx"></ng-container>
-    </ng-container>
+    }
   `,
 })
 class DataViewStub implements AfterContentInit, OnChanges {
@@ -71,7 +71,7 @@ class PaginatorStub {
 }
 
 class FakeSearchStore<T> {
-  constructor(private data: { content: T[]; totalElements: number }) {}
+  constructor(private data: { content: T[]; totalElements: number }) { }
   items() {
     return this.data;
   }
