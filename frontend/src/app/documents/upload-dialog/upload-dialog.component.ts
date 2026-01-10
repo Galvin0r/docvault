@@ -20,17 +20,17 @@ export class UploadDialogComponent {
         { label: 'Public', value: 'PUBLIC' }
     ];
 
-    titleControl = new FormControl('', [Validators.required, Validators.maxLength(255)]);
-    descriptionControl = new FormControl('', [Validators.maxLength(1000)]);
-    visibilityControl = new FormControl('PRIVATE', [Validators.required]);
-    fileControl = new FormControl<File | null>(null, [Validators.required]);
-
     form = this.fb.group({
-        title: this.titleControl,
-        description: this.descriptionControl,
-        visibility: this.visibilityControl,
-        file: this.fileControl
+        title: ['', [Validators.required, Validators.maxLength(255)]],
+        description: ['', [Validators.maxLength(1000)]],
+        visibility: ['PRIVATE', [Validators.required]],
+        file: [null as File | null, [Validators.required]]
     });
+
+    get titleControl() { return this.form.get('title') as FormControl; }
+    get descriptionControl() { return this.form.get('description') as FormControl; }
+    get visibilityControl() { return this.form.get('visibility') as FormControl; }
+    get fileControl() { return this.form.get('file') as FormControl; }
 
     onFileSelect(event: Event) {
         const input = event.target as HTMLInputElement;
@@ -48,27 +48,17 @@ export class UploadDialogComponent {
     }
 
     submit() {
-        if (!this.form.valid) {
+        if (this.form.invalid) {
+            this.form.markAllAsTouched();
             return;
         }
 
-        const title = this.titleControl.value!;
-        const description = this.descriptionControl.value;
-        const visibility = this.visibilityControl.value!;
-        const file = this.fileControl.value!;
+        const { title, description, visibility, file } = this.form.value;
 
-        this.documentService.createDraft(title, description, visibility as Visibility).subscribe(documentId => {
-            this.documentService.uploadFile(documentId, file);
+        this.documentService.createDraft(title!, description!, visibility as Visibility).subscribe(documentId => {
+            this.documentService.uploadFile(documentId, file!);
             this.dialogRef.close();
         });
-    }
-
-    formatSize(bytes: number): string {
-        if (bytes === 0) return '0 B';
-        const k = 1024;
-        const sizes = ['B', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
     }
 
     cancel() {

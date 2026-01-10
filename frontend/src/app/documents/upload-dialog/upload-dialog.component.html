@@ -1,4 +1,4 @@
-<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-4" [formGroup]="form">
     <div class="flex flex-col gap-2">
         <label for="file" class="font-medium">File *</label>
         <div class="flex items-center gap-2 overflow-hidden">
@@ -7,7 +7,7 @@
             @if (fileControl.value) {
             <span class="text-foreground/70 text-sm truncate min-w-0" [pTooltip]="fileControl.value.name">{{
                 fileControl.value.name }} ({{
-                formatSize(fileControl.value.size) }})</span>
+                fileControl.value.size | fileSize }})</span>
             }
         </div>
 
@@ -16,11 +16,11 @@
         }
     </div>
 
-    <input #fileInput id="file" type="file" (change)="onFileSelect($event)" class="hidden" style="display: none;">
+    <input #fileInput id="file" type="file" (change)="onFileSelect($event)" class="hidden">
 
     <div class="flex flex-col gap-2">
         <label for="title" class="font-medium">Title *</label>
-        <input pInputText id="title" [formControl]="titleControl" placeholder="Enter document title" class="w-full" />
+        <input pInputText id="title" formControlName="title" placeholder="Enter document title" class="w-full" />
         @if (titleControl.errors?.['required'] && titleControl.touched) {
         <small class="text-red-400">Title is required</small>
         }
@@ -28,18 +28,18 @@
 
     <div class="flex flex-col gap-2">
         <label for="description" class="font-medium">Description</label>
-        <textarea pInputTextarea id="description" [formControl]="descriptionControl" placeholder="Optional description"
+        <textarea pInputTextarea id="description" formControlName="description" placeholder="Optional description"
             rows="3" class="w-full"></textarea>
     </div>
 
     <div class="flex flex-col gap-2">
         <label class="font-medium">Visibility</label>
-        <p-selectButton [options]="visibilityOptions" [formControl]="visibilityControl" optionLabel="label"
+        <p-selectButton [options]="visibilityOptions" formControlName="visibility" optionLabel="label"
             optionValue="value" class="w-full"></p-selectButton>
     </div>
 
     <div class="flex justify-end gap-3 mt-4">
         <button pButton type="button" label="Cancel" class="p-button-outlined" (click)="cancel()"></button>
-        <button pButton type="button" label="Upload" [disabled]="!form.valid" (click)="submit()"></button>
+        <button pButton type="button" label="Upload" (click)="submit()"></button>
     </div>
 </div>

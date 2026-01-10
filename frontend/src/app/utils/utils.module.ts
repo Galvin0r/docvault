@@ -7,6 +7,7 @@ import { ThemeSwitchComponent } from './theme-switch/theme-switch.component';
 import { ThemeService } from './theme.service';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { CodePipe } from './pipes/code.pipe';
+import { FileSizePipe } from './pipes/file-size.pipe';
 import { FormErrorComponent } from './form-error/form-error.component';
 import { PaginatorComponent } from './search/paginator/paginator.component';
 import { FormsModule } from '@angular/forms';
@@ -17,6 +18,7 @@ import { FormsModule } from '@angular/forms';
     GoogleButtonComponent,
     ThemeSwitchComponent,
     CodePipe,
+    FileSizePipe,
     FormErrorComponent,
     PaginatorComponent,
   ],
@@ -27,8 +29,9 @@ import { FormsModule } from '@angular/forms';
     GoogleButtonComponent,
     ThemeSwitchComponent,
     CodePipe,
+    FileSizePipe,
     FormErrorComponent,
     PaginatorComponent,
   ],
 })
-export class UtilsModule {}
+export class UtilsModule { }

@@ -10,7 +10,7 @@
                 <span class="font-medium truncate">{{ document().title }}</span>
 
                 <span class="px-2 py-0.5 text-xs rounded-full border border-surface-600/60 text-foreground/80">
-                    {{ formatSize(document().size) }}
+                    {{ document().size | fileSize }}
                 </span>
             </div>
 
