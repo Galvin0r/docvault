@@ -73,6 +73,7 @@ export class TopMenuComponent {
       header: 'Upload Document',
       width: '500px',
       modal: true,
+      dismissableMask: true,
       breakpoints: {
         '960px': '75vw',
         '640px': '90vw'

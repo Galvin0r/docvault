@@ -13,6 +13,7 @@ export interface RegistrationRequest {
 }
 
 export interface UserInfo {
+  id: number;
   login: string,
   email: string,
   created: string

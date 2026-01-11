@@ -79,6 +79,7 @@ export class GroupViewComponent implements AfterViewInit {
       header: 'Add member',
       styleClass: 'group-dialog',
       modal: true,
+      dismissableMask: true,
     });
 
     this.ref.onClose.subscribe((data: any) => {
@@ -93,6 +94,7 @@ export class GroupViewComponent implements AfterViewInit {
       header: 'Edit group',
       styleClass: 'group-dialog',
       modal: true,
+      dismissableMask: true,
       data: {
         initial: this.group(),
       },

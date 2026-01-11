@@ -7,7 +7,6 @@ import com.pw.docvault.repository.document.DocumentRepository;
 import com.pw.docvault.service.document.DocumentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -49,15 +48,10 @@ public class DocumentController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping(value = "/download/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<StreamingResponseBody> download(@PathVariable Long id) {
-        Document document = documentRepository.findById(id).orElseThrow(
-                () -> new NoSuchElementException("Document with id " + id + " not found"));
-        StreamingResponseBody stream = documentService.download(document);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getOriginalFilename() + "\"")
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(stream);
+    @GetMapping(value = "/download/{id}")
+    public ResponseEntity<String> download(@PathVariable Long id) {
+        String url = documentService.download(id);
+        return ResponseEntity.ok(url);
     }
 
     @GetMapping
@@ -66,10 +60,8 @@ public class DocumentController {
             @RequestParam(required = false) String ownerName,
             @RequestParam(required = false) Instant dateFrom,
             @RequestParam(required = false) Instant dateTo,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            Pageable pageable
     ) {
-        Pageable pageable = PageRequest.of(page, size);
         Page<DocumentDto> documents = documentService.listUserDocuments(
                 titleSearch,
                 ownerName,

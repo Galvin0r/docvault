@@ -6,6 +6,8 @@ import com.pw.docvault.mapper.DocumentMapper;
 import com.pw.docvault.model.document.DocumentDto;
 import com.pw.docvault.model.enums.DocumentStatus;
 import com.pw.docvault.model.enums.DocumentVisibility;
+import com.pw.docvault.repository.document.DocumentAccessRepository;
+import com.pw.docvault.repository.document.DocumentIndexJobRepository;
 import com.pw.docvault.repository.document.DocumentRepository;
 import com.pw.docvault.service.security.CurrentUserProvider;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.InputStream;
@@ -27,6 +28,8 @@ import java.util.Objects;
 public class DocumentService {
 
     private final DocumentRepository documentRepository;
+    private final DocumentAccessRepository documentAccessRepository;
+    private final DocumentIndexJobRepository documentIndexJobRepository;
     private final GoogleCloudStorageService googleCloudStorageService;
     private final CurrentUserProvider currentUser;
     private final DocumentIndexJobService documentIndexJobService;
@@ -110,6 +113,12 @@ public class DocumentService {
     public void delete(Long id) {
         Document document = documentRepository.findById(id).orElseThrow(
                 () -> new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUNT, "Document with id " + id + " not found"));
+        
+        documentIndexJobRepository.deleteByDocumentId(id);
+        documentAccessRepository.deleteByDocumentId(id);
+        
+        // TODO: delete document from elasticsearch later
+        
         documentRepository.delete(document);
         
         if (document.getPath() != null && !document.getPath().isBlank()) {
@@ -139,36 +148,33 @@ public class DocumentService {
         }
     }
 
-    public StreamingResponseBody download(Document document) {
-        InputStream inputStream = googleCloudStorageService.download(document.getPath());;
-
-        return outputStream -> {
-            try (inputStream) {
-                byte[] buffer = new byte[bufferStorageSpace];
-                int bytesRead;
-                while ((bytesRead = inputStream.read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, bytesRead);
-                }
-            }
-        };
+    public String download(Long documentId) {
+        Document document = documentRepository.findById(documentId).orElseThrow(
+                () -> new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUNT, "Document with id " + documentId + " not found"));
+        if (document.getPath() == null || document.getPath().isBlank()) {
+            throw new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUNT, "Document path is missing");
+        }
+        return googleCloudStorageService.generateGetSignedUrl(document.getPath());
     }
 
-    public Page<DocumentDto> listUserDocuments(
-            String titleSearch,
-            String ownerName,
-            Instant dateFrom,
-            Instant dateTo,
-            Pageable pageable
-    ) {
+    public Page<DocumentDto> listUserDocuments(String titleSearch, String ownerName, Instant dateFrom, Instant dateTo,
+                                               Pageable pageable) {
         var user = currentUser.get();
-        Page<Document> documents = documentRepository.findDocumentsWithAccess(
-                user.getId(),
-                titleSearch,
-                ownerName,
-                dateFrom,
-                dateTo,
-                pageable
-        );
-        return documents.map(documentMapper::toDto);
+        Page<Document> documents = documentRepository.findDocumentsWithAccess(user.getId(), titleSearch, ownerName,
+                                                                              dateFrom, dateTo, pageable);
+        return documents.map(doc -> {
+            DocumentDto dto = documentMapper.toDto(doc);
+            if (Objects.equals(doc.getOwner().getId(), user.getId())) {
+                return documentIndexJobRepository.findByDocumentId(doc.getId())
+                        .map(job -> new DocumentDto(
+                                dto.id(), dto.title(), dto.description(), dto.originalFilename(),
+                                dto.mimeType(), dto.uploadedAt(), dto.visibility(), dto.ownerId(),
+                                dto.ownerLogin(), dto.size(), dto.status(),
+                                job.getAttempts(), job.getLastError()
+                        ))
+                        .orElse(dto);
+            }
+            return dto;
+        });
     }
 }

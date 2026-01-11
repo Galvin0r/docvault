@@ -1,25 +1,31 @@
 import { NgModule } from '@angular/core';
-import { UserComponent } from './user/user.component';
-import { PrimeNgModule } from '../primeng/primeng.module';
-import { UserListComponent } from './user-list/user-list.component';
-import { UtilsModule } from '../utils/utils.module';
-import { ProfileComponent } from './profile/profile.component';
-import { UserRoutingModule } from './user-routing.modu;e';
 import { CommonModule } from '@angular/common';
+import { UserRoutingModule } from './user-routing.module';
+import { UserListComponent } from './user-list/user-list.component';
+import { UserComponent } from './user/user.component';
+import { ProfileComponent } from './profile/profile.component';
+import { PrimeNgModule } from '../primeng/primeng.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { DocumentsModule } from '../documents/documents.module';
 import { SecurityModule } from '../security/security.module';
+import { UtilsModule } from '../utils/utils.module';
 
 @NgModule({
-  declarations: [UserComponent, UserListComponent, ProfileComponent],
-  imports: [
-    PrimeNgModule,
-    UtilsModule,
-    UserRoutingModule,
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    SecurityModule,
+  declarations: [
+    UserListComponent,
+    UserComponent,
+    ProfileComponent
   ],
-  exports: [UserComponent, UserListComponent],
+  imports: [
+    CommonModule,
+    UserRoutingModule,
+    PrimeNgModule,
+    ReactiveFormsModule,
+    FormsModule,
+    DocumentsModule,
+    SecurityModule,
+    UtilsModule
+  ],
+  exports: [UserComponent, UserListComponent]
 })
-export class UserModule {}
+export class UserModule { }

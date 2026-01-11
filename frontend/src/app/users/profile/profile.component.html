@@ -1,95 +1,64 @@
-<div class="mx-auto w-full max-w-6xl px-4 mt-8 pb-8 relative flex flex-col gap-4">
-  <p-card class="relative rounded-2xl shadow-lg border border-surface-700/30">
-    <div class="absolute right-5 top-4 text-sm opacity-80">
+<div class="mx-auto w-full max-w-6xl px-4 mt-8 pb-8 relative flex flex-col gap-6">
+  <p-card
+    class="relative !rounded-xl border border-surface-700/40 hover:border-primary-500/40 transition-colors shadow-lg overflow-hidden">
+    <div class="absolute right-5 top-4 text-xs font-semibold text-surface-500 uppercase tracking-wider opacity-80">
       Joined {{ userInfo()?.created | date : "yyyy-MM-dd" }}
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-[160px_1fr] gap-8 items-center">
+    <div class="grid grid-cols-1 md:grid-cols-[160px_1fr] gap-8 items-center p-2">
       <div class="flex justify-center md:justify-start">
-        <div class="w-40 h-40 rounded-full overflow-hidden border border-surface-600/40">
-          <img
-            src="assets/blank-user-circles.png"
-            alt="avatar"
-            class="w-full h-full object-cover rounded-full"
-          />
+        <div
+          class="profile-avatar-container w-40 h-40 rounded-2xl overflow-hidden border border-surface-600/30 bg-surface-800/20 p-2">
+          <img src="assets/blank-user-circles.png" alt="avatar" class="w-full h-full object-cover rounded-xl" />
         </div>
       </div>
 
-      <div class="space-y-1">
-        <div class="flex items-center gap-3">
-          <div class="text-lg">
-            <span class="opacity-80">Username:</span>
-
+      <div class="space-y-4">
+        <div class="flex flex-col gap-1">
+          <div class="text-xs font-semibold text-surface-500 uppercase tracking-wider">Username</div>
+          <div class="flex items-center gap-3 group">
             @if (!editingUsername()) {
-            <span class="font-medium ml-1">{{ userInfo()?.login }}</span>
+            <span class="text-2xl font-bold tracking-tight">{{ userInfo()?.login }}</span>
+            @if (canChange()) {
+            <button pButton type="button" icon="pi pi-pencil"
+              class="p-button-rounded p-button-text p-button-sm opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8"
+              (click)="onEditUsername()" pTooltip="Edit username"></button>
+            }
             } @else {
-            <span class="ml-1 inline-flex items-center gap-2">
-              <input
-                pInputText
-                type="text"
-                class="w-56"
-                [formControl]="editLoginCtrl"
-                [attr.aria-invalid]="
-                  editLoginCtrl.invalid && (editLoginCtrl.touched || submittedEdit())
-                "
-              />
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-2">
+                <input pInputText type="text" class="w-64" [formControl]="editLoginCtrl"
+                  [attr.aria-invalid]="editLoginCtrl.invalid && (editLoginCtrl.touched || submittedEdit())" />
 
-              <button
-                pButton
-                class="p-button-sm"
-                type="button"
-                label="Save"
-                [disabled]="editLoginCtrl.invalid || saving()"
-                (click)="saveUsername()"
-              ></button>
-              <button
-                pButton
-                class="p-button-text p-button-sm"
-                type="button"
-                label="Cancel"
-                [disabled]="saving()"
-                (click)="cancelEditUsername()"
-              ></button>
-            </span>
+                <button pButton class="p-button-sm" type="button" label="Save"
+                  [disabled]="editLoginCtrl.invalid || saving()" (click)="saveUsername()"></button>
+                <button pButton class="p-button-text p-button-sm" type="button" label="Cancel" [disabled]="saving()"
+                  (click)="cancelEditUsername()"></button>
+              </div>
+              @if (editLoginCtrl.invalid && (editLoginCtrl.touched || submittedEdit())) {
+              <div class="text-xs">
+                @if (editLoginCtrl.hasError('required')) {
+                <p-message severity="error" variant="simple" size="small">Username is required</p-message>
+                } @if (editLoginCtrl.hasError('minlength')) {
+                <p-message severity="error" variant="simple" size="small">Min 8 characters</p-message>
+                } @if (editLoginCtrl.hasError('taken')) {
+                <p-message severity="error" variant="simple" size="small">Already taken</p-message>
+                }
+              </div>
+              }
+            </div>
             }
           </div>
-
-          @if (!editingUsername() && canChange()) {
-          <button
-            pButton
-            type="button"
-            icon="pi pi-pencil"
-            class="p-button-rounded p-button-text p-button-sm"
-            (click)="onEditUsername()"
-            aria-label="Edit username"
-            title="Edit username"
-          ></button>
-          }
         </div>
 
-        @if (editingUsername()) {
-        <div class="ml-[5.6rem] text-sm mt-1">
-          @if (editLoginCtrl.hasError('required') && (editLoginCtrl.touched || submittedEdit())) {
-          <p-message severity="error" variant="simple" size="small">Username is required</p-message>
-          } @if (editLoginCtrl.hasError('minlength') && (editLoginCtrl.touched || submittedEdit()))
-          {
-          <p-message severity="error" variant="simple" size="small">Min 8 characters</p-message>
-          } @if (editLoginCtrl.hasError('taken') && (editLoginCtrl.touched || submittedEdit())) {
-          <p-message severity="error" variant="simple" size="small">
-            That username is already taken
-          </p-message>
-          }
-        </div>
-        }
-
-        <div class="text-lg mt-2">
-          <span class="opacity-80">Email:</span>
-          <span class="font-medium ml-1">{{ userInfo()?.email }}</span>
+        <div class="flex flex-col gap-1">
+          <div class="text-xs font-semibold text-surface-500 uppercase tracking-wider">Email</div>
+          <div class="text-lg font-medium text-surface-400">{{ userInfo()?.email }}</div>
         </div>
 
         @if (canChange()) {
-        <div class="mt-4">
-          <button pButton type="button" class="p-button-sm" (click)="onResetPassword()">
+        <div class="pt-2">
+          <button pButton type="button" class="p-button-outlined p-button-sm rounded-lg" (click)="onResetPassword()">
             Reset Password
           </button>
         </div>
@@ -98,98 +67,117 @@
     </div>
   </p-card>
 
-  <p-card class="relative rounded-2xl shadow-lg border border-surface-700/30">
-    <div class="flex flex-col gap-3">
-      <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <span class="text-sm opacity-80">User groups</span>
+  <p-card
+    class="relative !rounded-xl border border-surface-700/40 hover:border-primary-500/40 transition-colors shadow-lg overflow-hidden">
+    <p-tabs value="0">
+      <p-tablist>
+        <p-tab value="0">Groups</p-tab>
+        <p-tab value="1">Documents</p-tab>
+      </p-tablist>
+      <p-tabpanels>
+        <p-tabpanel value="0">
+          <div class="flex flex-col gap-3">
+            <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <span class="text-sm opacity-80">User groups</span>
 
-        <form [formGroup]="form" class="w-full md:w-80">
-          <p-floatlabel variant="on">
-            <input
-              id="group_name"
-              pInputText
-              type="text"
-              formControlName="groupName"
-              class="w-full"
-            />
-            <label for="group_name">Group name</label>
-          </p-floatlabel>
-        </form>
-      </div>
-
-      <p-divider></p-divider>
-
-      <div class="flex flex-col">
-        <p-dataview #dc [value]="searchStore.items().content">
-          <ng-template #list let-items>
-            <div class="flex flex-col gap-1">
-              @for (item of items; track item.id) {
-              <p-card
-                class="w-full !rounded-xl border border-surface-700/40 hover:bg-surface-800/40 hover:border-primary-500/40 transition-colors"
-              >
-                <div class="flex items-center gap-3">
-                  <div
-                    class="h-9 w-9 rounded-lg flex items-center justify-center bg-primary-500/15 text-primary-400"
-                  >
-                    <i class="pi pi-users text-sm"></i>
-                  </div>
-
-                  <div class="min-w-0 flex-1">
-                    <div class="flex items-center gap-2">
-                      <span class="font-medium truncate">{{ item.groupName }}</span>
-
-                      <span
-                        class="px-2 py-0.5 text-xs rounded-full border border-surface-600/60 text-foreground/80"
-                      >
-                        {{ item.role | titlecase }}
-                      </span>
-                    </div>
-
-                    <div class="mt-0.5 text-xs opacity-70 flex items-center gap-1">
-                      @if (item.groupVisibility === 'PUBLIC') {
-                      <i class="pi pi-lock-open"></i>
-                      <span>Public</span>
-                      } @else if (item.groupVisibility === 'PRIVATE') {
-                      <i class="pi pi-shield"></i>
-                      <span>Private</span>
-                      } @else {
-                      <i class="pi pi-user-plus"></i>
-                      <span>Request only</span>
-                      }
-                    </div>
-                  </div>
-
-                  <button
-                    pButton
-                    type="button"
-                    class="p-button-rounded p-button-text"
-                    icon="pi pi-arrow-right"
-                    pTooltip="Open group"
-                    (click)="goToGroup(item)"
-                  ></button>
-                </div>
-              </p-card>
-              }
+              <form [formGroup]="form" class="w-full md:w-80">
+                <p-floatlabel variant="on">
+                  <input id="group_name" pInputText type="text" formControlName="groupName" class="w-full" />
+                  <label for="group_name">Group name</label>
+                </p-floatlabel>
+              </form>
             </div>
-          </ng-template>
-        </p-dataview>
-        <div class="flex justify-between items-center mt-3">
-          <div>
-            <button pButton type="button" class="p-button-sm ml-1" (click)="openGroups()">
-              All Groups
-            </button>
-          </div>
 
-          <app-paginator
-            [total]="searchStore.items().totalElements"
-            [sizeOptions]="limitOptions"
-            [page]="page()"
-            [size]="size()"
-            (pageChange)="onPageChange($event)"
-            (sizeChange)="onSizeChange($event)"
-          />
-        </div>
-      </div>
-    </div>
+            <p-divider></p-divider>
+
+            <div class="flex flex-col">
+              <p-dataview #dc [value]="searchStore.items().content">
+                <ng-template #list let-items>
+                  <div class="flex flex-col gap-1">
+                    @for (item of items; track item.id) {
+                    <p-card
+                      class="w-full !rounded-xl border border-surface-700/40 hover:bg-surface-800/40 hover:border-primary-500/40 transition-colors">
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="h-9 w-9 rounded-lg flex items-center justify-center bg-primary-500/15 text-primary-400">
+                          <i class="pi pi-users text-sm"></i>
+                        </div>
+
+                        <div class="min-w-0 flex-1">
+                          <div class="flex items-center gap-2">
+                            <span class="font-medium truncate">{{ item.groupName }}</span>
+
+                            <span
+                              class="px-2 py-0.5 text-xs rounded-full border border-surface-600/60 text-foreground/80">
+                              {{ item.role | titlecase }}
+                            </span>
+                          </div>
+
+                          <div class="mt-0.5 text-xs opacity-70 flex items-center gap-1">
+                            @if (item.groupVisibility === 'PUBLIC') {
+                            <i class="pi pi-lock-open"></i>
+                            <span>Public</span>
+                            } @else if (item.groupVisibility === 'PRIVATE') {
+                            <i class="pi pi-shield"></i>
+                            <span>Private</span>
+                            } @else {
+                            <i class="pi pi-user-plus"></i>
+                            <span>Request only</span>
+                            }
+                          </div>
+                        </div>
+
+                        <button pButton type="button" class="p-button-rounded p-button-text" icon="pi pi-arrow-right"
+                          pTooltip="Open group" (click)="goToGroup(item)"></button>
+                      </div>
+                    </p-card>
+                    }
+                  </div>
+                </ng-template>
+              </p-dataview>
+              <div class="flex justify-between items-center mt-3">
+                <div>
+                  <button pButton type="button" class="p-button-sm ml-1" (click)="openGroups()">
+                    All Groups
+                  </button>
+                </div>
+
+                <app-paginator [total]="searchStore.items().totalElements" [sizeOptions]="limitOptions" [page]="page()"
+                  [size]="size()" (pageChange)="onPageChange($event)" (sizeChange)="onSizeChange($event)" />
+              </div>
+            </div>
+          </div>
+        </p-tabpanel>
+        <p-tabpanel value="1">
+          <div class="flex flex-col gap-3">
+            <form [formGroup]="documentForm" class="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 mt-2">
+              <p-floatlabel variant="on">
+                <input pInputText id="title" formControlName="titleSearch" class="w-full" />
+                <label for="title">Title</label>
+              </p-floatlabel>
+              <p-floatlabel variant="on">
+                <p-datepicker id="dateFrom" formControlName="dateFrom" showIcon="true" styleClass="w-full" />
+                <label for="dateFrom">Date From</label>
+              </p-floatlabel>
+              <p-floatlabel variant="on">
+                <p-datepicker id="dateTo" formControlName="dateTo" showIcon="true" styleClass="w-full" />
+                <label for="dateTo">Date To</label>
+              </p-floatlabel>
+
+              <button pButton type="button" icon="pi pi-filter-slash" class="p-button-outlined w-12"
+                pTooltip="Clear Filters" tooltipPosition="bottom" (click)="clearFilters()"></button>
+            </form>
+
+            <p-divider></p-divider>
+
+            @if (currentUserInfo(); as currentUser) {
+            <app-document-list [filtersForm]="documentForm" [currentUserLogin]="currentUser.login"
+              [limitOptions]="limitOptions">
+            </app-document-list>
+            }
+          </div>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
   </p-card>
 </div>

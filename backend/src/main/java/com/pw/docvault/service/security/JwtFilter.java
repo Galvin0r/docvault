@@ -56,16 +56,16 @@ public class JwtFilter extends OncePerRequestFilter {
             if (refreshToken != null) {
                 RefreshToken rt = refreshTokenService.getRefreshTokenOrThrow(refreshToken);
 
-                    UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(rt.getUser().getEmail());
+                UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(rt.getUser().getEmail());
 
-                    String newJwt = jwtService.generateToken(userDetails);
-                    RefreshToken newRt = refreshTokenService.rotateToken(rt.getId());
-                    ResponseCookie jwtCookie = jwtService.generateJwtCookie(newJwt);
-                    ResponseCookie refreshCookie = jwtService.generateRefreshJwtCookie(newRt.getToken());
-                    response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
-                    response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+                String newJwt = jwtService.generateToken(userDetails);
+                RefreshToken newRt = refreshTokenService.rotateToken(rt.getId());
+                ResponseCookie jwtCookie = jwtService.generateJwtCookie(newJwt);
+                ResponseCookie refreshCookie = jwtService.generateRefreshJwtCookie(newRt.getToken());
+                response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
+                response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
-                    setAuthentication(userDetails, request);
+                setAuthentication(userDetails, request);
             } else {
                 log.warn("JWT expired. No refresh token available.");
             }

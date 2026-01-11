@@ -1,13 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { catchError, Observable, of } from 'rxjs';
+import { catchError, filter, Observable, of, take } from 'rxjs';
 import { Page } from '../app.model';
 import { Group, GroupJoinRequest, GroupMembership, GroupRole } from './groups.model';
 import { ActivatedRouteSnapshot, ResolveFn } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class GroupService {
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) { }
 
   find(params: Record<string, any>): Observable<Page<Group>> {
     return this.httpClient.get<Page<Group>>('/api/groups', { params: params });
@@ -17,8 +17,8 @@ export class GroupService {
     return this.httpClient.get<Page<GroupMembership>>(`/api/groups/members`, { params: params });
   }
 
-  create(group: Group): Observable<void> {
-    return this.httpClient.post<void>('/api/groups', group);
+  create(group: Group): Observable<number> {
+    return this.httpClient.post<number>('/api/groups', group);
   }
 
   edit(group: Group): Observable<void> {

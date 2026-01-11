@@ -15,6 +15,8 @@ export interface DocumentDto {
     ownerLogin: string;
     size: number;
     status: DocumentStatus;
+    attempts?: number;
+    lastError?: string;
 }
 
 export interface UploadStatus {

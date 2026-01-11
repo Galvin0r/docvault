@@ -14,6 +14,7 @@ import { DocumentListComponent } from './document-list/document-list.component';
 import { SimpleDocumentComponent } from './simple-document/simple-document.component';
 import { UploadDialogComponent } from './upload-dialog/upload-dialog.component';
 import { UploadProgressComponent } from './upload-progress/upload-progress.component';
+import { DocumentInfoDialogComponent } from './document-info-dialog/document-info-dialog.component';
 import { UtilsModule } from '../utils/utils.module';
 
 @NgModule({
@@ -22,6 +23,7 @@ import { UtilsModule } from '../utils/utils.module';
         SimpleDocumentComponent,
         UploadDialogComponent,
         UploadProgressComponent,
+        DocumentInfoDialogComponent,
     ],
     imports: [
         CommonModule,
@@ -43,6 +45,7 @@ import { UtilsModule } from '../utils/utils.module';
         SimpleDocumentComponent,
         UploadDialogComponent,
         UploadProgressComponent,
+        DocumentInfoDialogComponent,
     ],
 })
 export class DocumentsModule { }

@@ -42,6 +42,13 @@ export class ProfileComponent implements OnInit {
     groupName: ['']
   });
 
+  documentForm = this.fb.group({
+    titleSearch: [''],
+    ownerName: [''],
+    dateFrom: [null as string | null],
+    dateTo: [null as string | null]
+  });
+
   editingUsername = signal(false);
   saving = signal(false);
   submittedEdit = signal(false);
@@ -58,6 +65,9 @@ export class ProfileComponent implements OnInit {
 
       this.form.patchValue({
         userLogin: userInfo?.login ?? '',
+      });
+      this.documentForm.patchValue({
+        ownerName: userInfo?.login ?? ''
       });
     });
   }
@@ -99,28 +109,28 @@ export class ProfileComponent implements OnInit {
     this.userService.changeLogin(newLogin)
       .pipe(finalize(() => this.saving.set(false)))
       .subscribe({
-      next: (updated: UserInfo) => {
-        this.userInfo.set(updated);
-        if (this.canChange()) this.currentUserInfo.set(updated);
-        this.form.patchValue({ userLogin: updated.login }, { emitEvent: true });
+        next: (updated: UserInfo) => {
+          this.userInfo.set(updated);
+          if (this.canChange()) this.currentUserInfo.set(updated);
+          this.form.patchValue({ userLogin: updated.login }, { emitEvent: true });
 
-        this.editingUsername.set(false);
-        this.submittedEdit.set(false);
-        this.editLoginCtrl.reset();
-        this.editLoginCtrl.updateValueAndValidity();
+          this.editingUsername.set(false);
+          this.submittedEdit.set(false);
+          this.editLoginCtrl.reset();
+          this.editLoginCtrl.updateValueAndValidity();
 
-        this.router.navigate(['/user', updated.login], { replaceUrl: true });
-      },
-      error: (err: HttpErrorResponse) => {
-        this.saving.set(false);
+          this.router.navigate(['/user', updated.login], { replaceUrl: true });
+        },
+        error: (err: HttpErrorResponse) => {
+          this.saving.set(false);
 
-        const error = err.error.code as string;
-        if (error === 'user.login_taken') {
-          this.editLoginCtrl.setErrors({ taken: true });
+          const error = err.error.code as string;
+          if (error === 'user.login_taken') {
+            this.editLoginCtrl.setErrors({ taken: true });
+          }
+          this.editLoginCtrl.markAsTouched();
         }
-        this.editLoginCtrl.markAsTouched();
-      }
-    });
+      });
   }
 
   onResetPassword() {
@@ -156,5 +166,11 @@ export class ProfileComponent implements OnInit {
 
   openGroups() {
     this.router.navigate(["/groups"]);
+  }
+
+  clearFilters() {
+    this.documentForm.reset({
+      ownerName: this.userInfo()?.login ?? ''
+    });
   }
 }

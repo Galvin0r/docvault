@@ -13,6 +13,8 @@ public interface DocumentMapper {
     @Mapping(source = "owner.login", target = "ownerLogin")
     @Mapping(source = "sizeBytes", target = "size")
     @Mapping(source = "created", target = "uploadedAt")
+    @Mapping(target = "attempts", ignore = true)
+    @Mapping(target = "lastError", ignore = true)
     DocumentDto toDto(Document entity);
 
     @InheritInverseConfiguration

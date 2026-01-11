@@ -1,4 +1,3 @@
-/* Progress Bar Color Overrides */
 :host ::ng-deep .upload-progress-bar {
     .p-progressbar {
         height: 8px;
@@ -31,8 +30,4 @@
 
 :host ::ng-deep .upload-progress-bar .p-progressbar-value {
     transition: width 80ms linear !important;
-}
-
-:host ::ng-deep .p-card .p-card-body {
-    padding: 0;
 }

@@ -16,7 +16,7 @@ public record DocumentDto(
         Long ownerId,
         String ownerLogin,
         Long size,
-        DocumentStatus status
-//        Short attempts,
-//        String lastError
+        DocumentStatus status,
+        Short attempts,
+        String lastError
 ) {}

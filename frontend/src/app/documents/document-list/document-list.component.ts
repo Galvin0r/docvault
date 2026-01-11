@@ -23,6 +23,7 @@ export class DocumentListComponent implements OnInit {
   private injector = inject(Injector);
 
   filtersForm = input.required<FormGroup>();
+  currentUserLogin = input.required<string>();
 
   limitOptions = input<number[]>([10, 20, 50]);
   searchStore!: SearchStore<DocumentDto>;
@@ -49,6 +50,11 @@ export class DocumentListComponent implements OnInit {
   }
 
   refresh() {
-    this.searchStore.refresh();
+    const items = this.searchStore.items();
+    if (items.content.length === 1 && this.page() > 1) {
+      this.page.update(p => p - 1);
+    } else {
+      this.searchStore.refresh();
+    }
   }
 }

@@ -11,6 +11,7 @@ import { FileSizePipe } from './pipes/file-size.pipe';
 import { FormErrorComponent } from './form-error/form-error.component';
 import { PaginatorComponent } from './search/paginator/paginator.component';
 import { FormsModule } from '@angular/forms';
+import { FileExtensionPipe } from './pipes/file-extension.pipe';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { FormsModule } from '@angular/forms';
     ThemeSwitchComponent,
     CodePipe,
     FileSizePipe,
+    FileExtensionPipe,
     FormErrorComponent,
     PaginatorComponent,
   ],
@@ -30,6 +32,7 @@ import { FormsModule } from '@angular/forms';
     ThemeSwitchComponent,
     CodePipe,
     FileSizePipe,
+    FileExtensionPipe,
     FormErrorComponent,
     PaginatorComponent,
   ],

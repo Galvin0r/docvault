@@ -33,11 +33,11 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
                 )
             )
           )
-          AND (:titleSearch IS NULL OR to_tsvector('english', d.title) @@ plainto_tsquery('english', :titleSearch))
-          AND (:ownerName IS NULL OR to_tsvector('english', u.login) @@ plainto_tsquery('english', :ownerName))
-          AND (:dateFrom IS NULL OR d.created >= :dateFrom)
-          AND (:dateTo IS NULL OR d.created <= :dateTo)
-        ORDER BY d.created DESC
+          AND (cast(:titleSearch as text) IS NULL OR d.title ILIKE CONCAT('%', cast(:titleSearch as text), '%'))
+          AND (cast(:ownerName as text) IS NULL OR to_tsvector('english', u.login) @@ plainto_tsquery('english', cast(:ownerName as text)))
+          AND (cast(:dateFrom as timestamp) IS NULL OR d.created >= cast(:dateFrom as timestamp))
+          AND (cast(:dateTo as timestamp) IS NULL OR d.created <= cast(:dateTo as timestamp))
+        ORDER BY d.created DESC, d.id DESC
         """,
         countQuery = """
         SELECT COUNT(DISTINCT d.id)
@@ -58,10 +58,10 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
                 )
             )
           )
-          AND (:titleSearch IS NULL OR to_tsvector('english', d.title) @@ plainto_tsquery('english', :titleSearch))
-          AND (:ownerName IS NULL OR to_tsvector('english', u.login) @@ plainto_tsquery('english', :ownerName))
-          AND (:dateFrom IS NULL OR d.created >= :dateFrom)
-          AND (:dateTo IS NULL OR d.created <= :dateTo)
+          AND (cast(:titleSearch as text) IS NULL OR d.title ILIKE CONCAT('%', cast(:titleSearch as text), '%'))
+          AND (cast(:ownerName as text) IS NULL OR to_tsvector('english', u.login) @@ plainto_tsquery('english', cast(:ownerName as text)))
+          AND (cast(:dateFrom as timestamp) IS NULL OR d.created >= cast(:dateFrom as timestamp))
+          AND (cast(:dateTo as timestamp) IS NULL OR d.created <= cast(:dateTo as timestamp))
         """,
         nativeQuery = true)
     Page<Document> findDocumentsWithAccess(

@@ -54,6 +54,17 @@ public class GoogleCloudStorageService {
         ).toString();
     }
 
+    public String generateGetSignedUrl(String objectName) {
+        BlobInfo blobInfo = BlobInfo.newBuilder(BlobId.of(bucketName, objectName)).build();
+
+        return storage.signUrl(
+                blobInfo,
+                15, TimeUnit.MINUTES,
+                Storage.SignUrlOption.httpMethod(HttpMethod.GET),
+                Storage.SignUrlOption.withV4Signature()
+        ).toString();
+    }
+
     public void delete(String objectName) {
         storage.delete(BlobId.of(bucketName, objectName));
     }

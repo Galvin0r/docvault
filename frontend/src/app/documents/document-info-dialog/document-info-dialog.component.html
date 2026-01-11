@@ -1,0 +1,86 @@
+<div class="flex flex-col gap-4 py-2">
+    <div class="flex flex-col gap-1">
+        <div class="text-xs font-semibold text-surface-500 uppercase tracking-wider">Title</div>
+        <div class="flex items-center justify-between group">
+            <span class="text-lg font-medium">{{ document.title }}</span>
+            <button pButton icon="pi pi-pencil"
+                class="p-button-text p-button-sm p-0 h-8 w-8 !rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                pTooltip="Edit title" (click)="editTitle()"></button>
+        </div>
+    </div>
+
+    <div class="flex flex-col gap-1">
+        <div class="text-xs font-semibold text-surface-500 uppercase tracking-wider">Description</div>
+        <div class="flex items-start justify-between group">
+            <div class="text-surface-400 italic">
+                @if (document.description) {
+                {{ document.description }}
+                } @else {
+                No description provided
+                }
+            </div>
+            <button pButton icon="pi pi-pencil"
+                class="p-button-text p-button-sm p-0 h-8 w-8 !rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                pTooltip="Edit description" (click)="editDescription()"></button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-x-8 gap-y-4 pt-2 border-t border-surface-700/50">
+        <div class="flex flex-col gap-1">
+            <div class="text-xs font-semibold text-surface-500 uppercase tracking-wider">Original Filename</div>
+            <div class="text-sm truncate" [pTooltip]="document.originalFilename" tooltipPosition="bottom">{{
+                document.originalFilename }}</div>
+        </div>
+        <div class="flex flex-col gap-1">
+            <div class="text-xs font-semibold text-surface-500 uppercase tracking-wider">Size</div>
+            <div class="text-sm">{{ document.size | fileSize }}</div>
+        </div>
+        <div class="flex flex-col gap-1">
+            <div class="text-xs font-semibold text-surface-500 uppercase tracking-wider">Mime Type</div>
+            <div class="text-sm">{{ document.originalFilename | fileExtension }}</div>
+        </div>
+        <div class="flex flex-col gap-1">
+            <div class="text-xs font-semibold text-surface-500 uppercase tracking-wider">Uploaded At</div>
+            <div class="text-sm">{{ document.uploadedAt | date:'short' }}</div>
+        </div>
+        <div class="flex flex-col gap-1">
+            <div class="text-xs font-semibold text-surface-500 uppercase tracking-wider">Visibility</div>
+            <div class="text-sm flex items-center gap-1">
+                <i class="pi" [class.pi-lock-open]="document.visibility === 'PUBLIC'"
+                    [class.pi-shield]="document.visibility === 'PRIVATE'"></i>
+                {{ document.visibility }}
+            </div>
+        </div>
+        <div class="flex flex-col gap-1">
+            <div class="text-xs font-semibold text-surface-500 uppercase tracking-wider">Owner</div>
+            <div class="text-sm">{{ document.ownerLogin }}</div>
+        </div>
+        <div class="flex flex-col gap-1">
+            <div class="text-xs font-semibold text-surface-500 uppercase tracking-wider">Status</div>
+            <div class="flex ml-[-0.5rem]">
+                <span class="px-2 py-0.5 rounded text-sm font-medium" [ngClass]="{
+                          'bg-primary-500/20 text-primary-400': document.status === 'INDEXED',
+                          'bg-yellow-500/20 text-yellow-400': document.status === 'INDEXING' || document.status === 'UPLOADING',
+                          'bg-red-500/20 text-red-400': document.status === 'FAILED'
+                      }">
+                    {{ document.status | titlecase }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    @if (showIndexingInfo) {
+    <div class="mt-2 p-3 rounded-lg bg-surface-900/50 border border-surface-700/50 flex flex-col gap-2">
+        <div class="text-xs font-semibold text-surface-500 uppercase tracking-wider">Indexing Details</div>
+        <div class="flex items-center gap-4 text-sm">
+            <div>Attempts: <span class="font-medium">{{ document.attempts ?? 0 }}</span></div>
+        </div>
+        @if (document.lastError) {
+        <div class="text-xs text-red-400 font-mono break-all line-clamp-3" [pTooltip]="document.lastError"
+            tooltipPosition="top">
+            {{ document.lastError }}
+        </div>
+        }
+    </div>
+    }
+</div>

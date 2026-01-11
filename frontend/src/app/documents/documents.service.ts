@@ -102,6 +102,10 @@ export class DocumentService {
         return this.http.delete<void>(`/api/documents/delete/${documentId}`);
     }
 
+    download(documentId: number): Observable<string> {
+        return this.http.get(`/api/documents/download/${documentId}`, { responseType: 'text' });
+    }
+
     private addUpload(upload: UploadStatus) {
         this.uploadsSignal.update(uploads => [...uploads, upload]);
     }

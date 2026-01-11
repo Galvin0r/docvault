@@ -3,7 +3,7 @@
         <ng-template #list let-items>
             <div class="flex flex-col gap-1">
                 @for (item of items; track item.id) {
-                <app-simple-document [document]="item" />
+                <app-simple-document [document]="item" [currentUserLogin]="currentUserLogin()" (deleted)="refresh()" />
                 }
             </div>
         </ng-template>
