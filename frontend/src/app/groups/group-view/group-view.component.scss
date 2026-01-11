@@ -1,3 +1,15 @@
+:host {
+  display: block;
+}
+
+.group-card {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 8px 30px -10px rgba(0, 0, 0, 0.3);
+  }
+}
+
 .badge {
   color: var(--p-button-contrast-color);
 }

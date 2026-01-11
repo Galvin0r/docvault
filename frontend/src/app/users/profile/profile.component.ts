@@ -10,6 +10,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { finalize } from 'rxjs';
 import { MessageService } from 'primeng/api';
 import { SecurityService } from '../../security/security.service';
+import { DialogService } from 'primeng/dynamicdialog';
+import { AddToGroupDialogComponent } from '../add-to-group-dialog/add-to-group-dialog.component';
 
 @Component({
   selector: 'app-profile',
@@ -23,6 +25,7 @@ export class ProfileComponent implements OnInit {
   private userService = inject(UserService);
   private messageService = inject(MessageService);
   private securityService = inject(SecurityService);
+  private dialogService = inject(DialogService);
 
   activatedRoute = inject(ActivatedRoute);
   fb = inject(FormBuilder);
@@ -171,6 +174,20 @@ export class ProfileComponent implements OnInit {
   clearFilters() {
     this.documentForm.reset({
       ownerName: this.userInfo()?.login ?? ''
+    });
+  }
+
+  openAddToGroupDialog(): void {
+    this.dialogService.open(AddToGroupDialogComponent, {
+      header: 'Add to Group',
+      width: '400px',
+      modal: true,
+      dismissableMask: true,
+      data: {
+        email: this.userInfo()?.email,
+        login: this.userInfo()?.login,
+        currentUserLogin: this.currentUserInfo()?.login
+      }
     });
   }
 }

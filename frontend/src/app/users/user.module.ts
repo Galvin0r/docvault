@@ -9,12 +9,14 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DocumentsModule } from '../documents/documents.module';
 import { SecurityModule } from '../security/security.module';
 import { UtilsModule } from '../utils/utils.module';
+import { AddToGroupDialogComponent } from './add-to-group-dialog/add-to-group-dialog.component';
 
 @NgModule({
   declarations: [
     UserListComponent,
     UserComponent,
-    ProfileComponent
+    ProfileComponent,
+    AddToGroupDialogComponent
   ],
   imports: [
     CommonModule,

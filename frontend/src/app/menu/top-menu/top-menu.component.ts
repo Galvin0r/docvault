@@ -27,11 +27,6 @@ export class TopMenuComponent {
       command: () => this.router.navigate(['/user', this.userInfo?.login])
 
     },
-    {
-      label: 'Groups',
-      icon: 'pi pi-users',
-      routerLink: ['/groups']
-    },
     { separator: true },
     {
       label: 'Log out',

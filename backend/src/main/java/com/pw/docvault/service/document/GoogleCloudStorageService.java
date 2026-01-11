@@ -1,6 +1,5 @@
 package com.pw.docvault.service.document;
 
-import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.ReadChannel;
 import com.google.cloud.storage.*;
 import com.pw.docvault.exception.ErrorCode;
@@ -21,10 +20,6 @@ public class GoogleCloudStorageService {
 
     @Value(value = "${app.gcs.bucket.name}")
     private String bucketName;
-
-    @Value(value = "${app.gsc.buffer.storage.space}")
-    public Integer bufferSpace;
-
 
     public Blob getMetadata(String objectName) {
         BlobId blobId = BlobId.of(bucketName, objectName);

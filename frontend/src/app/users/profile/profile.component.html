@@ -62,6 +62,13 @@
             Reset Password
           </button>
         </div>
+        } @else if (currentUserInfo()) {
+        <div class="pt-2">
+          <button pButton type="button" icon="pi pi-user-plus" class="p-button-outlined p-button-sm rounded-lg"
+            (click)="openAddToGroupDialog()">
+            Add to Group
+          </button>
+        </div>
         }
       </div>
     </div>
@@ -156,13 +163,11 @@
                 <label for="title">Title</label>
               </p-floatlabel>
               <p-floatlabel variant="on">
-                <p-datepicker id="dateFrom" formControlName="dateFrom" showIcon="true" styleClass="w-full"
-                  appendTo="body" />
+                <p-datepicker id="dateFrom" formControlName="dateFrom" showIcon="true" styleClass="w-full" />
                 <label for="dateFrom">Date From</label>
               </p-floatlabel>
               <p-floatlabel variant="on">
-                <p-datepicker id="dateTo" formControlName="dateTo" showIcon="true" styleClass="w-full"
-                  appendTo="body" />
+                <p-datepicker id="dateTo" formControlName="dateTo" showIcon="true" styleClass="w-full" />
                 <label for="dateTo">Date To</label>
               </p-floatlabel>
 

@@ -11,6 +11,8 @@
 
   <ng-template #end>
     <div class="flex mr-2 items-center">
+      <p-button icon="pi pi-users" [rounded]="true" [text]="true" severity="secondary" routerLink="/groups"
+        pTooltip="Groups" tooltipPosition="bottom"></p-button>
       <p-button icon="pi pi-upload" [rounded]="true" [text]="true" severity="secondary" (click)="openUploadDialog()"
         pTooltip="Upload Document" tooltipPosition="bottom"></p-button>
       <p-divider layout="vertical" />
