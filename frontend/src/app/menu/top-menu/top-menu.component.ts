@@ -53,7 +53,7 @@ export class TopMenuComponent {
   logout() {
     this.securityService.logout().subscribe(() => {
       location.reload();
-    })
+    });
   }
 
   private dialogService = inject(DialogService);

@@ -5,15 +5,15 @@ import com.google.cloud.ReadChannel;
 import com.google.cloud.storage.*;
 import com.pw.docvault.exception.ErrorCode;
 import com.pw.docvault.exception.NotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.Channels;
 import java.util.concurrent.TimeUnit;
 
+@RequiredArgsConstructor
 @Service
 public class GoogleCloudStorageService {
 
@@ -25,15 +25,6 @@ public class GoogleCloudStorageService {
     @Value(value = "${app.gsc.buffer.storage.space}")
     public Integer bufferSpace;
 
-    public GoogleCloudStorageService(@Value(value = "${app.gcs.credentials.location}")
-                                     Resource credentials) throws IOException {
-        this.storage = StorageOptions.newBuilder()
-                .setCredentials(
-                        ServiceAccountCredentials.fromStream(credentials.getInputStream())
-                )
-                .build()
-                .getService();
-    }
 
     public Blob getMetadata(String objectName) {
         BlobId blobId = BlobId.of(bucketName, objectName);

@@ -48,7 +48,7 @@ class FormErrorStub {
     <ng-content></ng-content>
   `,
 })
-class PInputGroupStub {}
+class PInputGroupStub { }
 
 @Component({
   selector: 'p-inputgroup-addon',
@@ -57,7 +57,7 @@ class PInputGroupStub {}
     <ng-content></ng-content>
   `,
 })
-class PInputGroupAddonStub {}
+class PInputGroupAddonStub { }
 
 @Component({
   selector: 'p-message',
@@ -86,16 +86,16 @@ class PPasswordStub implements ControlValueAccessor {
   @Input() feedback?: boolean;
   @Input() toggleMask?: boolean;
   @Input() inputStyleClass?: string;
-  private onChange = (_: any) => {};
-  private onTouched = () => {};
-  writeValue(_: any): void {}
+  private onChange = (_: any) => { };
+  private onTouched = () => { };
+  writeValue(_: any): void { }
   registerOnChange(fn: any): void {
     this.onChange = fn;
   }
   registerOnTouched(fn: any): void {
     this.onTouched = fn;
   }
-  setDisabledState(_: boolean): void {}
+  setDisabledState(_: boolean): void { }
   onInput(e: Event) {
     this.onChange((e.target as HTMLInputElement).value);
     this.onTouched();
@@ -208,6 +208,92 @@ describe('PasswordRecoveryComponent', () => {
     expect(security.setNewPassword).toHaveBeenCalledWith('ZzT0k', 'password123');
     expect(messages.add).toHaveBeenCalledWith(jasmine.objectContaining({ severity: 'success' }));
     expect(router.navigate).toHaveBeenCalledWith(['/home']);
+  });
+
+  it('onSubmit branch: success subscribe path', () => {
+    create('tok');
+    security.setNewPassword.and.returnValue(of(void 0));
+    component.form.setValue({ password: 'password123', confirmPassword: 'password123' });
+    component.onSubmit();
+    expect(messages.add).toHaveBeenCalledWith(jasmine.objectContaining({ severity: 'success' }));
+    expect((router as any).navigate).toHaveBeenCalledWith(['/home']);
+  });
+
+  it('onSubmit branch: error subscribe path', () => {
+    create('tok');
+    security.setNewPassword.and.returnValue(throwError(() => ({ error: { code: 'ERR' } })));
+    component.form.setValue({ password: 'password123', confirmPassword: 'password123' });
+    component.onSubmit();
+    expect((component as any).error).toBe('ERR');
+  });
+
+  it('onSubmit branch: invalid form (early return)', () => {
+    create('tok');
+    component.form.setValue({ password: '', confirmPassword: '' });
+    component.onSubmit();
+    expect(security.setNewPassword).not.toHaveBeenCalled();
+    expect(component.submitted).toBeTrue();
+  });
+
+  describe('Template and Logic branches', () => {
+    beforeEach(() => create());
+
+    it('shows and hides password validation message and nested @if branches', () => {
+      const pwd = component.form.get('password')!;
+
+      expect(fixture.debugElement.queryAll(By.directive(PMessageStub)).length).toBe(0);
+
+      pwd.markAsTouched();
+      pwd.setValue('');
+      fixture.detectChanges();
+      let msgs = fixture.debugElement.queryAll(By.directive(PMessageStub));
+      expect(msgs.length).toBeGreaterThan(0);
+      expect(msgs[0].nativeElement.textContent).toContain('Password is required');
+
+      pwd.setValue('short');
+      fixture.detectChanges();
+      msgs = fixture.debugElement.queryAll(By.directive(PMessageStub));
+      expect(msgs[0].nativeElement.textContent).toContain('at least 8');
+
+      pwd.setValue('validPassword123');
+      fixture.detectChanges();
+      expect(fixture.debugElement.queryAll(By.directive(PMessageStub)).length).toBe(0);
+    });
+
+    it('shows and hides isMismatched() validation @if', () => {
+      component.form.get('password')?.setValue('p1');
+      component.form.get('confirmPassword')?.setValue('p2');
+
+      fixture.detectChanges();
+      expect(fixture.debugElement.queryAll(By.directive(PMessageStub)).length).toBe(0);
+
+      component.form.get('confirmPassword')?.markAsTouched();
+      fixture.detectChanges();
+      expect(fixture.debugElement.queryAll(By.directive(PMessageStub)).length).toBeGreaterThan(0);
+      expect(fixture.debugElement.query(By.directive(PMessageStub)).nativeElement.textContent).toContain('match');
+    });
+
+    it('isMismatched coverage (exhaustive logic permutations)', () => {
+      const pwd = component.form.get('password')!;
+      const confirm = component.form.get('confirmPassword')!;
+
+      pwd.setValue('p1');
+      confirm.setValue('p1');
+      expect(component.isMismatched()).toBeFalse();
+
+      confirm.setValue('p2');
+      expect(component.form.hasError('passwordsMismatch')).toBeTrue();
+      expect(component.isMismatched()).toBeFalse();
+
+      confirm.markAsTouched();
+      expect(component.isMismatched()).toBeTrue();
+
+      create();
+      component.form.get('password')?.setValue('p1');
+      component.form.get('confirmPassword')?.setValue('p2');
+      component.submitted = true;
+      expect(component.isMismatched()).toBeTrue();
+    });
   });
 
   it('sets error on submit failure and passes it to form error', () => {

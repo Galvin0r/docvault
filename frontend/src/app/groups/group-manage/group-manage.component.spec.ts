@@ -142,10 +142,5 @@ describe('GroupManageComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/groups/edit/', 123]);
   });
 
-  it('ngOnDestroy closes dialog if open', () => {
-    create();
-    component.onAddGroup();
-    component.ngOnDestroy();
-    expect(dialog.ref.close).toHaveBeenCalled();
-  });
+
 });

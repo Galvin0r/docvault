@@ -1,0 +1,356 @@
+
+> doc-vault@0.0.0 test:cov
+> ng test -c cov --watch=false --browsers=ChromeHeadless
+
+- Generating browser application bundles (phase: setup)...
+✔ Browser application bundle generation complete.
+11 01 2026 15:21:24.792:INFO [karma-server]: Karma v6.4.4 server started at http://localhost:9876/
+11 01 2026 15:21:24.793:INFO [launcher]: Launching browsers ChromeHeadless with concurrency unlimited
+11 01 2026 15:21:24.796:INFO [launcher]: Starting browser ChromeHeadless
+11 01 2026 15:21:25.226:INFO [Chrome Headless 141.0.0.0 (Linux x86_64)]: Connected on socket u_2HOQatlIJsPaejAAAB with id 32191679
+Chrome Headless 141.0.0.0 (Linux x86_64): Executed 0 of 259 SUCCESS (0 secs / 0 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 1 of 259 SUCCESS (0 secs / 0.042 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 2 of 259 SUCCESS (0 secs / 0.083 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 3 of 259 SUCCESS (0 secs / 0.089 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 4 of 259 SUCCESS (0 secs / 0.096 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 5 of 259 SUCCESS (0 secs / 0.104 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 6 of 259 SUCCESS (0 secs / 0.109 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 7 of 259 SUCCESS (0 secs / 0.13 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 8 of 259 SUCCESS (0 secs / 0.135 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 9 of 259 SUCCESS (0 secs / 0.14 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 10 of 259 SUCCESS (0 secs / 0.148 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 11 of 259 SUCCESS (0 secs / 0.185 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 12 of 259 SUCCESS (0 secs / 0.188 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 13 of 259 SUCCESS (0 secs / 0.193 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 14 of 259 SUCCESS (0 secs / 0.197 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 15 of 259 SUCCESS (0 secs / 0.201 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 16 of 259 SUCCESS (0 secs / 0.205 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 17 of 259 SUCCESS (0 secs / 0.21 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 18 of 259 SUCCESS (0 secs / 0.214 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 19 of 259 SUCCESS (0 secs / 0.217 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 20 of 259 SUCCESS (0 secs / 0.22 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 21 of 259 SUCCESS (0 secs / 0.224 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 22 of 259 SUCCESS (0 secs / 0.228 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 23 of 259 SUCCESS (0 secs / 0.24 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 24 of 259 SUCCESS (0 secs / 0.244 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 25 of 259 SUCCESS (0 secs / 0.252 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 26 of 259 SUCCESS (0 secs / 0.256 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 27 of 259 SUCCESS (0 secs / 0.259 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 28 of 259 SUCCESS (0 secs / 0.261 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 29 of 259 SUCCESS (0 secs / 0.264 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 30 of 259 SUCCESS (0 secs / 0.266 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 31 of 259 SUCCESS (0 secs / 0.271 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 32 of 259 SUCCESS (0 secs / 0.272 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 33 of 259 SUCCESS (0 secs / 0.281 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 34 of 259 SUCCESS (0 secs / 0.285 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 35 of 259 SUCCESS (0 secs / 0.287 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 36 of 259 SUCCESS (0 secs / 0.289 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 37 of 259 SUCCESS (0 secs / 0.299 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 38 of 259 SUCCESS (0 secs / 0.302 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 39 of 259 SUCCESS (0 secs / 0.324 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 40 of 259 SUCCESS (0 secs / 0.328 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 41 of 259 SUCCESS (0 secs / 0.333 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 42 of 259 SUCCESS (0 secs / 0.337 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 43 of 259 SUCCESS (0 secs / 0.337 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 44 of 259 SUCCESS (0 secs / 0.337 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 45 of 259 SUCCESS (0 secs / 0.337 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 46 of 259 SUCCESS (0 secs / 0.338 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 47 of 259 SUCCESS (0 secs / 0.338 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 48 of 259 SUCCESS (0 secs / 0.339 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 49 of 259 SUCCESS (0 secs / 0.356 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 50 of 259 SUCCESS (0 secs / 0.36 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 51 of 259 SUCCESS (0 secs / 0.363 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 52 of 259 SUCCESS (0 secs / 0.366 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 53 of 259 SUCCESS (0 secs / 0.368 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 54 of 259 SUCCESS (0 secs / 0.38 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 55 of 259 SUCCESS (0 secs / 0.382 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 56 of 259 SUCCESS (0 secs / 0.384 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 57 of 259 SUCCESS (0 secs / 0.387 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 58 of 259 SUCCESS (0 secs / 0.39 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 59 of 259 SUCCESS (0 secs / 0.393 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 60 of 259 SUCCESS (0 secs / 0.395 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 61 of 259 SUCCESS (0 secs / 0.397 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 62 of 259 SUCCESS (0 secs / 0.399 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 63 of 259 SUCCESS (0 secs / 0.401 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 64 of 259 SUCCESS (0 secs / 0.405 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 65 of 259 SUCCESS (0 secs / 0.413 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 66 of 259 SUCCESS (0 secs / 0.415 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 67 of 259 SUCCESS (0 secs / 0.418 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 68 of 259 SUCCESS (0 secs / 0.419 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 69 of 259 SUCCESS (0 secs / 0.419 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 70 of 259 SUCCESS (0 secs / 0.42 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 71 of 259 SUCCESS (0 secs / 0.42 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 72 of 259 SUCCESS (0 secs / 0.421 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 73 of 259 SUCCESS (0 secs / 0.421 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 74 of 259 SUCCESS (0 secs / 0.422 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 75 of 259 SUCCESS (0 secs / 0.422 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 76 of 259 SUCCESS (0 secs / 0.438 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 77 of 259 SUCCESS (0 secs / 0.442 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 78 of 259 SUCCESS (0 secs / 0.445 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 79 of 259 SUCCESS (0 secs / 0.45 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 80 of 259 SUCCESS (0 secs / 0.453 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 81 of 259 SUCCESS (0 secs / 0.456 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 82 of 259 SUCCESS (0 secs / 0.459 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 83 of 259 SUCCESS (0 secs / 0.462 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 84 of 259 SUCCESS (0 secs / 0.468 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 85 of 259 SUCCESS (0 secs / 0.478 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 86 of 259 SUCCESS (0 secs / 0.483 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 87 of 259 SUCCESS (0 secs / 0.485 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 88 of 259 SUCCESS (0 secs / 0.487 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 89 of 259 SUCCESS (0 secs / 0.49 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 90 of 259 SUCCESS (0 secs / 0.493 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 91 of 259 SUCCESS (0 secs / 0.495 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 92 of 259 SUCCESS (0 secs / 0.497 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 93 of 259 SUCCESS (0 secs / 0.498 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 94 of 259 SUCCESS (0 secs / 0.499 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 95 of 259 SUCCESS (0 secs / 0.5 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 96 of 259 SUCCESS (0 secs / 0.501 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 97 of 259 SUCCESS (0 secs / 0.502 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 98 of 259 SUCCESS (0 secs / 0.503 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 99 of 259 SUCCESS (0 secs / 0.504 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 100 of 259 SUCCESS (0 secs / 0.505 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 101 of 259 SUCCESS (0 secs / 0.506 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 102 of 259 SUCCESS (0 secs / 0.508 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 103 of 259 SUCCESS (0 secs / 0.51 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 104 of 259 SUCCESS (0 secs / 0.511 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 105 of 259 SUCCESS (0 secs / 0.512 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 106 of 259 SUCCESS (0 secs / 0.513 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 107 of 259 SUCCESS (0 secs / 0.518 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 108 of 259 SUCCESS (0 secs / 0.52 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 109 of 259 SUCCESS (0 secs / 0.523 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 110 of 259 SUCCESS (0 secs / 0.527 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 111 of 259 SUCCESS (0 secs / 0.535 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 112 of 259 SUCCESS (0 secs / 0.539 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 113 of 259 SUCCESS (0 secs / 0.541 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 114 of 259 SUCCESS (0 secs / 0.543 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 115 of 259 SUCCESS (0 secs / 0.545 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 116 of 259 SUCCESS (0 secs / 0.546 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 117 of 259 SUCCESS (0 secs / 0.547 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 118 of 259 SUCCESS (0 secs / 0.551 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 119 of 259 SUCCESS (0 secs / 0.553 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 120 of 259 SUCCESS (0 secs / 0.573 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 121 of 259 SUCCESS (0 secs / 0.577 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 122 of 259 SUCCESS (0 secs / 0.584 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 123 of 259 SUCCESS (0 secs / 0.59 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 124 of 259 SUCCESS (0 secs / 0.595 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 125 of 259 SUCCESS (0 secs / 0.6 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 126 of 259 SUCCESS (0 secs / 0.606 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 127 of 259 SUCCESS (0 secs / 0.61 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 128 of 259 SUCCESS (0 secs / 0.617 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 129 of 259 SUCCESS (0 secs / 0.625 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 130 of 259 SUCCESS (0 secs / 0.63 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 131 of 259 SUCCESS (0 secs / 0.634 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 132 of 259 SUCCESS (0 secs / 0.637 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 133 of 259 SUCCESS (0 secs / 0.649 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 134 of 259 SUCCESS (0 secs / 0.649 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 135 of 259 SUCCESS (0 secs / 0.649 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 136 of 259 SUCCESS (0 secs / 0.649 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 137 of 259 SUCCESS (0 secs / 0.651 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 138 of 259 SUCCESS (0 secs / 0.652 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 139 of 259 SUCCESS (0 secs / 0.653 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 140 of 259 SUCCESS (0 secs / 0.655 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 141 of 259 SUCCESS (0 secs / 0.656 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 142 of 259 SUCCESS (0 secs / 0.658 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 143 of 259 SUCCESS (0 secs / 0.659 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 144 of 259 SUCCESS (0 secs / 0.659 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 145 of 259 SUCCESS (0 secs / 0.66 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 146 of 259 SUCCESS (0 secs / 0.66 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 147 of 259 SUCCESS (0 secs / 0.661 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 148 of 259 SUCCESS (0 secs / 0.661 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 149 of 259 SUCCESS (0 secs / 0.663 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 150 of 259 SUCCESS (0 secs / 0.664 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 151 of 259 SUCCESS (0 secs / 0.665 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 152 of 259 SUCCESS (0 secs / 0.666 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 153 of 259 SUCCESS (0 secs / 0.667 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 154 of 259 SUCCESS (0 secs / 0.681 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 155 of 259 SUCCESS (0 secs / 0.683 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 156 of 259 SUCCESS (0 secs / 0.685 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 157 of 259 SUCCESS (0 secs / 0.698 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 158 of 259 SUCCESS (0 secs / 0.703 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 159 of 259 SUCCESS (0 secs / 0.708 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 160 of 259 SUCCESS (0 secs / 0.711 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 161 of 259 SUCCESS (0 secs / 0.716 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 162 of 259 SUCCESS (0 secs / 0.721 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 163 of 259 SUCCESS (0 secs / 0.724 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 164 of 259 SUCCESS (0 secs / 0.736 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 165 of 259 SUCCESS (0 secs / 0.74 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 166 of 259 SUCCESS (0 secs / 0.742 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 167 of 259 SUCCESS (0 secs / 0.746 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 168 of 259 SUCCESS (0 secs / 0.751 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 169 of 259 SUCCESS (0 secs / 0.756 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 170 of 259 SUCCESS (0 secs / 0.759 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 171 of 259 SUCCESS (0 secs / 0.761 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 172 of 259 SUCCESS (0 secs / 0.765 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 173 of 259 SUCCESS (0 secs / 0.769 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 174 of 259 SUCCESS (0 secs / 0.771 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 175 of 259 SUCCESS (0 secs / 0.774 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 176 of 259 SUCCESS (0 secs / 0.777 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 177 of 259 SUCCESS (0 secs / 0.779 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 178 of 259 SUCCESS (0 secs / 0.78 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 179 of 259 SUCCESS (0 secs / 0.785 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 180 of 259 SUCCESS (0 secs / 0.787 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 181 of 259 SUCCESS (0 secs / 0.788 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 182 of 259 SUCCESS (0 secs / 0.789 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 183 of 259 SUCCESS (0 secs / 0.791 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 184 of 259 SUCCESS (0 secs / 0.794 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 185 of 259 SUCCESS (0 secs / 0.796 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 186 of 259 SUCCESS (0 secs / 0.798 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 187 of 259 SUCCESS (0 secs / 0.803 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 188 of 259 SUCCESS (0 secs / 0.805 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 189 of 259 SUCCESS (0 secs / 0.807 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 190 of 259 SUCCESS (0 secs / 0.809 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 191 of 259 SUCCESS (0 secs / 0.81 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 192 of 259 SUCCESS (0 secs / 0.812 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 193 of 259 SUCCESS (0 secs / 0.812 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 194 of 259 SUCCESS (0 secs / 0.813 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 195 of 259 SUCCESS (0 secs / 0.813 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 196 of 259 SUCCESS (0 secs / 0.813 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 197 of 259 SUCCESS (0 secs / 0.813 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 198 of 259 SUCCESS (0 secs / 0.816 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 199 of 259 SUCCESS (0 secs / 0.818 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 200 of 259 SUCCESS (0 secs / 0.82 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 201 of 259 SUCCESS (0 secs / 0.825 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 202 of 259 SUCCESS (0 secs / 0.828 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 203 of 259 SUCCESS (0 secs / 0.843 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 204 of 259 SUCCESS (0 secs / 0.845 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 205 of 259 SUCCESS (0 secs / 0.847 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 206 of 259 SUCCESS (0 secs / 0.849 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 207 of 259 SUCCESS (0 secs / 0.858 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 208 of 259 SUCCESS (0 secs / 0.86 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 209 of 259 SUCCESS (0 secs / 0.861 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 210 of 259 SUCCESS (0 secs / 0.862 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 211 of 259 SUCCESS (0 secs / 0.863 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 212 of 259 SUCCESS (0 secs / 0.875 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 213 of 259 SUCCESS (0 secs / 0.877 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 214 of 259 SUCCESS (0 secs / 0.879 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 215 of 259 SUCCESS (0 secs / 0.881 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 216 of 259 SUCCESS (0 secs / 0.882 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 217 of 259 SUCCESS (0 secs / 0.884 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 218 of 259 SUCCESS (0 secs / 0.885 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 219 of 259 SUCCESS (0 secs / 0.886 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 220 of 259 SUCCESS (0 secs / 0.887 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 221 of 259 SUCCESS (0 secs / 0.888 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 222 of 259 SUCCESS (0 secs / 0.89 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 223 of 259 SUCCESS (0 secs / 0.901 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 224 of 259 SUCCESS (0 secs / 0.905 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 225 of 259 SUCCESS (0 secs / 0.909 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 226 of 259 SUCCESS (0 secs / 0.914 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 227 of 259 SUCCESS (0 secs / 0.918 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 228 of 259 SUCCESS (0 secs / 0.919 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 229 of 259 SUCCESS (0 secs / 0.92 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 230 of 259 SUCCESS (0 secs / 0.921 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 231 of 259 SUCCESS (0 secs / 0.922 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 232 of 259 SUCCESS (0 secs / 0.923 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 233 of 259 SUCCESS (0 secs / 0.924 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 234 of 259 SUCCESS (0 secs / 0.925 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 235 of 259 SUCCESS (0 secs / 0.926 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 236 of 259 SUCCESS (0 secs / 0.927 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 237 of 259 SUCCESS (0 secs / 0.927 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 238 of 259 SUCCESS (0 secs / 0.927 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 239 of 259 SUCCESS (0 secs / 0.927 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 240 of 259 SUCCESS (0 secs / 0.927 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 241 of 259 SUCCESS (0 secs / 0.942 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 242 of 259 SUCCESS (0 secs / 0.946 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 243 of 259 SUCCESS (0 secs / 0.95 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 244 of 259 SUCCESS (0 secs / 0.955 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 245 of 259 SUCCESS (0 secs / 0.959 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 246 of 259 SUCCESS (0 secs / 0.962 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 247 of 259 SUCCESS (0 secs / 0.966 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 248 of 259 SUCCESS (0 secs / 0.973 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 249 of 259 SUCCESS (0 secs / 0.977 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 250 of 259 SUCCESS (0 secs / 0.98 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 251 of 259 SUCCESS (0 secs / 0.985 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 252 of 259 SUCCESS (0 secs / 0.985 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 253 of 259 SUCCESS (0 secs / 0.986 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 254 of 259 SUCCESS (0 secs / 0.987 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 255 of 259 SUCCESS (0 secs / 0.987 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 256 of 259 SUCCESS (0 secs / 0.987 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 257 of 259 SUCCESS (0 secs / 0.987 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 258 of 259 SUCCESS (0 secs / 0.987 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 259 of 259 SUCCESS (0 secs / 0.987 secs)
+[1A[2KChrome Headless 141.0.0.0 (Linux x86_64): Executed 259 of 259 SUCCESS (1.109 secs / 0.987 secs)
+TOTAL: 259 SUCCESS
+✔ Browser application bundle generation complete.
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |    86.6 |    70.76 |   82.86 |   87.88 |                   
+ app               |     100 |      100 |     100 |     100 |                   
+  app.component.ts |     100 |      100 |     100 |     100 |                   
+ app/documents     |       2 |        0 |       0 |    2.27 |                   
+  ...ts.service.ts |       2 |        0 |       0 |    2.27 | 13-115            
+ ...nt-info-dialog |   77.77 |      100 |       0 |      75 |                   
+  ....component.ts |   77.77 |      100 |       0 |      75 | 22-27             
+ .../document-list |      75 |    33.33 |   71.42 |   76.47 |                   
+  ....component.ts |      75 |    33.33 |   71.42 |   76.47 | 53-57             
+ ...imple-document |   60.52 |     5.55 |    87.5 |      75 |                   
+  ....component.ts |   60.52 |     5.55 |    87.5 |      75 | 29-34,65          
+ .../upload-dialog |   85.71 |    71.42 |      75 |   85.18 |                   
+  ....component.ts |   85.71 |    71.42 |      75 |   85.18 | 31-32,52-53       
+ ...pload-progress |   88.23 |      100 |      90 |   83.33 |                   
+  ....component.ts |   88.23 |      100 |      90 |   83.33 | 28-29             
+ app/groups        |   94.44 |      100 |   95.83 |   93.93 |                   
+  groups.model.ts  |   88.88 |      100 |     100 |   83.33 | 19                
+  ...ps.service.ts |   96.29 |      100 |   95.45 |   96.29 | 17                
+ app/groups/group  |     100 |      100 |     100 |     100 |                   
+  ....component.ts |     100 |      100 |     100 |     100 |                   
+ ...oups/group-add |     100 |      100 |     100 |     100 |                   
+  ....component.ts |     100 |      100 |     100 |     100 |                   
+ ...group-add-user |     100 |      100 |     100 |     100 |                   
+  ....component.ts |     100 |      100 |     100 |     100 |                   
+ ...p-join-request |     100 |      100 |     100 |     100 |                   
+  ....component.ts |     100 |      100 |     100 |     100 |                   
+ ...-join-requests |     100 |      100 |     100 |     100 |                   
+  ....component.ts |     100 |      100 |     100 |     100 |                   
+ ...ups/group-list |     100 |      100 |     100 |     100 |                   
+  ....component.ts |     100 |      100 |     100 |     100 |                   
+ ...s/group-manage |     100 |      100 |     100 |     100 |                   
+  ....component.ts |     100 |      100 |     100 |     100 |                   
+ ...ups/group-view |   98.41 |     87.5 |   96.66 |     100 |                   
+  ....component.ts |   98.41 |     87.5 |   96.66 |     100 | 45                
+ app/security      |   94.44 |     90.9 |      90 |   94.44 |                   
+  ....component.ts |     100 |      100 |     100 |     100 |                   
+  ...ty.service.ts |   88.23 |       50 |   84.61 |   88.23 | 59-61             
+ ...rity/auth-card |     100 |      100 |     100 |     100 |                   
+  ....component.ts |     100 |      100 |     100 |     100 |                   
+ ...l-verification |     100 |      100 |     100 |     100 |                   
+  ....component.ts |     100 |      100 |     100 |     100 |                   
+ ...y/interceptors |     100 |      100 |     100 |     100 |                   
+  ...nterceptor.ts |     100 |      100 |     100 |     100 |                   
+ ...security/login |     100 |      100 |     100 |     100 |                   
+  ....component.ts |     100 |      100 |     100 |     100 |                   
+ ...sword-recovery |     100 |      100 |     100 |     100 |                   
+  ....component.ts |     100 |      100 |     100 |     100 |                   
+ ...password-reset |     100 |      100 |     100 |     100 |                   
+  ....component.ts |     100 |      100 |     100 |     100 |                   
+ ...ecurity/signup |     100 |      100 |     100 |     100 |                   
+  ....component.ts |     100 |      100 |     100 |     100 |                   
+ app/users         |   33.33 |      100 |       0 |   33.33 |                   
+  user.service.ts  |   33.33 |      100 |       0 |   33.33 | 8-11              
+ app/users/user    |   88.23 |    85.71 |      70 |   88.23 |                   
+  ....component.ts |   88.23 |    85.71 |      70 |   88.23 | 45,52,61,121      
+ ...sers/user-list |     100 |      100 |     100 |     100 |                   
+  ....component.ts |     100 |      100 |     100 |     100 |                   
+ app/utils         |   96.49 |       90 |    92.3 |   96.49 |                   
+  consts.ts        |      75 |        0 |       0 |      75 | 63-64             
+  functions.ts     |     100 |      100 |     100 |     100 |                   
+  theme.service.ts |     100 |    91.66 |     100 |     100 | 20                
+  validators.ts    |     100 |      100 |     100 |     100 |                   
+ ...ils/form-error |     100 |      100 |     100 |     100 |                   
+  ....component.ts |     100 |      100 |     100 |     100 |                   
+ .../google-button |     100 |      100 |     100 |     100 |                   
+  ....component.ts |     100 |      100 |     100 |     100 |                   
+ app/utils/logo    |     100 |      100 |     100 |     100 |                   
+  ....component.ts |     100 |      100 |     100 |     100 |                   
+ app/utils/pipes   |     100 |      100 |     100 |     100 |                   
+  code.pipe.ts     |     100 |      100 |     100 |     100 |                   
+  ...nsion.pipe.ts |     100 |      100 |     100 |     100 |                   
+  ...-size.pipe.ts |     100 |      100 |     100 |     100 |                   
+ app/utils/search  |   93.54 |      100 |   71.42 |   96.55 |                   
+  search-store.ts  |   93.54 |      100 |   71.42 |   96.55 | 33                
+ ...arch/paginator |     100 |      100 |     100 |     100 |                   
+  ....component.ts |     100 |      100 |     100 |     100 |                   
+ ...s/theme-switch |     100 |      100 |     100 |     100 |                   
+  ....component.ts |     100 |      100 |     100 |     100 |                   
+-------------------|---------|----------|---------|---------|-------------------
+✔ Browser application bundle generation complete.

@@ -3,8 +3,10 @@ package com.pw.docvault.config;
 import com.pw.docvault.exception.BadCredentialsException;
 import com.pw.docvault.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -52,5 +54,13 @@ public class BeansConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public com.google.cloud.storage.Storage storage(@Value("${app.gcs.credentials.location}") Resource credentials) throws java.io.IOException {
+        return com.google.cloud.storage.StorageOptions.newBuilder()
+                .setCredentials(com.google.auth.oauth2.ServiceAccountCredentials.fromStream(credentials.getInputStream()))
+                .build()
+                .getService();
     }
 }

@@ -102,7 +102,7 @@ describe('SecurityService', () => {
   });
 
   it('getUserInfo() -> GET "/api/accounts" and returns UserInfo', () => {
-    const mockUser = { id: 1, username: 'john' } as any;
+    const mockUser = { id: 1, login: 'john', email: 'a@b', created: '' } as UserInfo;
 
     service.getUserInfo().subscribe((u) => {
       expect(u).toEqual(mockUser);
@@ -146,10 +146,11 @@ describe('userResolver', () => {
 
     const req = http.expectOne('/api/accounts');
     expect(req.request.method).toBe('GET');
-    req.flush({ email: 'a@b', login: 'john', created: '' });
+    const mockUser: UserInfo = { id: 1, email: 'a@b', login: 'john', created: '' };
+    req.flush(mockUser);
 
     const result = await resultPromise;
-    expect(result).toEqual({ email: 'a@b', login: 'john', created: '' });
+    expect(result).toEqual(mockUser);
   });
 
   it('returns null when error (catchError -> of(null))', async () => {

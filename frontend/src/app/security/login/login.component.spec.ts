@@ -48,7 +48,7 @@ class FormErrorStub {
     <ng-content></ng-content>
   `,
 })
-class PInputGroupStub {}
+class PInputGroupStub { }
 
 @Component({
   selector: 'p-inputgroup-addon',
@@ -57,7 +57,7 @@ class PInputGroupStub {}
     <ng-content></ng-content>
   `,
 })
-class PInputGroupAddonStub {}
+class PInputGroupAddonStub { }
 
 @Component({
   selector: 'p-message',
@@ -86,16 +86,16 @@ class PPasswordStub implements ControlValueAccessor {
   @Input() feedback?: boolean;
   @Input() toggleMask?: boolean;
   @Input() inputStyleClass?: string;
-  private onChange = (_: any) => {};
-  private onTouched = () => {};
-  writeValue(_: any): void {}
+  private onChange = (_: any) => { };
+  private onTouched = () => { };
+  writeValue(_: any): void { }
   registerOnChange(fn: any): void {
     this.onChange = fn;
   }
   registerOnTouched(fn: any): void {
     this.onTouched = fn;
   }
-  setDisabledState(_: boolean): void {}
+  setDisabledState(_: boolean): void { }
   handle(e: Event) {
     this.onChange((e.target as HTMLInputElement).value);
     this.onTouched();
@@ -116,8 +116,8 @@ class PCheckBoxStub implements ControlValueAccessor {
   @Input() binary?: boolean;
   @Input() size?: string;
   model = false;
-  private onChange = (_: any) => {};
-  private onTouched = () => {};
+  private onChange = (_: any) => { };
+  private onTouched = () => { };
   writeValue(val: any): void {
     this.model = !!val;
   }
@@ -127,7 +127,7 @@ class PCheckBoxStub implements ControlValueAccessor {
   registerOnTouched(fn: any): void {
     this.onTouched = fn;
   }
-  setDisabledState(_: boolean): void {}
+  setDisabledState(_: boolean): void { }
   toggle(e: Event) {
     this.model = (e.target as HTMLInputElement).checked;
     this.onChange(this.model);
@@ -217,15 +217,29 @@ describe('LoginComponent', () => {
     expect((req.deviceInfo as string).length).toBeGreaterThan(0);
   });
 
-  it('sets error on login failure and passes it to form error', () => {
+  it('onSubmit branch: successful login (next path)', () => {
+    create();
+    const navSpy = spyOn(router, 'navigate').and.stub();
+    security.login.and.returnValue(of(void 0));
+    component.form.setValue({ identifier: 'john', password: 'secret', rememberMe: true });
+    component.onSubmit();
+    expect(navSpy).toHaveBeenCalledWith(['/home']);
+  });
+
+  it('onSubmit branch: login failure (error path)', () => {
     create();
     security.login.and.returnValue(throwError(() => ({ error: { code: 'INVALID' } })));
     component.form.setValue({ identifier: 'john', password: 'bad', rememberMe: false });
-    fixture.debugElement.query(By.css('form')).triggerEventHandler('ngSubmit', {});
-    fixture.detectChanges();
-    const err = fixture.debugElement.query(By.directive(FormErrorStub))
-      .componentInstance as FormErrorStub;
-    expect(err.error).toBe('INVALID');
+    component.onSubmit();
+    expect((component as any).error).toBe('INVALID');
+  });
+
+  it('onSubmit branch: invalid form (early return)', () => {
+    create();
+    component.form.setValue({ identifier: '', password: '', rememberMe: false });
+    component.onSubmit();
+    expect(security.login).not.toHaveBeenCalled();
+    expect(component.submitted).toBeTrue();
   });
 
   it('toggles rememberMe via checkbox CVA', () => {
@@ -264,15 +278,48 @@ describe('LoginComponent', () => {
     expect(assign).toHaveBeenCalledWith('/api/oauth2/authorization/google');
   });
 
-  it('reflects password validity in p-password inputStyleClass', () => {
-    create();
-    const pwdDe = fixture.debugElement.query(By.directive(PPasswordStub));
-    component.form.get('password')?.markAsTouched();
-    fixture.detectChanges();
-    const input = pwdDe.query(By.css('input')).nativeElement as HTMLInputElement;
-    expect(input.className).toContain('p-invalid');
-    component.form.get('password')?.setValue('ok');
-    fixture.detectChanges();
-    expect(input.className).toContain('p-valid');
+  describe('Template branches', () => {
+    beforeEach(() => create());
+
+    it('shows and hides identifier validation message (@if)', () => {
+      expect(fixture.debugElement.query(By.directive(PMessageStub))).toBeNull();
+
+      component.form.get('identifier')?.markAsTouched();
+      component.form.get('identifier')?.setValue('');
+      fixture.detectChanges();
+      expect(fixture.debugElement.query(By.directive(PMessageStub))).not.toBeNull();
+
+      component.form.get('identifier')?.setValue('user');
+      fixture.detectChanges();
+      expect(fixture.debugElement.query(By.directive(PMessageStub))).toBeNull();
+    });
+
+    it('covers password inputStyleClass ternary branches', () => {
+      const pwdDe = fixture.debugElement.query(By.directive(PPasswordStub));
+      const getStyle = () => (pwdDe.componentInstance as PPasswordStub).inputStyleClass;
+
+      expect(getStyle()).toBe('');
+
+      component.form.get('password')?.markAsTouched();
+      component.form.get('password')?.setValue('');
+      fixture.detectChanges();
+      expect(getStyle()).toBe('p-invalid');
+
+      component.form.get('password')?.setValue('pass1234');
+      fixture.detectChanges();
+      expect(getStyle()).toBe('p-valid');
+    });
+
+    it('covers identifier input ngClass/aria-invalid branches', () => {
+      const inputDe = fixture.debugElement.query(By.css('input[formControlName="identifier"]'));
+
+      component.form.get('identifier')?.markAsTouched();
+      fixture.detectChanges();
+      expect(inputDe.nativeElement.classList).toContain('p-invalid');
+
+      component.form.get('identifier')?.setValue('val');
+      fixture.detectChanges();
+      expect(inputDe.nativeElement.classList).toContain('p-valid');
+    });
   });
 });

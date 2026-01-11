@@ -13,7 +13,7 @@ module.exports = (config) => {
     coverageReporter: {
       reporters: [
         { type: 'html' },
-        { type: 'text-summary' },
+        { type: 'text' },
         { type: 'lcovonly' }
       ],
       includeAllSources: false

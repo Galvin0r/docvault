@@ -47,7 +47,7 @@ class FormErrorStub {
     <ng-content></ng-content>
   `,
 })
-class PInputGroupStub {}
+class PInputGroupStub { }
 
 @Component({
   selector: 'p-inputgroup-addon',
@@ -56,7 +56,7 @@ class PInputGroupStub {}
     <ng-content></ng-content>
   `,
 })
-class PInputGroupAddonStub {}
+class PInputGroupAddonStub { }
 
 @Component({
   selector: 'p-message',
@@ -85,16 +85,16 @@ class PPasswordStub implements ControlValueAccessor {
   @Input() feedback?: boolean;
   @Input() toggleMask?: boolean;
   @Input() inputStyleClass?: string;
-  private onChange = (_: any) => {};
-  private onTouched = () => {};
-  writeValue(_: any): void {}
+  private onChange = (_: any) => { };
+  private onTouched = () => { };
+  writeValue(_: any): void { }
   registerOnChange(fn: any): void {
     this.onChange = fn;
   }
   registerOnTouched(fn: any): void {
     this.onTouched = fn;
   }
-  setDisabledState(_: boolean): void {}
+  setDisabledState(_: boolean): void { }
   onInput(e: Event) {
     this.onChange((e.target as HTMLInputElement).value);
     this.onTouched();
@@ -239,19 +239,100 @@ describe('SignupComponent', () => {
     });
   });
 
-  it('sets error on submit failure and passes it to form error', () => {
+  it('onSubmit branch: success subscribe path', () => {
     create();
-    security.register.and.returnValue(throwError(() => ({ error: { code: 'ALREADY_EXISTS' } })));
+    security.register.and.returnValue(of(void 0));
     component.form.setValue({
       username: 'alice',
-      email: 'alice@example.com',
+      email: 'p1@site.com',
       passwords: { password: 'password123', confirmPassword: 'password123' },
     });
-    fixture.debugElement.query(By.css('form')).triggerEventHandler('ngSubmit', {});
-    fixture.detectChanges();
-    const errComp = fixture.debugElement.query(By.directive(FormErrorStub))
-      .componentInstance as FormErrorStub;
-    expect(errComp.error).toBe('ALREADY_EXISTS');
+    component.onSubmit();
+    expect((router as any).navigate).toHaveBeenCalledWith(['/emailVerification'], {
+      queryParams: { email: 'p1@site.com' },
+    });
+  });
+
+  it('onSubmit branch: error subscribe path', () => {
+    create();
+    security.register.and.returnValue(throwError(() => ({ error: { code: 'ERR' } })));
+    component.form.setValue({
+      username: 'alice',
+      email: 'p1@site.com',
+      passwords: { password: 'password123', confirmPassword: 'password123' },
+    });
+    component.onSubmit();
+    expect((component as any).error).toBe('ERR');
+  });
+
+  it('onSubmit branch: invalid form (early return)', () => {
+    create();
+    component.form.setValue({
+      username: '',
+      email: '',
+      passwords: { password: '', confirmPassword: '' },
+    });
+    component.onSubmit();
+    expect(security.register).not.toHaveBeenCalled();
+    expect(component.submitted).toBeTrue();
+  });
+
+  describe('Template and Logic branches', () => {
+    beforeEach(() => create());
+
+    it('shows and hides username validation message (@if)', () => {
+      expect(fixture.debugElement.query(By.css('p-message[severity="error"]'))).toBeNull();
+      component.form.get('username')?.markAsTouched();
+      fixture.detectChanges();
+      expect(fixture.debugElement.query(By.css('p-message[severity="error"]'))).not.toBeNull();
+    });
+
+    it('covers email validation @if and @else if branches', () => {
+      const email = component.form.get('email')!;
+      email.markAsTouched();
+
+      email.setValue('');
+      fixture.detectChanges();
+      expect(fixture.debugElement.nativeElement.textContent).toContain('Email is required');
+
+      email.setValue('invalid');
+      fixture.detectChanges();
+      expect(fixture.debugElement.nativeElement.textContent).toContain('Not a valid email');
+    });
+
+    it('covers password validation @if and @else if branches', () => {
+      const pwd = component.form.get('passwords.password')!;
+      pwd.markAsTouched();
+
+      pwd.setValue('');
+      fixture.detectChanges();
+      expect(fixture.debugElement.nativeElement.textContent).toContain('Password is required');
+
+      pwd.setValue('short');
+      fixture.detectChanges();
+      expect(fixture.debugElement.nativeElement.textContent).toContain('at least 8');
+    });
+
+    it('isMismatched coverage (exhaustive logic permutations)', () => {
+      const pwd = component.form.get('passwords.password')!;
+      const confirm = component.form.get('passwords.confirmPassword')!;
+
+      pwd.setValue('p1');
+      confirm.setValue('p1');
+      expect(component.isMismatched()).toBeFalse();
+
+      confirm.setValue('p2');
+      expect(component.isMismatched()).toBeFalse();
+
+      confirm.markAsTouched();
+      expect(component.isMismatched()).toBeTrue();
+
+      create();
+      component.form.get('passwords.password')?.setValue('p1');
+      component.form.get('passwords.confirmPassword')?.setValue('p2');
+      component.submitted = true;
+      expect(component.isMismatched()).toBeTrue();
+    });
   });
 
   it('continueWithGoogle sets cookie and redirects', () => {

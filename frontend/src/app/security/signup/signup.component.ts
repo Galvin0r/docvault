@@ -37,7 +37,9 @@ export class SignupComponent extends BaseFormComponent {
   }
 
   onSubmit() {
-    if (!this.guardSubmit()) return;
+    if (!this.guardSubmit()) {
+      return;
+    }
     const { username, email, passwords: { password, confirmPassword } } = this.form.value as any;
     const regRequest: RegistrationRequest = { login: username, password: password, email: email } as RegistrationRequest;
     this.securityService.register(regRequest).subscribe({

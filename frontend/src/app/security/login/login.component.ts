@@ -23,7 +23,9 @@ export class LoginComponent extends BaseFormComponent {
   }
 
   onSubmit() {
-    if (!this.guardSubmit()) return;
+    if (!this.guardSubmit()) {
+      return;
+    }
 
     const deviceId = getDeviceId();
     const { identifier, password, rememberMe } = this.form.value;

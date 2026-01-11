@@ -31,7 +31,9 @@ export class PasswordRecoveryComponent extends BaseFormComponent implements OnIn
   }
 
   onSubmit() {
-    if (!this.guardSubmit()) return;
+    if (!this.guardSubmit()) {
+      return;
+    }
 
     const { password, confirmPassword } = this.form.value;
     this.securityService.setNewPassword(String(this.token), password).subscribe({
