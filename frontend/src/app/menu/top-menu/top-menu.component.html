@@ -11,6 +11,12 @@
 
   <ng-template #end>
     <div class="flex mr-2 items-center">
+      <div class="mr-4">
+        <p-iconField iconPosition="left">
+          <p-inputIcon class="pi pi-search" />
+          <input type="text" pInputText pSize="small" placeholder="Search..." class="w-40 transparent-search pl-10" />
+        </p-iconField>
+      </div>
       <p-button icon="pi pi-users" [rounded]="true" [text]="true" severity="secondary" routerLink="/groups"
         pTooltip="Groups" tooltipPosition="bottom"></p-button>
       <p-button icon="pi pi-upload" [rounded]="true" [text]="true" severity="secondary" (click)="openUploadDialog()"
