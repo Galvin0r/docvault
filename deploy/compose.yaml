@@ -7,6 +7,22 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - pg-data:/var/lib/postgresql/data
+  elasticsearch:
+    image: elasticsearch:9.2.3
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx1024m
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+  kibana:
+    image: kibana:9.2.3
+    depends_on: 
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "127.0.0.1:5601:5601"
   backend:
     image: backend
     depends_on:
@@ -29,6 +45,8 @@ services:
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
 
       GCS_CREDENTIALS_LOCATION: /run/secrets/docvault-gcs-key.json
+
+      SPRING_ELASTICSEARCH_URIS: ${ELASTICSEARCH_URIS}
     volumes:
     - /opt/docvault/secrets/docvault-gcs-key.json:/run/secrets/docvault-gcs-key.json:ro
   frontend:
@@ -39,3 +57,4 @@ services:
       - "80:80"
 volumes:
   pg-data:
+  es-data:
