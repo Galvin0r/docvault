@@ -351,7 +351,7 @@
             <column name="document_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
-            <column name="locked_by" type="VARCHAR(30)" />
+            <column name="locked_by" type="VARCHAR(36)" />
             <column name="lock_until" type="TIMESTAMPTZ" />
             <column name="attempts" type="INT" defaultValueNumeric="0">
                 <constraints nullable="false" />
@@ -371,6 +371,17 @@
                 constraintName="fk_indexjobs_document"/>
 
         <createSequence sequenceName="document_index_jobs_seq" />
+    </changeSet>
+
+    <changeSet id="22" author="Roman">
+        <createIndex indexName="idx_index_jobs_status_next" tableName="document_index_jobs">
+            <column name="status"/>
+            <column name="next_attempt_at"/>
+        </createIndex>
+
+        <createIndex indexName="idx_index_jobs_lock_until" tableName="document_index_jobs">
+            <column name="lock_until"/>
+        </createIndex>
     </changeSet>
 
     <include file="db.insert-data.xml" relativeToChangelogFile="true" />

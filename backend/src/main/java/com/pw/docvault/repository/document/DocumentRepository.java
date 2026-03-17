@@ -2,6 +2,7 @@ package com.pw.docvault.repository.document;
 
 import com.pw.docvault.entity.document.Document;
 import com.pw.docvault.model.enums.DocumentStatus;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,9 +11,14 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 public interface DocumentRepository extends JpaRepository<Document, Long> {
     List<Document> findByOwnerIdAndStatusAndCreatedBefore(Long ownerId, DocumentStatus status, Instant created);
+
+    @EntityGraph(attributePaths = "owner")
+    @Query("SELECT d FROM Document d WHERE d.id = :id")
+    Optional<Document> findWithOwnerById(@Param("id") Long id);
 
     @Query(value = """
         SELECT DISTINCT d.*

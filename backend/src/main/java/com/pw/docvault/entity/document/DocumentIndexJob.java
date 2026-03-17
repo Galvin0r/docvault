@@ -33,6 +33,7 @@ public class DocumentIndexJob extends BaseEntity {
     @Column(name = "last_error")
     private String lastError;
 
+    @Enumerated(EnumType.STRING)
     private DocumentIndexJobStatus status;
 
     @Column(name = "next_attempt_at")
