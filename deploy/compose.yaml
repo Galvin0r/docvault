@@ -23,10 +23,14 @@ services:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     ports:
       - "127.0.0.1:5601:5601"
+  processor:
+    image: ghcr.io/galvin0r/docvault-processor:latest
   backend:
-    image: backend
+    image: ghcr.io/galvin0r/docvault-backend:latest
     depends_on:
       - postgres
+      - processor
+      - elasticsearch
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/docvault
       SPRING_DATASOURCE_USERNAME: docvault
@@ -47,10 +51,12 @@ services:
       GCS_CREDENTIALS_LOCATION: /run/secrets/docvault-gcs-key.json
 
       SPRING_ELASTICSEARCH_URIS: ${ELASTICSEARCH_URIS}
+      APP_PROCESSING_MODE: http
+      APP_PROCESSING_HTTP_BASE_URL: http://processor:8000
     volumes:
     - /opt/docvault/secrets/docvault-gcs-key.json:/run/secrets/docvault-gcs-key.json:ro
   frontend:
-    image: frontend
+    image: ghcr.io/galvin0r/docvault-frontend:latest
     depends_on:
       - backend
     ports:

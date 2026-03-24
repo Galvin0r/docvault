@@ -23,6 +23,7 @@
     <modules>
         <module>backend</module>
         <module>frontend</module>
+        <module>processor</module>
     </modules>
 
     <profiles>

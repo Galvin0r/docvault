@@ -44,6 +44,7 @@ jobs:
       REGISTRY: ghcr.io
       IMAGE_BACKEND: ghcr.io/galvin0r/docvault-backend
       IMAGE_FRONTEND: ghcr.io/galvin0r/docvault-frontend
+      IMAGE_PROCESSOR: ghcr.io/galvin0r/docvault-processor
 
     steps:
       - name: Checkout
@@ -86,6 +87,17 @@ jobs:
         working-directory: frontend
         run: npm run build -- --configuration production
 
+        # Processor
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Processor - run tests (via Maven)
+        working-directory: processor
+        run: mvn -B test
+
         # Docker
 
       - name: Log in to GitHub Container Registry
@@ -111,6 +123,14 @@ jobs:
             -t $IMAGE_FRONTEND:$GITHUB_REF_NAME \
             frontend
 
+      - name: Build processor image
+        run: |
+          docker build \
+            -f processor/Dockerfile \
+            -t $IMAGE_PROCESSOR:latest \
+            -t $IMAGE_PROCESSOR:$GITHUB_REF_NAME \
+            processor
+
       - name: Push backend image
         run: |
           docker push $IMAGE_BACKEND:latest
@@ -120,3 +140,8 @@ jobs:
         run: |
           docker push $IMAGE_FRONTEND:latest
           docker push $IMAGE_FRONTEND:$GITHUB_REF_NAME
+
+      - name: Push processor image
+        run: |
+          docker push $IMAGE_PROCESSOR:latest
+          docker push $IMAGE_PROCESSOR:$GITHUB_REF_NAME
