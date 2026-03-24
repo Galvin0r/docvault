@@ -1,11 +1,11 @@
 package com.pw.docvault.service.document;
 
 import com.pw.docvault.entity.document.DocumentFragment;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @Service
-@ConditionalOnMissingBean(DocumentProcessingClient.class)
+@ConditionalOnProperty(name = "app.processing.mode", havingValue = "stub", matchIfMissing = true)
 public class StubDocumentProcessingClient implements DocumentProcessingClient {
 
     private static final String DEFAULT_MIME_TYPE = "application/octet-stream";

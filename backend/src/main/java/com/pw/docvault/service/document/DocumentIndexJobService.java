@@ -67,7 +67,7 @@ public class DocumentIndexJobService {
     private DocumentIndexJob loadLockedJob(Long jobId, String workerId) {
         DocumentIndexJob job = documentIndexJobRepository.findById(jobId)
                 .orElseThrow(() -> new NotFoundException(
-                        ErrorCode.DOCUMENT_NOT_FOUNT,
+                        ErrorCode.DOCUMENT_NOT_FOUND,
                         "Document index job with id " + jobId + " not found"
                 ));
 

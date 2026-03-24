@@ -19,7 +19,7 @@ public class DocumentIndexingStateService {
     public Document loadDocumentForIndexing(Long documentId) {
         return documentRepository.findWithOwnerById(documentId)
                 .orElseThrow(() -> new NotFoundException(
-                        ErrorCode.DOCUMENT_NOT_FOUNT,
+                        ErrorCode.DOCUMENT_NOT_FOUND,
                         "Document with id " + documentId + " not found"
                 ));
     }
@@ -47,7 +47,7 @@ public class DocumentIndexingStateService {
     private void updateStatus(Long documentId, DocumentStatus status) {
         Document document = documentRepository.findById(documentId)
                 .orElseThrow(() -> new NotFoundException(
-                        ErrorCode.DOCUMENT_NOT_FOUNT,
+                        ErrorCode.DOCUMENT_NOT_FOUND,
                         "Document with id " + documentId + " not found"
                 ));
         document.setStatus(status);

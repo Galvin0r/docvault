@@ -18,6 +18,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.net.http.HttpClient;
+import java.time.Duration;
+
 @RequiredArgsConstructor
 @Configuration
 public class BeansConfig {
@@ -54,6 +57,13 @@ public class BeansConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public HttpClient httpClient(@Value("${app.processing.http.connect-timeout-seconds}") int connectTimeoutSeconds) {
+        return HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(connectTimeoutSeconds))
+                .build();
     }
 
     @Bean

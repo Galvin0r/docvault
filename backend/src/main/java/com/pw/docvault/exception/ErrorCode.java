@@ -4,8 +4,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ErrorCode {
     // document
-    DOCUMENT_NOT_FOUNT("document.not_found"),
+    DOCUMENT_NOT_FOUND("document.not_found"),
     DOCUMENT_UPLOAD_FAILED("document.upload_failed"),
+    DOCUMENT_PROCESSING_FAILED("document.processing_failed"),
     DOCUMENT_FORBIDDEN("document.forbidden"),
     DOCUMENT_INVALID_STATE("document.invalid_state"),
     DOCUMENT_EMPTY("document.empty"),

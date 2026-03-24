@@ -60,7 +60,7 @@ public class GoogleCloudStorageService {
 
         Blob blob = storage.get(blobId);
         if (blob == null) {
-            throw new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUNT, "GCS object not found: " + objectName);
+            throw new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUND, "GCS object not found: " + objectName);
         }
 
         ReadChannel reader = blob.reader();

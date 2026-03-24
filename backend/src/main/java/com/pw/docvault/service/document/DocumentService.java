@@ -55,7 +55,7 @@ public class DocumentService {
         cleanupStaleDrafts(user.getId());
         
         var draft = documentRepository.findById(id).orElseThrow(
-                () -> new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUNT, "Document with id: " + id + " not found"));
+                () -> new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUND, "Document with id: " + id + " not found"));
         if (draft.getStatus() != DocumentStatus.UPLOADING) {
             throw new ConflictException(ErrorCode.DOCUMENT_INVALID_STATE,
                     "Document for id " + id + " is already loaded. Please, try again.");
@@ -81,7 +81,7 @@ public class DocumentService {
     public void completeUpload(Long id) {
         var user = currentUser.get();
         var draft = documentRepository.findById(id).orElseThrow(
-                () -> new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUNT, "Document with id: " + id + " not found"));
+                () -> new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUND, "Document with id: " + id + " not found"));
 
         if (!Objects.equals(draft.getOwner().getId(), user.getId())) {
             throw new ForbiddenException(ErrorCode.DOCUMENT_FORBIDDEN, "Completing upload for other user is forbidden");
@@ -89,7 +89,7 @@ public class DocumentService {
 
         var blob = googleCloudStorageService.getMetadata(draft.getPath());
         if (blob == null || !blob.exists()) {
-             throw new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUNT, "File not found in storage");
+             throw new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUND, "File not found in storage");
         }
 
         draft.setStatus(DocumentStatus.UPLOADED);
@@ -110,7 +110,7 @@ public class DocumentService {
 
     public void delete(Long id) {
         Document document = documentRepository.findById(id).orElseThrow(
-                () -> new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUNT, "Document with id " + id + " not found"));
+                () -> new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUND, "Document with id " + id + " not found"));
         
         documentIndexJobRepository.deleteByDocumentId(id);
         documentAccessRepository.deleteByDocumentId(id);
@@ -148,9 +148,9 @@ public class DocumentService {
 
     public String download(Long documentId) {
         Document document = documentRepository.findById(documentId).orElseThrow(
-                () -> new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUNT, "Document with id " + documentId + " not found"));
+                () -> new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUND, "Document with id " + documentId + " not found"));
         if (document.getPath() == null || document.getPath().isBlank()) {
-            throw new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUNT, "Document path is missing");
+            throw new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUND, "Document path is missing");
         }
         return googleCloudStorageService.generateGetSignedUrl(document.getPath());
     }

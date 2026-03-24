@@ -1,0 +1,85 @@
+package com.pw.docvault.service.document;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pw.docvault.entity.document.DocumentFragment;
+import com.pw.docvault.exception.DocumentException;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.http.HttpClient;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+class HttpDocumentProcessingClientTest {
+
+    private HttpServer httpServer;
+    private HttpDocumentProcessingClient client;
+
+    @BeforeEach
+    void setup() throws IOException {
+        httpServer = HttpServer.create(new InetSocketAddress(0), 0);
+        httpServer.start();
+
+        client = new HttpDocumentProcessingClient(HttpClient.newHttpClient(), new ObjectMapper());
+        ReflectionTestUtils.setField(client, "baseUrl", "http://localhost:" + httpServer.getAddress().getPort());
+        ReflectionTestUtils.setField(client, "readTimeoutSeconds", 30);
+    }
+
+    @AfterEach
+    void tearDown() {
+        httpServer.stop(0);
+    }
+
+    @Test
+    void processFromSignedUrlStreamsNdjsonFragments() {
+        httpServer.createContext("/process", exchange -> respond(
+                exchange,
+                200,
+                """
+                {"fragmentOrder":0,"content":"chunk one","embedding":[0.1,0.2]}
+                {"fragmentOrder":1,"content":"chunk two","embedding":[0.3,0.4]}
+                """
+        ));
+
+        List<DocumentFragment> fragments = new ArrayList<>();
+
+        client.processFromSignedUrl("https://signed", "application/pdf", fragments::add);
+
+        assertThat(fragments).hasSize(2);
+        assertThat(fragments.get(0).getFragmentOrder()).isEqualTo(0);
+        assertThat(fragments.get(0).getContent()).isEqualTo("chunk one");
+        assertThat(fragments.get(0).getEmbedding()).containsExactly(0.1f, 0.2f);
+        assertThat(fragments.get(1).getFragmentOrder()).isEqualTo(1);
+    }
+
+    @Test
+    void processFromSignedUrlThrowsWhenProcessorReturnsError() {
+        httpServer.createContext("/process", exchange -> respond(exchange, 502, "processor failed"));
+
+        assertThrows(DocumentException.class,
+                () -> client.processFromSignedUrl("https://signed", "application/pdf", fragment -> {
+                }));
+    }
+
+    private void respond(HttpExchange exchange, int statusCode, String body) throws IOException {
+        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+        exchange.getResponseHeaders().add("Content-Type", "application/x-ndjson");
+        exchange.sendResponseHeaders(statusCode, bytes.length);
+        try (OutputStream outputStream = exchange.getResponseBody()) {
+            outputStream.write(bytes);
+        } finally {
+            exchange.close();
+        }
+    }
+}
