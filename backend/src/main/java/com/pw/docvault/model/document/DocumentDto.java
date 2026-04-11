@@ -18,5 +18,5 @@ public record DocumentDto(
         Long size,
         DocumentStatus status,
         Short attempts,
-        String lastError
+        Instant nextAttemptAt
 ) {}

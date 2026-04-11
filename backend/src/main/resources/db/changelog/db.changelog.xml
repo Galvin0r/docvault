@@ -384,5 +384,11 @@
         </createIndex>
     </changeSet>
 
+    <changeSet id="23" author="Roman">
+        <modifyDataType tableName="document_index_jobs"
+                        columnName="locked_by"
+                        newDataType="VARCHAR(36)"/>
+    </changeSet>
+
     <include file="db.insert-data.xml" relativeToChangelogFile="true" />
 </databaseChangeLog>

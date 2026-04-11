@@ -16,7 +16,7 @@ export interface DocumentDto {
     size: number;
     status: DocumentStatus;
     attempts?: number;
-    lastError?: string;
+    nextAttemptAt?: string;
 }
 
 export interface UploadStatus {

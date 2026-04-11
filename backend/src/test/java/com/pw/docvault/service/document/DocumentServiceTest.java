@@ -238,6 +238,6 @@ class DocumentServiceTest {
         assertThat(result.getContent()).hasSize(1);
         DocumentDto enriched = result.getContent().get(0);
         assertThat(enriched.attempts()).isEqualTo((short) 5);
-        assertThat(enriched.lastError()).isEqualTo("Failed to index");
+        assertThat(enriched.getLastError()).isEqualTo("Failed to index");
     }
 }

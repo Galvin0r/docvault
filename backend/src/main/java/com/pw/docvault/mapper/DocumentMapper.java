@@ -14,7 +14,7 @@ public interface DocumentMapper {
     @Mapping(source = "sizeBytes", target = "size")
     @Mapping(source = "created", target = "uploadedAt")
     @Mapping(target = "attempts", ignore = true)
-    @Mapping(target = "lastError", ignore = true)
+    @Mapping(target = "nextAttemptAt", ignore = true)
     DocumentDto toDto(Document entity);
 
     @InheritInverseConfiguration

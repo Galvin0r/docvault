@@ -24,7 +24,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
         SELECT DISTINCT d.*
         FROM documents d
         INNER JOIN users u ON d.owner_id = u.id
-        WHERE d.status IN ('UPLOADED', 'INDEXING', 'INDEXED')
+        WHERE d.status IN ('UPLOADED', 'INDEXING', 'INDEXED', 'FAILED')
           AND (
             d.visibility = 'PUBLIC'
             OR d.owner_id = :userId

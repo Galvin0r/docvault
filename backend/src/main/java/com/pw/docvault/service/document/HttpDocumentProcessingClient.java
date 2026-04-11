@@ -1,5 +1,6 @@
 package com.pw.docvault.service.document;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pw.docvault.entity.document.DocumentFragment;
 import com.pw.docvault.exception.DocumentException;
@@ -45,16 +46,14 @@ public class HttpDocumentProcessingClient implements DocumentProcessingClient {
             HttpResponse<InputStream> response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
 
             try (InputStream body = response.body();
-                 BufferedReader reader = new BufferedReader(new InputStreamReader(body, StandardCharsets.UTF_8))) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(body, StandardCharsets.UTF_8))) {
 
                 if (response.statusCode() < 200 || response.statusCode() >= 300) {
                     throw new DocumentException(
                             ErrorCode.DOCUMENT_PROCESSING_FAILED,
                             "Processing service returned status %d: %s".formatted(
                                     response.statusCode(),
-                                    readRemainingBody(reader)
-                            )
-                    );
+                                    readRemainingBody(reader)));
                 }
 
                 String line;
@@ -77,10 +76,11 @@ public class HttpDocumentProcessingClient implements DocumentProcessingClient {
         try {
             String payload = objectMapper.writeValueAsString(new ProcessingRequest(signedUrl, mimeType));
             return HttpRequest.newBuilder(processUri())
+                    .version(HttpClient.Version.HTTP_1_1)
                     .timeout(Duration.ofSeconds(readTimeoutSeconds))
-                    .header("Content-Type", "application/json")
+                    .header("Content-Type", "application/json; charset=UTF-8")
                     .header("Accept", NDJSON_MEDIA_TYPE)
-                    .POST(HttpRequest.BodyPublishers.ofString(payload))
+                    .POST(HttpRequest.BodyPublishers.ofString(payload, StandardCharsets.UTF_8))
                     .build();
         } catch (IOException ex) {
             throw new DocumentException(ErrorCode.DOCUMENT_PROCESSING_FAILED, "Failed to build processing request", ex);
@@ -105,6 +105,7 @@ public class HttpDocumentProcessingClient implements DocumentProcessingClient {
         }
     }
 
-    private record ProcessingRequest(String signedUrl, String mimeType) {
+    private record ProcessingRequest( @JsonProperty("signedUrl") String signedUrl,
+                                      @JsonProperty("mimeType") String mimeType) {
     }
 }

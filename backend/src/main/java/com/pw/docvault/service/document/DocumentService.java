@@ -168,7 +168,7 @@ public class DocumentService {
                                 dto.id(), dto.title(), dto.description(), dto.originalFilename(),
                                 dto.mimeType(), dto.uploadedAt(), dto.visibility(), dto.ownerId(),
                                 dto.ownerLogin(), dto.size(), dto.status(),
-                                job.getAttempts(), job.getLastError()
+                                job.getAttempts(), job.getNextAttemptAt()
                         ))
                         .orElse(dto);
             }

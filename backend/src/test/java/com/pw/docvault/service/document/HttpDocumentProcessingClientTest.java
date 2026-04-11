@@ -17,6 +17,7 @@ import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -43,8 +44,17 @@ class HttpDocumentProcessingClientTest {
 
     @Test
     void processFromSignedUrlStreamsNdjsonFragments() {
+        AtomicReference<String> requestBody = new AtomicReference<>();
+        AtomicReference<String> requestContentType = new AtomicReference<>();
+        AtomicReference<String> requestAccept = new AtomicReference<>();
+        AtomicReference<String> requestProtocol = new AtomicReference<>();
+
         httpServer.createContext("/process", exchange -> respond(
                 exchange,
+                requestBody,
+                requestContentType,
+                requestAccept,
+                requestProtocol,
                 200,
                 """
                 {"fragmentOrder":0,"content":"chunk one","embedding":[0.1,0.2]}
@@ -61,18 +71,41 @@ class HttpDocumentProcessingClientTest {
         assertThat(fragments.get(0).getContent()).isEqualTo("chunk one");
         assertThat(fragments.get(0).getEmbedding()).containsExactly(0.1f, 0.2f);
         assertThat(fragments.get(1).getFragmentOrder()).isEqualTo(1);
+        assertThat(requestProtocol.get()).isEqualTo("HTTP/1.1");
+        assertThat(requestContentType.get()).isEqualTo("application/json; charset=UTF-8");
+        assertThat(requestAccept.get()).isEqualTo("application/x-ndjson");
+        assertThat(requestBody.get()).isEqualTo("{\"signedUrl\":\"https://signed\",\"mimeType\":\"application/pdf\"}");
     }
 
     @Test
     void processFromSignedUrlThrowsWhenProcessorReturnsError() {
-        httpServer.createContext("/process", exchange -> respond(exchange, 502, "processor failed"));
+        httpServer.createContext("/process", exchange -> respond(
+                exchange,
+                new AtomicReference<>(),
+                new AtomicReference<>(),
+                new AtomicReference<>(),
+                new AtomicReference<>(),
+                502,
+                "processor failed"
+        ));
 
         assertThrows(DocumentException.class,
                 () -> client.processFromSignedUrl("https://signed", "application/pdf", fragment -> {
                 }));
     }
 
-    private void respond(HttpExchange exchange, int statusCode, String body) throws IOException {
+    private void respond(HttpExchange exchange,
+                         AtomicReference<String> requestBody,
+                         AtomicReference<String> requestContentType,
+                         AtomicReference<String> requestAccept,
+                         AtomicReference<String> requestProtocol,
+                         int statusCode,
+                         String body) throws IOException {
+        requestBody.set(new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
+        requestContentType.set(exchange.getRequestHeaders().getFirst("Content-Type"));
+        requestAccept.set(exchange.getRequestHeaders().getFirst("Accept"));
+        requestProtocol.set(exchange.getProtocol());
+
         byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().add("Content-Type", "application/x-ndjson");
         exchange.sendResponseHeaders(statusCode, bytes.length);
