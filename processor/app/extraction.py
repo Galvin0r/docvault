@@ -1,13 +1,9 @@
-from pathlib import Path
-from io import BytesIO
+from collections.abc import Iterator
 import logging
-
-from bs4 import BeautifulSoup
-from docx import Document as DocxDocument
-from ebooklib import ITEM_DOCUMENT, epub
-from pypdf import PdfReader
+from pathlib import Path
 
 from .chunking import normalize_text
+from .extractors import get_extractor, normalize_mime_type
 
 logger = logging.getLogger(__name__)
 
@@ -20,64 +16,24 @@ class EmptyDocumentError(ValueError):
     pass
 
 
-PDF_MIME_TYPES = {"application/pdf"}
-DOCX_MIME_TYPES = {
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-}
-TEXT_MIME_TYPES = {"text/plain"}
-EPUB_MIME_TYPES = {"application/epub+zip"}
-
-
-def extract_text(file_path: Path, mime_type: str) -> str:
-    normalized_mime_type = mime_type.split(";", 1)[0].strip().lower()
-
-    if normalized_mime_type in PDF_MIME_TYPES:
-        text = _extract_pdf_text(file_path)
-    elif normalized_mime_type in DOCX_MIME_TYPES:
-        text = _extract_docx_text(file_path)
-    elif normalized_mime_type in TEXT_MIME_TYPES:
-        text = _extract_plain_text(file_path)
-    elif normalized_mime_type in EPUB_MIME_TYPES:
-        text = _extract_epub_text(file_path)
-    else:
+def iter_extracted_text_units(file_path: Path, mime_type: str) -> Iterator[str]:
+    normalized_mime_type = normalize_mime_type(mime_type)
+    extractor = get_extractor(normalized_mime_type)
+    if extractor is None:
         raise UnsupportedMimeTypeError(f"Unsupported mime type: {mime_type}")
 
-    normalized_text = normalize_text(text)
-    if not normalized_text:
+    yielded = 0
+    total_characters = 0
+
+    for unit in extractor.iter_text_units(file_path):
+        normalized_unit = normalize_text(unit)
+        if not normalized_unit:
+            continue
+        yielded += 1
+        total_characters += len(normalized_unit)
+        yield normalized_unit
+
+    if yielded == 0:
         raise EmptyDocumentError("Document did not contain any extractable text")
 
-    logger.info("Extracted %d characters from %s document", len(normalized_text), normalized_mime_type)
-    return normalized_text
-
-
-def _extract_pdf_text(file_path: Path) -> str:
-    reader = PdfReader(file_path)
-    return "\n\n".join(
-        text for page in reader.pages
-        if (text := (page.extract_text() or "").strip())
-    )
-
-
-def _extract_docx_text(file_path: Path) -> str:
-    document = DocxDocument(str(file_path))
-    paragraphs = [paragraph.text.strip() for paragraph in document.paragraphs if paragraph.text.strip()]
-    return "\n\n".join(paragraphs)
-
-
-def _extract_plain_text(file_path: Path) -> str:
-    try:
-        return file_path.read_text(encoding="utf-8")
-    except UnicodeDecodeError:
-        return file_path.read_text(encoding="latin-1")
-
-
-def _extract_epub_text(file_path: Path) -> str:
-    book = epub.read_epub(str(file_path))
-
-    parts: list[str] = []
-    for item in book.get_items_of_type(ITEM_DOCUMENT):
-        soup = BeautifulSoup(item.get_content(), "html.parser")
-        text = soup.get_text("\n", strip=True)
-        if text:
-            parts.append(text)
-    return "\n\n".join(parts)
+    logger.info("Extracted %d characters from %s document", total_characters, normalized_mime_type)

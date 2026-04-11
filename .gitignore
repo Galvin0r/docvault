@@ -1,2 +1,4 @@
 .idea
 deploy/.env
+__pycache__/
+*.py[cod]

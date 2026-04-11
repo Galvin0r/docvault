@@ -3,13 +3,15 @@ import logging
 import tempfile
 from pathlib import Path
 from typing import Iterator
+from itertools import chain
 
 import requests
 
-from .chunking import iter_text_chunks
+from .chunking import iter_text_chunks_from_units
 from .config import get_settings
 from .embedding import embed_texts
-from .extraction import extract_text
+from .extraction import iter_extracted_text_units
+from .extractors import suffix_for_mime_type
 from .schemas import ProcessedFragment
 
 logger = logging.getLogger(__name__)
@@ -27,19 +29,33 @@ def download_to_file(signed_url: str, dest_path: Path) -> None:
     logger.info("Downloaded document to temp file (%d bytes)", dest_path.stat().st_size)
 
 
-def extract_document_text(signed_url: str, mime_type: str) -> str:
+def stream_processed_fragments_from_document(signed_url: str, mime_type: str) -> Iterator[str]:
     with tempfile.NamedTemporaryFile(suffix=_suffix_for(mime_type)) as tmp:
         tmp_path = Path(tmp.name)
         download_to_file(signed_url, tmp_path)
-        return extract_text(tmp_path, mime_type)
+
+        units = iter_extracted_text_units(tmp_path, mime_type)
+        first_unit = next(units)
+        yield from stream_processed_fragments_from_units(chain([first_unit], units))
 
 
 def stream_processed_fragments(text: str) -> Iterator[str]:
+    yield from stream_processed_fragments_from_units(iter([text]))
+
+
+def stream_processed_fragments_from_units(units: Iterator[str]) -> Iterator[str]:
     settings = get_settings()
     pending_batch: list[tuple[int, str]] = []
 
+    chunk_iterator = iter_text_chunks_from_units(
+        units,
+        settings.chunk_size_chars,
+        settings.chunk_overlap_chars,
+        settings.min_chunk_size_chars,
+    )
+
     for fragment_order, chunk in enumerate(
-            iter_text_chunks(text, settings.chunk_size_chars, settings.chunk_overlap_chars)
+            chunk_iterator
     ):
         pending_batch.append((fragment_order, chunk))
         if len(pending_batch) >= settings.embedding_batch_size:
@@ -62,11 +78,4 @@ def _serialize_batch(batch: list[tuple[int, str]]) -> Iterator[str]:
 
 
 def _suffix_for(mime_type: str) -> str:
-    normalized = mime_type.split(";", 1)[0].strip().lower()
-    suffixes = {
-        "application/pdf": ".pdf",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": ".docx",
-        "text/plain": ".txt",
-        "application/epub+zip": ".epub",
-    }
-    return suffixes.get(normalized, "")
+    return suffix_for_mime_type(mime_type)

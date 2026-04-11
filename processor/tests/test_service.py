@@ -1,9 +1,8 @@
 import json
-import pytest
 from pathlib import Path
-from unittest.mock import patch, mock_open
+from unittest.mock import patch
 
-from app.service import download_to_file, extract_document_text, stream_processed_fragments, _suffix_for
+from app.service import download_to_file, stream_processed_fragments, stream_processed_fragments_from_document, _suffix_for
 
 def test_download_to_file(tmp_path: Path, mock_settings):
     dest = tmp_path / "download.tmp"
@@ -16,13 +15,18 @@ def test_download_to_file(tmp_path: Path, mock_settings):
         
         assert dest.read_bytes() == b"chunk1chunk2"
 
-def test_extract_document_text(mock_settings):
+def test_stream_processed_fragments_from_document(mock_settings):
     with patch("app.service.download_to_file") as mock_download, \
-         patch("app.service.extract_text") as mock_ext:
-        mock_ext.return_value = "extracted content"
-        
-        res = extract_document_text("http://dummy", "text/plain")
-        assert res == "extracted content"
+         patch("app.service.iter_extracted_text_units") as mock_units, \
+         patch("app.service.embed_texts") as mock_embed:
+        mock_units.return_value = iter(["Hello world.", "Second chunk."])
+        mock_embed.return_value = [[0.1, 0.2]]
+
+        items = list(stream_processed_fragments_from_document("http://dummy", "text/plain"))
+
+        assert len(items) == 1
+        first = json.loads(items[0])
+        assert first["content"] == "Hello world. Second chunk."
 
 def test_stream_processed_fragments(mock_settings):
     text = "Hello world. This is a test string for fragmentation."
@@ -30,7 +34,7 @@ def test_stream_processed_fragments(mock_settings):
     with patch("app.service.embed_texts") as mock_embed:
         mock_embed.return_value = [[0.1, 0.2], [0.3, 0.4]]
         
-        with patch("app.service.iter_text_chunks") as mock_chunk:
+        with patch("app.service.iter_text_chunks_from_units") as mock_chunk:
             mock_chunk.return_value = ["Hello", "world"]
             items = list(stream_processed_fragments(text))
             
