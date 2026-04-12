@@ -1,6 +1,8 @@
 package com.pw.docvault.repository.document;
 
 import com.pw.docvault.entity.document.DocumentIndexJob;
+import com.pw.docvault.model.enums.DocumentIndexJobStatus;
+import com.pw.docvault.model.enums.DocumentSyncOperation;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.data.jpa.repository.Query;
@@ -14,7 +16,19 @@ public interface DocumentIndexJobRepository extends JpaRepository<DocumentIndexJ
     @Transactional
     void deleteByDocumentId(Long documentId);
 
-    Optional<DocumentIndexJob> findByDocumentId(Long documentId);
+    @Transactional
+    void deleteByDocumentIdAndOperationIn(Long documentId, List<DocumentSyncOperation> operations);
+
+    Optional<DocumentIndexJob> findFirstByDocumentIdAndStatusInOrderByCreatedDesc(
+            Long documentId,
+            List<DocumentIndexJobStatus> statuses
+    );
+
+    Optional<DocumentIndexJob> findFirstByDocumentIdAndOperationAndStatusIn(
+            Long documentId,
+            DocumentSyncOperation operation,
+            List<DocumentIndexJobStatus> statuses
+    );
 
     @Transactional
     @Query(value = """

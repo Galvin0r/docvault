@@ -2,6 +2,7 @@ package com.pw.docvault.entity.document;
 
 import com.pw.docvault.entity.BaseEntity;
 import com.pw.docvault.model.enums.DocumentIndexJobStatus;
+import com.pw.docvault.model.enums.DocumentSyncOperation;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,6 +33,9 @@ public class DocumentIndexJob extends BaseEntity {
 
     @Column(name = "last_error")
     private String lastError;
+
+    @Enumerated(EnumType.STRING)
+    private DocumentSyncOperation operation;
 
     @Enumerated(EnumType.STRING)
     private DocumentIndexJobStatus status;

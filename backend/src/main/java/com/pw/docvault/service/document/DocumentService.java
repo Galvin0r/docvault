@@ -1,10 +1,13 @@
 package com.pw.docvault.service.document;
 
 import com.pw.docvault.entity.document.Document;
+import com.pw.docvault.entity.document.DocumentIndexJob;
 import com.pw.docvault.exception.*;
 import com.pw.docvault.mapper.DocumentMapper;
 import com.pw.docvault.model.document.DocumentDto;
 import com.pw.docvault.model.enums.DocumentStatus;
+import com.pw.docvault.model.enums.DocumentIndexJobStatus;
+import com.pw.docvault.model.enums.DocumentSyncOperation;
 import com.pw.docvault.model.enums.DocumentVisibility;
 import com.pw.docvault.repository.document.DocumentAccessRepository;
 import com.pw.docvault.repository.document.DocumentIndexJobRepository;
@@ -16,8 +19,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -31,10 +36,18 @@ public class DocumentService {
     private final GoogleCloudStorageService googleCloudStorageService;
     private final CurrentUserProvider currentUser;
     private final DocumentIndexJobService documentIndexJobService;
+    private final DocumentSyncExecutionService documentSyncExecutionService;
     private final DocumentMapper documentMapper;
+    private final TransactionTemplate transactionTemplate;
 
     @Value(value = "${app.gsc.buffer.storage.space}")
     private Integer bufferStorageSpace;
+
+    @Value(value = "${indexer.maxAttempts:3}")
+    private int maxAttempts;
+
+    @Value(value = "${indexer.retryDelaySeconds:300}")
+    private int retryDelaySeconds;
 
     public Long createDocumentDraft(String title, String description, DocumentVisibility visibility) {
         var user = currentUser.get();
@@ -96,7 +109,7 @@ public class DocumentService {
         draft.setSizeBytes(blob.getSize());
 
         documentRepository.save(draft);
-        documentIndexJobService.create(draft);
+        documentIndexJobService.create(draft, DocumentSyncOperation.INDEX_CONTENT);
     }
 
     private String safeContentType(String ct) {
@@ -109,22 +122,42 @@ public class DocumentService {
     }
 
     public void delete(Long id) {
-        Document document = documentRepository.findById(id).orElseThrow(
+        var user = currentUser.get();
+        var document = documentRepository.findById(id).orElseThrow(
                 () -> new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUND, "Document with id " + id + " not found"));
-        
-        documentIndexJobRepository.deleteByDocumentId(id);
-        documentAccessRepository.deleteByDocumentId(id);
-        
-        // TODO: delete document from elasticsearch later
-        
-        documentRepository.delete(document);
-        
-        if (document.getPath() != null && !document.getPath().isBlank()) {
-            try {
-                googleCloudStorageService.delete(document.getPath());
-            } catch (Exception e) {
-                log.warn("Failed to delete GCS file for document {}: {}", id, e.getMessage());
+        if (!Objects.equals(document.getOwner().getId(), user.getId())) {
+            throw new ForbiddenException(ErrorCode.DOCUMENT_FORBIDDEN, "Deleting document for other user is forbidden");
+        }
+
+        updateStatus(id, DocumentStatus.DELETING);
+        documentIndexJobService.deleteJobsForDocument(
+                id,
+                List.of(DocumentSyncOperation.INDEX_CONTENT, DocumentSyncOperation.SYNC_METADATA)
+        );
+
+        try {
+            documentSyncExecutionService.deleteExternalResources(document);
+            documentSyncExecutionService.deletePostgresMetadata(id);
+        } catch (Exception ex) {
+            DocumentIndexJob retryJob = documentIndexJobService.failOrRetry(
+                    document,
+                    DocumentSyncOperation.DELETE,
+                    ex.getMessage(),
+                    maxAttempts,
+                    retryDelaySeconds
+            );
+
+            if (retryJob.getStatus() == DocumentIndexJobStatus.RETRY) {
+                updateStatus(id, DocumentStatus.DELETING);
+                log.warn("Document deletion failed for document {}, retry scheduled at {}: {}",
+                        id, retryJob.getNextAttemptAt(), retryJob.getLastError(), ex);
+            } else {
+                updateStatus(id, DocumentStatus.DELETE_FAILED);
+                log.error("Document deletion permanently failed for document {}: {}",
+                        id, retryJob.getLastError(), ex);
             }
+
+            throw ex;
         }
     }
 
@@ -163,7 +196,15 @@ public class DocumentService {
         return documents.map(doc -> {
             DocumentDto dto = documentMapper.toDto(doc);
             if (Objects.equals(doc.getOwner().getId(), user.getId())) {
-                return documentIndexJobRepository.findByDocumentId(doc.getId())
+                return documentIndexJobRepository.findFirstByDocumentIdAndStatusInOrderByCreatedDesc(
+                                doc.getId(),
+                                List.of(
+                                        DocumentIndexJobStatus.PENDING,
+                                        DocumentIndexJobStatus.RUNNING,
+                                        DocumentIndexJobStatus.RETRY,
+                                        DocumentIndexJobStatus.FAILED
+                                )
+                        )
                         .map(job -> new DocumentDto(
                                 dto.id(), dto.title(), dto.description(), dto.originalFilename(),
                                 dto.mimeType(), dto.uploadedAt(), dto.visibility(), dto.ownerId(),
@@ -173,6 +214,15 @@ public class DocumentService {
                         .orElse(dto);
             }
             return dto;
+        });
+    }
+
+    public void updateStatus(Long documentId, DocumentStatus status) {
+        transactionTemplate.executeWithoutResult(ignored -> {
+            var document = documentRepository.findById(documentId).orElseThrow(
+                    () -> new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUND, "Document with id " + documentId + " not found"));
+            document.setStatus(status);
+            documentRepository.save(document);
         });
     }
 }

@@ -1,9 +1,11 @@
 package com.pw.docvault.service.document;
 
 import com.pw.docvault.entity.document.DocumentIndexJob;
-import lombok.extern.slf4j.Slf4j;
+import com.pw.docvault.model.enums.DocumentStatus;
+import com.pw.docvault.model.enums.DocumentSyncOperation;
 import com.pw.docvault.repository.document.DocumentIndexJobRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -19,8 +21,8 @@ public class DocumentIndexWorker {
 
     private final DocumentIndexJobRepository documentIndexJobRepository;
     private final DocumentIndexJobService documentIndexJobService;
-    private final DocumentIndexer documentIndexer;
-    private final DocumentIndexingStateService documentIndexingStateService;
+    private final DocumentSyncExecutionService documentSyncExecutionService;
+    private final DocumentService documentService;
 
     private final String workerId = UUID.randomUUID().toString();
 
@@ -45,11 +47,21 @@ public class DocumentIndexWorker {
     }
 
     private void process(DocumentIndexJob job) {
-        Long documentId = job.getDocument().getId();
+        var documentId = job.getDocument().getId();
 
         try {
-            documentIndexer.indexDocument(documentId);
-            documentIndexJobService.markDone(job.getId(), workerId);
+            if (job.getOperation() == DocumentSyncOperation.INDEX_CONTENT) {
+                documentService.updateStatus(documentId, DocumentStatus.INDEXING);
+            }
+            documentSyncExecutionService.execute(job.getOperation(), documentId);
+            if (job.getOperation() == DocumentSyncOperation.DELETE) {
+                documentSyncExecutionService.deletePostgresMetadata(documentId);
+            } else {
+                if (job.getOperation() == DocumentSyncOperation.INDEX_CONTENT) {
+                    documentService.updateStatus(documentId, DocumentStatus.INDEXED);
+                }
+                documentIndexJobService.markDone(job.getId(), workerId);
+            }
         } catch (Exception ex) {
             handleFailure(job, documentId, ex);
         }
@@ -59,17 +71,26 @@ public class DocumentIndexWorker {
         String error = resolveErrorMessage(ex);
         
         if (job.getAttempts() + 1 >= maxAttempts) {
-            documentIndexingStateService.markFailed(documentId);
+            if (job.getOperation() == DocumentSyncOperation.INDEX_CONTENT) {
+                documentService.updateStatus(documentId, DocumentStatus.INDEX_FAILED);
+            } else if (job.getOperation() == DocumentSyncOperation.DELETE) {
+                documentService.updateStatus(documentId, DocumentStatus.DELETE_FAILED);
+            }
             documentIndexJobService.markFailed(job.getId(), workerId, error);
-            log.error("Indexing permanently failed for document {} and job {}: {}", documentId, job.getId(), error, ex);
+            log.error("Document sync permanently failed for operation {} on document {} and job {}: {}",
+                    job.getOperation(), documentId, job.getId(), error, ex);
             return;
         }
 
-        Instant nextAttemptAt = Instant.now().plusSeconds(retryDelaySeconds);
-        documentIndexingStateService.markUploaded(documentId);
+        var nextAttemptAt = Instant.now().plusSeconds(retryDelaySeconds);
+        if (job.getOperation() == DocumentSyncOperation.INDEX_CONTENT) {
+            documentService.updateStatus(documentId, DocumentStatus.UPLOADED);
+        } else if (job.getOperation() == DocumentSyncOperation.DELETE) {
+            documentService.updateStatus(documentId, DocumentStatus.DELETING);
+        }
         documentIndexJobService.markRetry(job.getId(), workerId, error, nextAttemptAt);
-        log.warn("Indexing failed for document {} and job {}, retry scheduled at {}: {}",
-                documentId, job.getId(), nextAttemptAt, error, ex);
+        log.warn("Document sync failed for operation {} on document {} and job {}, retry scheduled at {}: {}",
+                job.getOperation(), documentId, job.getId(), nextAttemptAt, error, ex);
     }
 
     private String resolveErrorMessage(Exception ex) {

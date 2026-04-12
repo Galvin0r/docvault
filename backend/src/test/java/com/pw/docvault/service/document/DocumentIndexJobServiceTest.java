@@ -4,6 +4,7 @@ import com.pw.docvault.entity.document.Document;
 import com.pw.docvault.entity.document.DocumentIndexJob;
 import com.pw.docvault.exception.ConflictException;
 import com.pw.docvault.model.enums.DocumentIndexJobStatus;
+import com.pw.docvault.model.enums.DocumentSyncOperation;
 import com.pw.docvault.repository.document.DocumentIndexJobRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +39,7 @@ class DocumentIndexJobServiceTest {
         document.setId(123L);
         stubSaveReturnsEntity();
 
-        DocumentIndexJob result = documentIndexJobService.create(document);
+        DocumentIndexJob result = documentIndexJobService.create(document, DocumentSyncOperation.INDEX_CONTENT);
 
         ArgumentCaptor<DocumentIndexJob> captor = ArgumentCaptor.forClass(DocumentIndexJob.class);
         verify(documentIndexJobRepository).save(captor.capture());
@@ -46,6 +47,7 @@ class DocumentIndexJobServiceTest {
         DocumentIndexJob savedJob = captor.getValue();
         assertThat(savedJob.getDocument()).isEqualTo(document);
         assertThat(savedJob.getAttempts()).isEqualTo((short) 0);
+        assertThat(savedJob.getOperation()).isEqualTo(DocumentSyncOperation.INDEX_CONTENT);
         assertThat(savedJob.getStatus()).isEqualTo(DocumentIndexJobStatus.PENDING);
         assertThat(result).isEqualTo(savedJob);
     }

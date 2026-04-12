@@ -5,5 +5,7 @@ public enum DocumentStatus {
     UPLOADED,
     INDEXING,
     INDEXED,
-    FAILED
+    INDEX_FAILED,
+    DELETING,
+    DELETE_FAILED
 }

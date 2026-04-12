@@ -6,6 +6,7 @@ import com.pw.docvault.entity.document.DocumentFragment;
 import com.pw.docvault.exception.DocumentException;
 import com.pw.docvault.model.enums.DocumentVisibility;
 import com.pw.docvault.repository.document.DocumentAccessRepository;
+import com.pw.docvault.repository.document.DocumentRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -25,10 +26,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class DocumentIndexerTest {
+class DocumentIndexerServiceTest {
 
     @Mock
-    private DocumentIndexingStateService documentIndexingStateService;
+    private DocumentRepository documentRepository;
 
     @Mock
     private DocumentAccessRepository documentAccessRepository;
@@ -43,12 +44,13 @@ class DocumentIndexerTest {
     private DocumentProcessingClient documentProcessingClient;
 
     @InjectMocks
-    private DocumentIndexer documentIndexer;
+    private DocumentIndexerService documentIndexerService;
 
     @Test
     void indexDocumentStreamsFragmentsInBatchesAndEnrichesMetadata() {
         Document document = indexingDocument();
-        when(documentIndexingStateService.loadDocumentForIndexing(11L)).thenReturn(document);
+        when(documentRepository.findWithOwnerById(11L)).thenReturn(java.util.Optional.of(document));
+        when(documentRepository.save(any(Document.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(documentAccessRepository.findUserIdsByDocumentId(11L)).thenReturn(List.of(7L, 8L));
         when(documentAccessRepository.findGroupIdsByDocumentId(11L)).thenReturn(List.of(17L));
         when(googleCloudStorageService.generateGetSignedUrl("bucket/object")).thenReturn("https://signed");
@@ -64,12 +66,11 @@ class DocumentIndexerTest {
             return null;
         }).when(documentProcessingClient).processFromSignedUrl(anyString(), anyString(), any());
 
-        documentIndexer.indexDocument(11L);
+        documentIndexerService.indexDocument(11L);
 
-        verify(documentIndexingStateService).markIndexing(11L);
+        verify(documentRepository, never()).save(any(Document.class));
         verify(documentFragmentIndexService).deleteByDocumentId(11L);
         verify(documentProcessingClient).processFromSignedUrl(eq("https://signed"), eq("application/pdf"), any());
-        verify(documentIndexingStateService).markIndexed(11L);
 
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<DocumentFragment>> captor = ArgumentCaptor.forClass(List.class);
@@ -98,11 +99,11 @@ class DocumentIndexerTest {
     void indexDocumentFailsWhenPathMissing() {
         Document document = indexingDocument();
         document.setPath("   ");
-        when(documentIndexingStateService.loadDocumentForIndexing(11L)).thenReturn(document);
+        when(documentRepository.findWithOwnerById(11L)).thenReturn(java.util.Optional.of(document));
 
-        assertThrows(DocumentException.class, () -> documentIndexer.indexDocument(11L));
+        assertThrows(DocumentException.class, () -> documentIndexerService.indexDocument(11L));
 
-        verify(documentIndexingStateService, never()).markIndexing(anyLong());
+        verify(documentRepository, never()).save(any(Document.class));
         verify(documentFragmentIndexService, never()).deleteByDocumentId(anyLong());
         verify(documentProcessingClient, never()).processFromSignedUrl(anyString(), anyString(), any());
     }

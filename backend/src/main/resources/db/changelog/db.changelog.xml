@@ -390,5 +390,19 @@
                         newDataType="VARCHAR(36)"/>
     </changeSet>
 
+    <changeSet id="24" author="Roman">
+        <addColumn tableName="document_index_jobs">
+            <column name="operation" type="VARCHAR(30)" defaultValue="INDEX_CONTENT">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <createIndex indexName="idx_index_jobs_operation_status_next" tableName="document_index_jobs">
+            <column name="operation"/>
+            <column name="status"/>
+            <column name="next_attempt_at"/>
+        </createIndex>
+    </changeSet>
+
     <include file="db.insert-data.xml" relativeToChangelogFile="true" />
 </databaseChangeLog>

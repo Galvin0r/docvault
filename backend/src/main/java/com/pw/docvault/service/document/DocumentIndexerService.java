@@ -4,7 +4,9 @@ import com.pw.docvault.entity.document.Document;
 import com.pw.docvault.entity.document.DocumentFragment;
 import com.pw.docvault.exception.DocumentException;
 import com.pw.docvault.exception.ErrorCode;
+import com.pw.docvault.exception.NotFoundException;
 import com.pw.docvault.repository.document.DocumentAccessRepository;
+import com.pw.docvault.repository.document.DocumentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,37 +17,39 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @RequiredArgsConstructor
 @Service
-public class DocumentIndexer {
+public class DocumentIndexerService {
 
     private static final int FRAGMENT_BATCH_SIZE = 64;
     private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
 
-    private final DocumentIndexingStateService documentIndexingStateService;
+    private final DocumentRepository documentRepository;
     private final DocumentAccessRepository documentAccessRepository;
     private final GoogleCloudStorageService googleCloudStorageService;
     private final DocumentFragmentIndexService documentFragmentIndexService;
     private final DocumentProcessingClient documentProcessingClient;
 
     public void indexDocument(Long documentId) {
-        Document document = documentIndexingStateService.loadDocumentForIndexing(documentId);
+        var document = documentRepository.findWithOwnerById(documentId)
+                .orElseThrow(() -> new NotFoundException(
+                        ErrorCode.DOCUMENT_NOT_FOUND,
+                        "Document with id " + documentId + " not found"
+                ));
         validateDocumentPath(document);
 
-        documentIndexingStateService.markIndexing(documentId);
-
-        List<Long> permittedUserIds = documentAccessRepository.findUserIdsByDocumentId(documentId);
-        List<Long> permittedGroupIds = documentAccessRepository.findGroupIdsByDocumentId(documentId);
+        var permittedUserIds = documentAccessRepository.findUserIdsByDocumentId(documentId);
+        var permittedGroupIds = documentAccessRepository.findGroupIdsByDocumentId(documentId);
         String signedUrl = googleCloudStorageService.generateGetSignedUrl(document.getPath());
 
         documentFragmentIndexService.deleteByDocumentId(documentId);
 
-        List<DocumentFragment> buffer = new ArrayList<>(FRAGMENT_BATCH_SIZE);
-        AtomicInteger fragmentCounter = new AtomicInteger();
+        var buffer = new ArrayList<DocumentFragment>(FRAGMENT_BATCH_SIZE);
+        var fragmentCounter = new AtomicInteger();
 
         documentProcessingClient.processFromSignedUrl(
                 signedUrl,
                 safeMimeType(document.getMimeType()),
                 fragment -> {
-                    DocumentFragment enrichedFragment = enrichFragment(
+                    var enrichedFragment = enrichFragment(
                             fragment,
                             document,
                             permittedUserIds,
@@ -60,7 +64,6 @@ public class DocumentIndexer {
         );
 
         flush(buffer);
-        documentIndexingStateService.markIndexed(documentId);
     }
 
     private void validateDocumentPath(Document document) {

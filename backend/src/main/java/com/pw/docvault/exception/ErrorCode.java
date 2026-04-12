@@ -7,6 +7,7 @@ public enum ErrorCode {
     DOCUMENT_NOT_FOUND("document.not_found"),
     DOCUMENT_UPLOAD_FAILED("document.upload_failed"),
     DOCUMENT_PROCESSING_FAILED("document.processing_failed"),
+    DOCUMENT_DELETE_FAILED("document.delete_failed"),
     DOCUMENT_FORBIDDEN("document.forbidden"),
     DOCUMENT_INVALID_STATE("document.invalid_state"),
     DOCUMENT_EMPTY("document.empty"),

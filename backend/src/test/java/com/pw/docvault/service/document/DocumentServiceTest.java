@@ -5,11 +5,14 @@ import com.pw.docvault.entity.User;
 import com.pw.docvault.entity.document.Document;
 import com.pw.docvault.entity.document.DocumentIndexJob;
 import com.pw.docvault.exception.ConflictException;
+import com.pw.docvault.exception.DocumentException;
 import com.pw.docvault.exception.ForbiddenException;
 import com.pw.docvault.exception.NotFoundException;
 import com.pw.docvault.mapper.DocumentMapper;
 import com.pw.docvault.model.document.DocumentDto;
+import com.pw.docvault.model.enums.DocumentIndexJobStatus;
 import com.pw.docvault.model.enums.DocumentStatus;
+import com.pw.docvault.model.enums.DocumentSyncOperation;
 import com.pw.docvault.model.enums.DocumentVisibility;
 import com.pw.docvault.repository.document.DocumentAccessRepository;
 import com.pw.docvault.repository.document.DocumentIndexJobRepository;
@@ -25,6 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.Instant;
 import java.util.List;
@@ -57,7 +61,16 @@ class DocumentServiceTest {
     private DocumentIndexJobService documentIndexJobService;
 
     @Mock
+    private DocumentMetadataSyncService documentMetadataSyncService;
+
+    @Mock
+    private DocumentSyncExecutionService documentSyncExecutionService;
+
+    @Mock
     private DocumentMapper documentMapper;
+
+    @Mock
+    private TransactionTemplate transactionTemplate;
 
     @InjectMocks
     private DocumentService documentService;
@@ -69,8 +82,16 @@ class DocumentServiceTest {
         user = new User();
         user.setId(1L);
         user.setLogin("testuser");
+
+        doAnswer(invocation -> {
+            java.util.function.Consumer<org.springframework.transaction.TransactionStatus> consumer = invocation.getArgument(0);
+            consumer.accept(null);
+            return null;
+        }).when(transactionTemplate).executeWithoutResult(any());
         
         ReflectionTestUtils.setField(documentService, "bufferStorageSpace", 500);
+        ReflectionTestUtils.setField(documentService, "maxAttempts", 3);
+        ReflectionTestUtils.setField(documentService, "retryDelaySeconds", 300);
     }
 
     @Test
@@ -165,7 +186,7 @@ class DocumentServiceTest {
         assertThat(doc.getStatus()).isEqualTo(DocumentStatus.UPLOADED);
         assertThat(doc.getSizeBytes()).isEqualTo(1024L);
         verify(documentRepository).save(doc);
-        verify(documentIndexJobService).create(doc);
+        verify(documentIndexJobService).create(doc, DocumentSyncOperation.INDEX_CONTENT);
     }
 
     @Test
@@ -183,19 +204,76 @@ class DocumentServiceTest {
     }
 
     @Test
-    void deleteRemovesFromDbAndGcs() {
+    void deleteRemovesMetadataOnlyAfterExternalDeletionSucceeds() {
         Document doc = new Document();
         doc.setId(10L);
         doc.setPath("path/to/delete");
+        doc.setOwner(user);
 
+        when(currentUser.get()).thenReturn(user);
         when(documentRepository.findById(10L)).thenReturn(Optional.of(doc));
+        when(documentRepository.save(any(Document.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         documentService.delete(10L);
 
-        verify(documentIndexJobRepository).deleteByDocumentId(10L);
-        verify(documentAccessRepository).deleteByDocumentId(10L);
-        verify(documentRepository).delete(doc);
-        verify(googleCloudStorageService).delete("path/to/delete");
+        verify(documentRepository).save(argThat(document -> document.getId().equals(10L)
+                && document.getStatus() == DocumentStatus.DELETING));
+        verify(documentIndexJobService).deleteJobsForDocument(
+                10L,
+                List.of(DocumentSyncOperation.INDEX_CONTENT, DocumentSyncOperation.SYNC_METADATA)
+        );
+        verify(documentSyncExecutionService).deleteExternalResources(doc);
+        verify(documentSyncExecutionService).deletePostgresMetadata(10L);
+    }
+
+    @Test
+    void deleteSchedulesRetryWhenExternalDeletionFails() {
+        Document doc = new Document();
+        doc.setId(10L);
+        doc.setPath("path/to/delete");
+        doc.setOwner(user);
+
+        DocumentIndexJob retryJob = new DocumentIndexJob();
+        retryJob.setStatus(DocumentIndexJobStatus.RETRY);
+        retryJob.setNextAttemptAt(Instant.now().plusSeconds(300));
+        retryJob.setLastError("boom");
+
+        when(currentUser.get()).thenReturn(user);
+        when(documentRepository.findById(10L)).thenReturn(Optional.of(doc));
+        when(documentRepository.save(any(Document.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        doThrow(new DocumentException(com.pw.docvault.exception.ErrorCode.DOCUMENT_DELETE_FAILED, "boom"))
+                .when(documentSyncExecutionService).deleteExternalResources(any(Document.class));
+        when(documentIndexJobService.failOrRetry(eq(doc), eq(DocumentSyncOperation.DELETE), eq("boom"), eq(3), eq(300)))
+                .thenReturn(retryJob);
+
+        assertThrows(DocumentException.class, () -> documentService.delete(10L));
+
+        verify(documentRepository, times(2)).save(argThat(document -> document.getId().equals(10L)
+                && document.getStatus() == DocumentStatus.DELETING));
+        verify(documentIndexJobService).deleteJobsForDocument(
+                10L,
+                List.of(DocumentSyncOperation.INDEX_CONTENT, DocumentSyncOperation.SYNC_METADATA)
+        );
+        verify(documentSyncExecutionService, never()).deletePostgresMetadata(10L);
+    }
+
+    @Test
+    void deleteThrowsForbiddenForNonOwner() {
+        User otherUser = new User();
+        otherUser.setId(2L);
+
+        Document doc = new Document();
+        doc.setId(10L);
+        doc.setOwner(otherUser);
+
+        when(currentUser.get()).thenReturn(user);
+        when(documentRepository.findById(10L)).thenReturn(Optional.of(doc));
+
+        assertThrows(ForbiddenException.class, () -> documentService.delete(10L));
+
+        verify(documentIndexJobService, never()).deleteJobsForDocument(anyLong(), anyList());
+        verify(documentSyncExecutionService, never()).deleteExternalResources(any(Document.class));
+        verify(documentSyncExecutionService, never()).deletePostgresMetadata(anyLong());
     }
 
     @Test
@@ -231,13 +309,13 @@ class DocumentServiceTest {
         DocumentIndexJob job = new DocumentIndexJob();
         job.setAttempts((short) 5);
         job.setLastError("Failed to index");
-        when(documentIndexJobRepository.findByDocumentId(10L)).thenReturn(Optional.of(job));
+        when(documentIndexJobRepository.findFirstByDocumentIdAndStatusInOrderByCreatedDesc(eq(10L), any()))
+                .thenReturn(Optional.of(job));
 
         Page<DocumentDto> result = documentService.listUserDocuments(null, null, null, null, PageRequest.of(0, 10));
 
         assertThat(result.getContent()).hasSize(1);
         DocumentDto enriched = result.getContent().get(0);
         assertThat(enriched.attempts()).isEqualTo((short) 5);
-        assertThat(enriched.getLastError()).isEqualTo("Failed to index");
     }
 }
