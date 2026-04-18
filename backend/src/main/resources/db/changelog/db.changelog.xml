@@ -404,5 +404,17 @@
         </createIndex>
     </changeSet>
 
+    <changeSet id="25" author="Roman">
+        <addUniqueConstraint
+                tableName="document_access"
+                columnNames="document_id, user_id"
+                constraintName="uq_document_access_document_user"/>
+
+        <addUniqueConstraint
+                tableName="document_access"
+                columnNames="document_id, group_id"
+                constraintName="uq_document_access_document_group"/>
+    </changeSet>
+
     <include file="db.insert-data.xml" relativeToChangelogFile="true" />
 </databaseChangeLog>

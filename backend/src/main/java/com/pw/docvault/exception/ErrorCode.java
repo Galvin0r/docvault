@@ -10,6 +10,7 @@ public enum ErrorCode {
     DOCUMENT_DELETE_FAILED("document.delete_failed"),
     DOCUMENT_FORBIDDEN("document.forbidden"),
     DOCUMENT_INVALID_STATE("document.invalid_state"),
+    DOCUMENT_ACCESS_INVALID("document.access_invalid"),
     DOCUMENT_EMPTY("document.empty"),
 
     // auth

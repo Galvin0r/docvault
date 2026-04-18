@@ -2,15 +2,7 @@
 Document management system with advanced search and access control
 
 # TODO
-Authentication:
-    JWT authentication + mail confirmation - READY
-    refresh tokens
-    password/login/email change
-    oauth2 google accaout
-    remember me
 Documents upload
-    access rights
     vector search
-Groups creating and managing
-Notifications:
-    realtime notifications
+    
+Add screen for document view and managment and add preview there(1 or more chunks of text) and information about users and groups that you already shared with.

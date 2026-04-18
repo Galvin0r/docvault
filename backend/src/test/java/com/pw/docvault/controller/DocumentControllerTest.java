@@ -1,11 +1,10 @@
 package com.pw.docvault.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.pw.docvault.model.document.DocumentAccessDto;
 import com.pw.docvault.model.document.DocumentDto;
 import com.pw.docvault.model.enums.DocumentStatus;
 import com.pw.docvault.model.enums.DocumentVisibility;
-import com.pw.docvault.repository.document.DocumentRepository;
+import com.pw.docvault.service.document.DocumentAccessService;
 import com.pw.docvault.service.document.DocumentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -36,19 +34,16 @@ class DocumentControllerTest {
     private DocumentService documentService;
 
     @Mock 
-    private DocumentRepository documentRepository;
+    private DocumentAccessService documentAccessService;
 
     private MockMvc mockMvc;
-    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setup() {
-        DocumentController controller = new DocumentController(documentService, documentRepository);
+        DocumentController controller = new DocumentController(documentService, documentAccessService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .build();
-        objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
     }
 
     @Test
@@ -85,6 +80,15 @@ class DocumentControllerTest {
     }
 
     @Test
+    void updateVisibilityReturnsNoContent() throws Exception {
+        mockMvc.perform(patch("/documents/10/visibility")
+                        .param("visibility", "PUBLIC"))
+                .andExpect(status().isNoContent());
+
+        verify(documentService).updateVisibility(10L, DocumentVisibility.PUBLIC);
+    }
+
+    @Test
     void downloadReturnsSignedUrl() throws Exception {
         when(documentService.download(10L)).thenReturn("http://download-url");
 
@@ -110,6 +114,49 @@ class DocumentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value(10))
                 .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void listAccessReturnsEntries() throws Exception {
+        var access = new DocumentAccessDto(1L, 10L, 2L, "alice", null, null);
+        when(documentAccessService.listAccess(10L)).thenReturn(List.of(access));
+
+        mockMvc.perform(get("/documents/10/access"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].documentId").value(10))
+                .andExpect(jsonPath("$[0].userLogin").value("alice"));
+    }
+
+    @Test
+    void grantUserAccessReturnsNoContent() throws Exception {
+        mockMvc.perform(put("/documents/10/access/users/2"))
+                .andExpect(status().isNoContent());
+
+        verify(documentAccessService).grantUserAccess(10L, 2L);
+    }
+
+    @Test
+    void revokeUserAccessReturnsNoContent() throws Exception {
+        mockMvc.perform(delete("/documents/10/access/users/2"))
+                .andExpect(status().isNoContent());
+
+        verify(documentAccessService).revokeUserAccess(10L, 2L);
+    }
+
+    @Test
+    void grantGroupAccessReturnsNoContent() throws Exception {
+        mockMvc.perform(put("/documents/10/access/groups/4"))
+                .andExpect(status().isNoContent());
+
+        verify(documentAccessService).grantGroupAccess(10L, 4L);
+    }
+
+    @Test
+    void revokeGroupAccessReturnsNoContent() throws Exception {
+        mockMvc.perform(delete("/documents/10/access/groups/4"))
+                .andExpect(status().isNoContent());
+
+        verify(documentAccessService).revokeGroupAccess(10L, 4L);
     }
 
     @Test

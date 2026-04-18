@@ -16,5 +16,6 @@ public interface DocumentAccessMapper {
     DocumentAccessDto toDto(DocumentAccess entity);
 
     @InheritInverseConfiguration
+    @Mapping(target = "permission", ignore = true)
     DocumentAccess toEntity(DocumentAccessDto dto);
 }

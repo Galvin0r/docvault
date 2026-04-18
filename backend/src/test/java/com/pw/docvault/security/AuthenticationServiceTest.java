@@ -19,6 +19,7 @@ import com.pw.docvault.service.EmailService;
 import com.pw.docvault.service.security.AuthenticationService;
 import com.pw.docvault.service.security.JwtService;
 import com.pw.docvault.service.security.RefreshTokenService;
+import com.pw.docvault.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -71,6 +72,9 @@ public class AuthenticationServiceTest {
 
     @Mock
     private RefreshTokenService refreshTokenService;
+
+    @Mock
+    private UserService userService;
 
     @InjectMocks
     private AuthenticationService authenticationService;
@@ -306,7 +310,7 @@ public class AuthenticationServiceTest {
         token.setExpiresAt(Instant.now().plusSeconds(300));
 
         when(activationTokenRepository.findByToken(token.getToken())).thenReturn(Optional.of(token));
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userService.getUserOrThrow(user.getId())).thenReturn(user);
 
         authenticationService.activateAccount(token.getToken());
 

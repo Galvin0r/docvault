@@ -8,7 +8,7 @@ import com.pw.docvault.exception.ForbiddenException;
 import com.pw.docvault.exception.NotFoundException;
 import com.pw.docvault.model.enums.GroupRole;
 import com.pw.docvault.repository.group.GroupMembershipRepository;
-import com.pw.docvault.repository.UserRepository;
+import com.pw.docvault.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +23,7 @@ import java.util.Optional;
 public class GroupMembershipService {
 
     private final GroupMembershipRepository groupMembershipRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     public GroupMembership create(User user, Group group, GroupRole role) {
         var membership = new GroupMembership();
@@ -98,8 +98,7 @@ public class GroupMembershipService {
         }
 
         if (findMembership(userId, group.getId()).isEmpty()){
-            var user = userRepository.findById(userId).orElseThrow(
-                    () -> new NotFoundException(ErrorCode.USER_NOT_FOUND, "User not found."));
+            var user = userService.getUserOrThrow(userId);
             create(user, group, GroupRole.USER);
         }
     }

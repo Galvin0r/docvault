@@ -1,22 +1,19 @@
 package com.pw.docvault.controller;
 
-import com.pw.docvault.entity.document.Document;
+import com.pw.docvault.model.document.DocumentAccessDto;
 import com.pw.docvault.model.document.DocumentDto;
 import com.pw.docvault.model.enums.DocumentVisibility;
-import com.pw.docvault.repository.document.DocumentRepository;
+import com.pw.docvault.service.document.DocumentAccessService;
 import com.pw.docvault.service.document.DocumentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.time.Instant;
-import java.util.NoSuchElementException;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -24,7 +21,7 @@ import java.util.NoSuchElementException;
 public class DocumentController {
 
     private final DocumentService documentService;
-    private final DocumentRepository documentRepository;
+    private final DocumentAccessService documentAccessService;
 
     @PostMapping("draft")
     public ResponseEntity<Long> uploadDraft(@RequestParam("title") String title,
@@ -46,6 +43,13 @@ public class DocumentController {
     public ResponseEntity<Void> completeUpload(@PathVariable Long id) {
         documentService.completeUpload(id);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PatchMapping("/{id}/visibility")
+    public ResponseEntity<Void> updateVisibility(@PathVariable Long id,
+                                                 @RequestParam("visibility") DocumentVisibility visibility) {
+        documentService.updateVisibility(id, visibility);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping(value = "/download/{id}")
@@ -70,6 +74,35 @@ public class DocumentController {
                 pageable
         );
         return ResponseEntity.ok(documents);
+    }
+
+    @GetMapping("/{id}/access")
+    public ResponseEntity<List<DocumentAccessDto>> listAccess(@PathVariable Long id) {
+        return ResponseEntity.ok(documentAccessService.listAccess(id));
+    }
+
+    @PutMapping("/{id}/access/users/{userId}")
+    public ResponseEntity<Void> grantUserAccess(@PathVariable Long id, @PathVariable Long userId) {
+        documentAccessService.grantUserAccess(id, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}/access/users/{userId}")
+    public ResponseEntity<Void> revokeUserAccess(@PathVariable Long id, @PathVariable Long userId) {
+        documentAccessService.revokeUserAccess(id, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/access/groups/{groupId}")
+    public ResponseEntity<Void> grantGroupAccess(@PathVariable Long id, @PathVariable Long groupId) {
+        documentAccessService.grantGroupAccess(id, groupId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}/access/groups/{groupId}")
+    public ResponseEntity<Void> revokeGroupAccess(@PathVariable Long id, @PathVariable Long groupId) {
+        documentAccessService.revokeGroupAccess(id, groupId);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/delete/{id}")

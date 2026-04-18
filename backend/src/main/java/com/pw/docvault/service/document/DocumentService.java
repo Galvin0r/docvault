@@ -36,6 +36,7 @@ public class DocumentService {
     private final GoogleCloudStorageService googleCloudStorageService;
     private final CurrentUserProvider currentUser;
     private final DocumentIndexJobService documentIndexJobService;
+    private final DocumentMetadataSyncService documentMetadataSyncService;
     private final DocumentSyncExecutionService documentSyncExecutionService;
     private final DocumentMapper documentMapper;
     private final TransactionTemplate transactionTemplate;
@@ -67,15 +68,10 @@ public class DocumentService {
         
         cleanupStaleDrafts(user.getId());
         
-        var draft = documentRepository.findById(id).orElseThrow(
-                () -> new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUND, "Document with id: " + id + " not found"));
+        var draft = getOwnedDocumentOrThrow(id);
         if (draft.getStatus() != DocumentStatus.UPLOADING) {
             throw new ConflictException(ErrorCode.DOCUMENT_INVALID_STATE,
                     "Document for id " + id + " is already loaded. Please, try again.");
-        }
-        if (!Objects.equals(draft.getOwner().getId(), user.getId())) {
-            throw new ForbiddenException(ErrorCode.DOCUMENT_FORBIDDEN,
-                    "Uploading document for other user is forbidden");
         }
 
         String safeName = safeFilename(draft.getTitle());
@@ -92,13 +88,7 @@ public class DocumentService {
     }
 
     public void completeUpload(Long id) {
-        var user = currentUser.get();
-        var draft = documentRepository.findById(id).orElseThrow(
-                () -> new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUND, "Document with id: " + id + " not found"));
-
-        if (!Objects.equals(draft.getOwner().getId(), user.getId())) {
-            throw new ForbiddenException(ErrorCode.DOCUMENT_FORBIDDEN, "Completing upload for other user is forbidden");
-        }
+        var draft = getOwnedDocumentOrThrow(id);
 
         var blob = googleCloudStorageService.getMetadata(draft.getPath());
         if (blob == null || !blob.exists()) {
@@ -112,6 +102,17 @@ public class DocumentService {
         documentIndexJobService.create(draft, DocumentSyncOperation.INDEX_CONTENT);
     }
 
+    public void updateVisibility(Long documentId, DocumentVisibility visibility) {
+        var document = getOwnedDocumentOrThrow(documentId);
+        if (document.getVisibility() == visibility) {
+            return;
+        }
+
+        document.setVisibility(visibility);
+        documentRepository.save(document);
+        documentMetadataSyncService.schedule(documentId);
+    }
+
     private String safeContentType(String ct) {
         return (ct == null || ct.isBlank()) ? "application/octet-stream" : ct;
     }
@@ -122,12 +123,7 @@ public class DocumentService {
     }
 
     public void delete(Long id) {
-        var user = currentUser.get();
-        var document = documentRepository.findById(id).orElseThrow(
-                () -> new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUND, "Document with id " + id + " not found"));
-        if (!Objects.equals(document.getOwner().getId(), user.getId())) {
-            throw new ForbiddenException(ErrorCode.DOCUMENT_FORBIDDEN, "Deleting document for other user is forbidden");
-        }
+        var document = getOwnedDocumentOrThrow(id);
 
         updateStatus(id, DocumentStatus.DELETING);
         documentIndexJobService.deleteJobsForDocument(
@@ -180,8 +176,7 @@ public class DocumentService {
     }
 
     public String download(Long documentId) {
-        Document document = documentRepository.findById(documentId).orElseThrow(
-                () -> new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUND, "Document with id " + documentId + " not found"));
+        Document document = getReadableDocumentOrThrow(documentId);
         if (document.getPath() == null || document.getPath().isBlank()) {
             throw new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUND, "Document path is missing");
         }
@@ -217,10 +212,47 @@ public class DocumentService {
         });
     }
 
+    public Document getDocumentOrThrow(Long documentId) {
+        return documentRepository.findWithOwnerById(documentId).orElseThrow(
+                () -> new NotFoundException(
+                        ErrorCode.DOCUMENT_NOT_FOUND,
+                        "Document with id " + documentId + " not found"
+                )
+        );
+    }
+
+    public Document getOwnedDocumentOrThrow(Long documentId) {
+        var document = getDocumentOrThrow(documentId);
+        if (!Objects.equals(document.getOwner().getId(), currentUser.getId())) {
+            throw new ForbiddenException(
+                    ErrorCode.DOCUMENT_FORBIDDEN,
+                    "You are not allowed to manage this document."
+            );
+        }
+        return document;
+    }
+
+    public Document getReadableDocumentOrThrow(Long documentId) {
+        var document = getDocumentOrThrow(documentId);
+        var userId = currentUser.getId();
+
+        boolean isReadable = document.getVisibility() == DocumentVisibility.PUBLIC
+                || Objects.equals(document.getOwner().getId(), userId)
+                || documentAccessRepository.countReadableEntries(documentId, userId) > 0;
+
+        if (!isReadable) {
+            throw new ForbiddenException(
+                    ErrorCode.DOCUMENT_FORBIDDEN,
+                    "You are not allowed to access this document."
+            );
+        }
+
+        return document;
+    }
+
     public void updateStatus(Long documentId, DocumentStatus status) {
         transactionTemplate.executeWithoutResult(ignored -> {
-            var document = documentRepository.findById(documentId).orElseThrow(
-                    () -> new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUND, "Document with id " + documentId + " not found"));
+            var document = getDocumentOrThrow(documentId);
             document.setStatus(status);
             documentRepository.save(document);
         });

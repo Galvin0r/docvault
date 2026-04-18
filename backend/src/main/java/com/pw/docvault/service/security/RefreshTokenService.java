@@ -40,8 +40,7 @@ public class RefreshTokenService {
 
     @Transactional
     public RefreshToken rotateToken(Long tokenId) {
-        var token = refreshTokenRepository.findById(tokenId).orElseThrow(
-                () -> new NotFoundException(ErrorCode.AUTH_REFRESH_TOKEN_INVALID));
+        var token = getRefreshTokenOrThrow(tokenId);
         token.setToken(UUID.randomUUID().toString());
         return token;
     }
@@ -65,5 +64,11 @@ public class RefreshTokenService {
                                      .map(this::verifyExpiration)
                                      .orElseThrow(() -> new RefreshTokenException(ErrorCode.AUTH_REFRESH_TOKEN_EXPIRED,
                                                                                   "Refresh token expired"));
+    }
+
+    @Transactional(readOnly = true)
+    public RefreshToken getRefreshTokenOrThrow(Long tokenId) {
+        return refreshTokenRepository.findById(tokenId).orElseThrow(
+                () -> new NotFoundException(ErrorCode.AUTH_REFRESH_TOKEN_INVALID));
     }
 }

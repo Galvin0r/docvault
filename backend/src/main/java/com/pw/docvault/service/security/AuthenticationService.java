@@ -12,6 +12,7 @@ import com.pw.docvault.repository.security.PasswordResetTokenRepository;
 import com.pw.docvault.repository.security.RoleRepository;
 import com.pw.docvault.repository.UserRepository;
 import com.pw.docvault.service.EmailService;
+import com.pw.docvault.service.user.UserService;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,6 +53,7 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
+    private final UserService userService;
 
     public void register(RegistrationRequest request) {
         var userRole = roleRepository.findByName(RoleCode.USER.name())
@@ -185,8 +187,7 @@ public class AuthenticationService {
             throw new ActivationTokenException(ErrorCode.AUTH_ACTIVATION_TOKEN_EXPIRED,
                                                "Activation token has expired");
         }
-        var user = userRepository.findById(savedToken.getUser().getId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, "User not found"));
+        var user = userService.getUserOrThrow(savedToken.getUser().getId());
         user.setEnabled(true);
         savedToken.setValidatedAt(Instant.now());
     }

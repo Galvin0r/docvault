@@ -83,7 +83,8 @@ class DocumentServiceTest {
         user.setId(1L);
         user.setLogin("testuser");
 
-        doAnswer(invocation -> {
+        lenient().when(currentUser.getId()).thenReturn(user.getId());
+        lenient().doAnswer(invocation -> {
             java.util.function.Consumer<org.springframework.transaction.TransactionStatus> consumer = invocation.getArgument(0);
             consumer.accept(null);
             return null;
@@ -123,7 +124,7 @@ class DocumentServiceTest {
         doc.setOwner(user);
         doc.setStatus(DocumentStatus.UPLOADING);
 
-        when(documentRepository.findById(10L)).thenReturn(Optional.of(doc));
+        when(documentRepository.findWithOwnerById(10L)).thenReturn(Optional.of(doc));
         when(googleCloudStorageService.generatePutSignedUrl(anyString(), anyString())).thenReturn("http://signed-url");
 
         String url = documentService.initiateUpload(10L, "text/plain", "file.txt");
@@ -142,7 +143,7 @@ class DocumentServiceTest {
         doc.setId(10L);
         doc.setOwner(user);
         doc.setStatus(DocumentStatus.UPLOADED);
-        when(documentRepository.findById(10L)).thenReturn(Optional.of(doc));
+        when(documentRepository.findWithOwnerById(10L)).thenReturn(Optional.of(doc));
 
         assertThrows(ConflictException.class, () -> 
             documentService.initiateUpload(10L, "text/plain", "file.txt")
@@ -159,7 +160,7 @@ class DocumentServiceTest {
         doc.setId(10L);
         doc.setOwner(otherUser);
         doc.setStatus(DocumentStatus.UPLOADING);
-        when(documentRepository.findById(10L)).thenReturn(Optional.of(doc));
+        when(documentRepository.findWithOwnerById(10L)).thenReturn(Optional.of(doc));
 
         assertThrows(ForbiddenException.class, () -> 
             documentService.initiateUpload(10L, "text/plain", "file.txt")
@@ -168,7 +169,6 @@ class DocumentServiceTest {
 
     @Test
     void completeUploadUpdatesStatusAndCreatesJob() {
-        when(currentUser.get()).thenReturn(user);
         Document doc = new Document();
         doc.setId(10L);
         doc.setOwner(user);
@@ -178,7 +178,7 @@ class DocumentServiceTest {
         when(blob.exists()).thenReturn(true);
         when(blob.getSize()).thenReturn(1024L);
 
-        when(documentRepository.findById(10L)).thenReturn(Optional.of(doc));
+        when(documentRepository.findWithOwnerById(10L)).thenReturn(Optional.of(doc));
         when(googleCloudStorageService.getMetadata("path/to/file")).thenReturn(blob);
 
         documentService.completeUpload(10L);
@@ -191,13 +191,12 @@ class DocumentServiceTest {
 
     @Test
     void completeUploadThrowsIfFileNotFoundInGCS() {
-        when(currentUser.get()).thenReturn(user);
         Document doc = new Document();
         doc.setId(10L);
         doc.setOwner(user);
         doc.setPath("missing");
 
-        when(documentRepository.findById(10L)).thenReturn(Optional.of(doc));
+        when(documentRepository.findWithOwnerById(10L)).thenReturn(Optional.of(doc));
         when(googleCloudStorageService.getMetadata("missing")).thenReturn(null);
 
         assertThrows(NotFoundException.class, () -> documentService.completeUpload(10L));
@@ -210,8 +209,7 @@ class DocumentServiceTest {
         doc.setPath("path/to/delete");
         doc.setOwner(user);
 
-        when(currentUser.get()).thenReturn(user);
-        when(documentRepository.findById(10L)).thenReturn(Optional.of(doc));
+        when(documentRepository.findWithOwnerById(10L)).thenReturn(Optional.of(doc));
         when(documentRepository.save(any(Document.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         documentService.delete(10L);
@@ -238,8 +236,7 @@ class DocumentServiceTest {
         retryJob.setNextAttemptAt(Instant.now().plusSeconds(300));
         retryJob.setLastError("boom");
 
-        when(currentUser.get()).thenReturn(user);
-        when(documentRepository.findById(10L)).thenReturn(Optional.of(doc));
+        when(documentRepository.findWithOwnerById(10L)).thenReturn(Optional.of(doc));
         when(documentRepository.save(any(Document.class))).thenAnswer(invocation -> invocation.getArgument(0));
         doThrow(new DocumentException(com.pw.docvault.exception.ErrorCode.DOCUMENT_DELETE_FAILED, "boom"))
                 .when(documentSyncExecutionService).deleteExternalResources(any(Document.class));
@@ -266,8 +263,7 @@ class DocumentServiceTest {
         doc.setId(10L);
         doc.setOwner(otherUser);
 
-        when(currentUser.get()).thenReturn(user);
-        when(documentRepository.findById(10L)).thenReturn(Optional.of(doc));
+        when(documentRepository.findWithOwnerById(10L)).thenReturn(Optional.of(doc));
 
         assertThrows(ForbiddenException.class, () -> documentService.delete(10L));
 
@@ -277,12 +273,44 @@ class DocumentServiceTest {
     }
 
     @Test
-    void downloadReturnsSignedUrl() {
+    void updateVisibilityPersistsChangeAndSchedulesMetadataSync() {
+        Document doc = new Document();
+        doc.setId(10L);
+        doc.setOwner(user);
+        doc.setVisibility(DocumentVisibility.PRIVATE);
+
+        when(documentRepository.findWithOwnerById(10L)).thenReturn(Optional.of(doc));
+
+        documentService.updateVisibility(10L, DocumentVisibility.PUBLIC);
+
+        assertThat(doc.getVisibility()).isEqualTo(DocumentVisibility.PUBLIC);
+        verify(documentRepository).save(doc);
+        verify(documentMetadataSyncService).schedule(10L);
+    }
+
+    @Test
+    void updateVisibilitySkipsSaveWhenValueUnchanged() {
+        Document doc = new Document();
+        doc.setId(10L);
+        doc.setOwner(user);
+        doc.setVisibility(DocumentVisibility.PRIVATE);
+
+        when(documentRepository.findWithOwnerById(10L)).thenReturn(Optional.of(doc));
+
+        documentService.updateVisibility(10L, DocumentVisibility.PRIVATE);
+
+        verify(documentRepository, never()).save(any(Document.class));
+        verify(documentMetadataSyncService, never()).schedule(anyLong());
+    }
+
+    @Test
+    void downloadReturnsSignedUrlForReadableDocument() {
         Document doc = new Document();
         doc.setId(10L);
         doc.setPath("path/to/download");
+        doc.setOwner(user);
 
-        when(documentRepository.findById(10L)).thenReturn(Optional.of(doc));
+        when(documentRepository.findWithOwnerById(10L)).thenReturn(Optional.of(doc));
         when(googleCloudStorageService.generateGetSignedUrl("path/to/download")).thenReturn("http://download-url");
 
         String url = documentService.download(10L);

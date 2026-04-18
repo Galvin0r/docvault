@@ -3,12 +3,13 @@ package com.pw.docvault.group;
 import com.pw.docvault.entity.User;
 import com.pw.docvault.entity.group.Group;
 import com.pw.docvault.entity.group.GroupMembership;
+import com.pw.docvault.exception.ErrorCode;
 import com.pw.docvault.exception.ForbiddenException;
 import com.pw.docvault.exception.NotFoundException;
 import com.pw.docvault.model.enums.GroupRole;
-import com.pw.docvault.repository.UserRepository;
 import com.pw.docvault.repository.group.GroupMembershipRepository;
 import com.pw.docvault.service.group.GroupMembershipService;
+import com.pw.docvault.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +31,7 @@ public class GroupMembershipServiceTest {
     private GroupMembershipRepository groupMembershipRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private UserService userService;
 
     @InjectMocks
     private GroupMembershipService groupMembershipService;
@@ -237,7 +238,7 @@ public class GroupMembershipServiceTest {
                 .thenReturn(Optional.of(membership(1L, actor, group, GroupRole.ADMIN)));
         when(groupMembershipService.findMembership(user.getId(), group.getId()))
                 .thenReturn(Optional.empty());
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userService.getUserOrThrow(user.getId())).thenReturn(user);
         when(groupMembershipRepository.save(any(GroupMembership.class)))
                 .thenReturn(newMembership);
 
@@ -262,7 +263,8 @@ public class GroupMembershipServiceTest {
                 .thenReturn(Optional.of(membership(1L, actor, group, GroupRole.OWNER)));
         when(groupMembershipService.findMembership(user.getId(), group.getId()))
                 .thenReturn(Optional.empty());
-        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+        when(userService.getUserOrThrow(user.getId()))
+                .thenThrow(new NotFoundException(ErrorCode.USER_NOT_FOUND, "User not found."));
 
         assertThatThrownBy(() -> groupMembershipService.addMember(actor.getId(), user.getId(), group))
                 .isInstanceOf(NotFoundException.class)
