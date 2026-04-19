@@ -326,7 +326,7 @@ class DocumentServiceTest {
         doc.setOwner(user);
 
         Page<Document> page = new PageImpl<>(List.of(doc));
-        when(documentRepository.findDocumentsWithAccess(eq(user.getId()), any(), any(), any(), any(), any()))
+        when(documentRepository.findDocumentsWithAccess(eq(user.getId()), any(), any(), any(), any(), any(), anyBoolean(), any()))
                 .thenReturn(page);
 
         DocumentDto baseDto = new DocumentDto(10L, "Title", "Desc", "file.txt", "text/plain", 
@@ -340,10 +340,11 @@ class DocumentServiceTest {
         when(documentIndexJobRepository.findFirstByDocumentIdAndStatusInOrderByCreatedDesc(eq(10L), any()))
                 .thenReturn(Optional.of(job));
 
-        Page<DocumentDto> result = documentService.listUserDocuments(null, null, null, null, PageRequest.of(0, 10));
+        Page<DocumentDto> result = documentService.listUserDocuments(null, null, null, null, 4L, true, PageRequest.of(0, 10));
 
         assertThat(result.getContent()).hasSize(1);
         DocumentDto enriched = result.getContent().get(0);
         assertThat(enriched.attempts()).isEqualTo((short) 5);
+        verify(documentRepository).findDocumentsWithAccess(user.getId(), null, null, null, null, 4L, true, PageRequest.of(0, 10));
     }
 }

@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -104,16 +105,20 @@ class DocumentControllerTest {
         
         var page = new PageImpl<>(List.of(dto), PageRequest.of(0, 10), 1);
         
-        when(documentService.listUserDocuments(any(), any(), any(), any(), any()))
+        when(documentService.listUserDocuments(any(), any(), any(), any(), any(), anyBoolean(), any()))
                 .thenReturn(page);
 
         mockMvc.perform(get("/documents")
                         .param("titleSearch", "test")
+                        .param("groupId", "7")
+                        .param("ownedOnly", "true")
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value(10))
                 .andExpect(jsonPath("$.totalElements").value(1));
+
+        verify(documentService).listUserDocuments("test", null, null, null, 7L, true, PageRequest.of(0, 10));
     }
 
     @Test

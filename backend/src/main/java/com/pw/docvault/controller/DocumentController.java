@@ -64,6 +64,8 @@ public class DocumentController {
             @RequestParam(required = false) String ownerName,
             @RequestParam(required = false) Instant dateFrom,
             @RequestParam(required = false) Instant dateTo,
+            @RequestParam(required = false) Long groupId,
+            @RequestParam(defaultValue = "false") boolean ownedOnly,
             Pageable pageable
     ) {
         Page<DocumentDto> documents = documentService.listUserDocuments(
@@ -71,6 +73,8 @@ public class DocumentController {
                 ownerName,
                 dateFrom,
                 dateTo,
+                groupId,
+                ownedOnly,
                 pageable
         );
         return ResponseEntity.ok(documents);

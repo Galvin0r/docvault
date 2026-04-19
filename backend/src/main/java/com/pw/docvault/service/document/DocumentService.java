@@ -184,10 +184,11 @@ public class DocumentService {
     }
 
     public Page<DocumentDto> listUserDocuments(String titleSearch, String ownerName, Instant dateFrom, Instant dateTo,
-                                               Pageable pageable) {
+                                               Long groupId, boolean ownedOnly, Pageable pageable) {
         var user = currentUser.get();
         Page<Document> documents = documentRepository.findDocumentsWithAccess(user.getId(), titleSearch, ownerName,
-                                                                              dateFrom, dateTo, pageable);
+                                                                              dateFrom, dateTo, groupId, ownedOnly,
+                                                                              pageable);
         return documents.map(doc -> {
             DocumentDto dto = documentMapper.toDto(doc);
             if (Objects.equals(doc.getOwner().getId(), user.getId())) {

@@ -43,6 +43,12 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
           AND (cast(:ownerName as text) IS NULL OR to_tsvector('english', u.login) @@ plainto_tsquery('english', cast(:ownerName as text)))
           AND (cast(:dateFrom as timestamp) IS NULL OR d.created >= cast(:dateFrom as timestamp))
           AND (cast(:dateTo as timestamp) IS NULL OR d.created <= cast(:dateTo as timestamp))
+          AND (cast(:groupId as bigint) IS NULL OR EXISTS (
+              SELECT 1 FROM document_access dag
+              WHERE dag.document_id = d.id
+                AND dag.group_id = cast(:groupId as bigint)
+          ))
+          AND (cast(:ownedOnly as boolean) IS FALSE OR d.owner_id = :userId)
         ORDER BY d.created DESC, d.id DESC
         """,
         countQuery = """
@@ -68,6 +74,12 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
           AND (cast(:ownerName as text) IS NULL OR to_tsvector('english', u.login) @@ plainto_tsquery('english', cast(:ownerName as text)))
           AND (cast(:dateFrom as timestamp) IS NULL OR d.created >= cast(:dateFrom as timestamp))
           AND (cast(:dateTo as timestamp) IS NULL OR d.created <= cast(:dateTo as timestamp))
+          AND (cast(:groupId as bigint) IS NULL OR EXISTS (
+              SELECT 1 FROM document_access dag
+              WHERE dag.document_id = d.id
+                AND dag.group_id = cast(:groupId as bigint)
+          ))
+          AND (cast(:ownedOnly as boolean) IS FALSE OR d.owner_id = :userId)
         """,
         nativeQuery = true)
     Page<Document> findDocumentsWithAccess(
@@ -76,6 +88,8 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
         @Param("ownerName") String ownerName,
         @Param("dateFrom") Instant dateFrom,
         @Param("dateTo") Instant dateTo,
+        @Param("groupId") Long groupId,
+        @Param("ownedOnly") boolean ownedOnly,
         Pageable pageable
     );
 }
