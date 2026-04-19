@@ -17,7 +17,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.channels.Channels;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,16 +60,21 @@ class GoogleCloudStorageServiceTest {
         String contentType = "text/plain";
         URL url = new URL("https://signed-url.com");
 
-        when(storage.signUrl(any(BlobInfo.class), anyLong(), any(TimeUnit.class), any(), any(), any()))
+        when(storage.signUrl(any(BlobInfo.class), anyLong(), any(TimeUnit.class), any(Storage.SignUrlOption[].class)))
                 .thenReturn(url);
 
         String result = gcsService.generatePutSignedUrl(objectName, contentType);
 
         assertThat(result).isEqualTo(url.toString());
-        verify(storage).signUrl(
-                argThat(info -> info.getBlobId().getName().equals(objectName) && info.getContentType().equals(contentType)),
-                eq(15L), eq(TimeUnit.MINUTES), any(), any(), any()
-        );
+        ArgumentCaptor<BlobInfo> blobInfoCaptor = ArgumentCaptor.forClass(BlobInfo.class);
+        ArgumentCaptor<Storage.SignUrlOption[]> optionsCaptor = ArgumentCaptor.forClass(Storage.SignUrlOption[].class);
+
+        verify(storage).signUrl(blobInfoCaptor.capture(), eq(15L), eq(TimeUnit.MINUTES), optionsCaptor.capture());
+
+        BlobInfo blobInfo = blobInfoCaptor.getValue();
+        assertThat(blobInfo.getBlobId().getName()).isEqualTo(objectName);
+        assertThat(blobInfo.getContentType()).isEqualTo(contentType);
+        assertThat(optionsCaptor.getValue()).hasSize(3);
     }
 
     @Test
@@ -76,16 +82,47 @@ class GoogleCloudStorageServiceTest {
         String objectName = "download.txt";
         URL url = new URL("https://get-url.com");
 
-        when(storage.signUrl(any(BlobInfo.class), anyLong(), any(TimeUnit.class), any(), any()))
+        when(storage.signUrl(any(BlobInfo.class), anyLong(), any(TimeUnit.class), any(Storage.SignUrlOption[].class)))
                 .thenReturn(url);
 
         String result = gcsService.generateGetSignedUrl(objectName);
 
         assertThat(result).isEqualTo(url.toString());
-        verify(storage).signUrl(
-                argThat(info -> info.getBlobId().getName().equals(objectName)),
-                eq(15L), eq(TimeUnit.MINUTES), any(), any()
-        );
+        ArgumentCaptor<BlobInfo> blobInfoCaptor = ArgumentCaptor.forClass(BlobInfo.class);
+        ArgumentCaptor<Storage.SignUrlOption[]> optionsCaptor = ArgumentCaptor.forClass(Storage.SignUrlOption[].class);
+
+        verify(storage).signUrl(blobInfoCaptor.capture(), eq(15L), eq(TimeUnit.MINUTES), optionsCaptor.capture());
+
+        assertThat(blobInfoCaptor.getValue().getBlobId().getName()).isEqualTo(objectName);
+        assertThat(optionsCaptor.getValue()).hasSize(2);
+        assertThat(extractQueryParams(optionsCaptor.getValue())).isNull();
+    }
+
+    @Test
+    void generateGetSignedUrlWithDownloadFilenameAddsContentDisposition() throws Exception {
+        String objectName = "user_1/uuid-object";
+        String downloadFilename = "report final.pdf";
+        URL url = new URL("https://get-url.com");
+
+        when(storage.signUrl(any(BlobInfo.class), anyLong(), any(TimeUnit.class), any(Storage.SignUrlOption[].class)))
+                .thenReturn(url);
+
+        String result = gcsService.generateGetSignedUrl(objectName, downloadFilename);
+
+        assertThat(result).isEqualTo(url.toString());
+
+        ArgumentCaptor<BlobInfo> blobInfoCaptor = ArgumentCaptor.forClass(BlobInfo.class);
+        ArgumentCaptor<Storage.SignUrlOption[]> optionsCaptor = ArgumentCaptor.forClass(Storage.SignUrlOption[].class);
+
+        verify(storage).signUrl(blobInfoCaptor.capture(), eq(15L), eq(TimeUnit.MINUTES), optionsCaptor.capture());
+
+        assertThat(blobInfoCaptor.getValue().getBlobId().getName()).isEqualTo(objectName);
+        Map<String, String> queryParams = extractQueryParams(optionsCaptor.getValue());
+        assertThat(queryParams).isNotNull();
+        assertThat(queryParams).containsKey("response-content-disposition");
+        assertThat(queryParams.get("response-content-disposition")).contains("attachment");
+        assertThat(queryParams.get("response-content-disposition")).contains("filename*=");
+        assertThat(queryParams.get("response-content-disposition")).contains("report%20final.pdf");
     }
 
     @Test
@@ -116,5 +153,15 @@ class GoogleCloudStorageServiceTest {
         when(storage.get(BlobId.of(BUCKET_NAME, objectName))).thenReturn(null);
 
         assertThrows(NotFoundException.class, () -> gcsService.download(objectName));
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, String> extractQueryParams(Storage.SignUrlOption[] options) {
+        return Arrays.stream(options)
+                .map(option -> ReflectionTestUtils.invokeMethod(option, "getValue"))
+                .filter(Map.class::isInstance)
+                .map(value -> (Map<String, String>) value)
+                .findFirst()
+                .orElse(null);
     }
 }

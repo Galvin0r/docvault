@@ -180,7 +180,7 @@ public class DocumentService {
         if (document.getPath() == null || document.getPath().isBlank()) {
             throw new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUND, "Document path is missing");
         }
-        return googleCloudStorageService.generateGetSignedUrl(document.getPath());
+        return googleCloudStorageService.generateGetSignedUrl(document.getPath(), document.getOriginalFilename());
     }
 
     public Page<DocumentDto> listUserDocuments(String titleSearch, String ownerName, Instant dateFrom, Instant dateTo,

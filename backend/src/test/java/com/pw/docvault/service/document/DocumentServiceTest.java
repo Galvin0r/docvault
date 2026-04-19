@@ -308,14 +308,17 @@ class DocumentServiceTest {
         Document doc = new Document();
         doc.setId(10L);
         doc.setPath("path/to/download");
+        doc.setOriginalFilename("report.pdf");
         doc.setOwner(user);
 
         when(documentRepository.findWithOwnerById(10L)).thenReturn(Optional.of(doc));
-        when(googleCloudStorageService.generateGetSignedUrl("path/to/download")).thenReturn("http://download-url");
+        when(googleCloudStorageService.generateGetSignedUrl("path/to/download", "report.pdf"))
+                .thenReturn("http://download-url");
 
         String url = documentService.download(10L);
 
         assertThat(url).isEqualTo("http://download-url");
+        verify(googleCloudStorageService).generateGetSignedUrl("path/to/download", "report.pdf");
     }
 
     @Test

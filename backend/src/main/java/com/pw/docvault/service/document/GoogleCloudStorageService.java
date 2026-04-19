@@ -5,11 +5,14 @@ import com.google.cloud.storage.*;
 import com.pw.docvault.exception.ErrorCode;
 import com.pw.docvault.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ContentDisposition;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.nio.channels.Channels;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
@@ -49,6 +52,39 @@ public class GoogleCloudStorageService {
                 Storage.SignUrlOption.httpMethod(HttpMethod.GET),
                 Storage.SignUrlOption.withV4Signature()
         ).toString();
+    }
+
+    public String generateGetSignedUrl(String objectName, String downloadFilename) {
+        BlobInfo blobInfo = BlobInfo.newBuilder(BlobId.of(bucketName, objectName)).build();
+        var contentDisposition = ContentDisposition.attachment()
+                .filename(resolveDownloadFilename(objectName, downloadFilename), StandardCharsets.UTF_8)
+                .build()
+                .toString();
+
+        return storage.signUrl(
+                blobInfo,
+                15, TimeUnit.MINUTES,
+                Storage.SignUrlOption.httpMethod(HttpMethod.GET),
+                Storage.SignUrlOption.withV4Signature(),
+                Storage.SignUrlOption.withQueryParams(Map.of(
+                        "response-content-disposition",
+                        contentDisposition
+                ))
+        ).toString();
+    }
+
+    private String resolveDownloadFilename(String objectName, String downloadFilename) {
+        if (downloadFilename != null && !downloadFilename.isBlank()) {
+            return downloadFilename;
+        }
+        int lastSlashIndex = objectName.lastIndexOf('/');
+        if (lastSlashIndex >= 0 && lastSlashIndex < objectName.length() - 1) {
+            return objectName.substring(lastSlashIndex + 1);
+        }
+        if (!objectName.isBlank()) {
+            return objectName;
+        }
+        return "download";
     }
 
     public void delete(String objectName) {
