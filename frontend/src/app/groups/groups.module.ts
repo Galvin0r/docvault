@@ -13,6 +13,8 @@ import { UserModule } from '../users/user.module';
 import { GroupAddUserComponent } from './group-add-user/group-add-user.component';
 import { GroupJoinRequestsComponent } from './group-join-requests/group-join-requests.component';
 import { GroupJoinRequestComponent } from './group-join-request/group-join-request.component';
+import { DocumentsModule } from '../documents/documents.module';
+import { GroupAddDocumentDialogComponent } from './group-add-document-dialog/group-add-document-dialog.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +26,7 @@ import { GroupJoinRequestComponent } from './group-join-request/group-join-reque
     GroupAddUserComponent,
     GroupJoinRequestsComponent,
     GroupJoinRequestComponent,
+    GroupAddDocumentDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -33,6 +36,7 @@ import { GroupJoinRequestComponent } from './group-join-request/group-join-reque
     FormsModule,
     ReactiveFormsModule,
     UserModule,
+    DocumentsModule,
   ],
 })
 export class GroupsModule {}

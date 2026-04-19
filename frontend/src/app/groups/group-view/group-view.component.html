@@ -67,8 +67,59 @@
 
     <p-divider></p-divider>
 
-    <app-user-list [groupId]="group().id" [searchForm]="dummyForm" [canManageRole]="isOwner()"
-      [canRemove]="isOwner() || isAdmin()" (userRoleChanged)="onRoleChange()" />
+    <p-tabs value="0">
+      <p-tablist>
+        <p-tab value="0">Users</p-tab>
+        <p-tab value="1">Documents</p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="0">
+          <app-user-list [groupId]="group().id" [searchForm]="membersForm" [canManageRole]="isOwner()"
+            [canRemove]="isOwner() || isAdmin()" (userRoleChanged)="onRoleChange()" />
+        </p-tabpanel>
+
+        <p-tabpanel value="1">
+          <div class="flex flex-col gap-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div class="text-sm text-surface-400">
+                Browse documents currently available to this group.
+              </div>
+
+              @if (membership()) {
+              <button pButton type="button" icon="pi pi-plus" class="p-button-sm" (click)="onAddDocument()">
+                Add Document
+              </button>
+              }
+            </div>
+
+            <form [formGroup]="documentForm" class="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4">
+              <p-floatlabel variant="on">
+                <input pInputText id="title" formControlName="titleSearch" class="w-full" />
+                <label for="title">Title</label>
+              </p-floatlabel>
+
+              <p-floatlabel variant="on">
+                <p-datepicker id="dateFrom" formControlName="dateFrom" showIcon="true" styleClass="w-full" />
+                <label for="dateFrom">Date From</label>
+              </p-floatlabel>
+
+              <p-floatlabel variant="on">
+                <p-datepicker id="dateTo" formControlName="dateTo" showIcon="true" styleClass="w-full" />
+                <label for="dateTo">Date To</label>
+              </p-floatlabel>
+
+              <button pButton type="button" icon="pi pi-filter-slash" class="p-button-outlined w-12"
+                pTooltip="Clear Filters" tooltipPosition="bottom" (click)="clearDocumentFilters()"></button>
+            </form>
+
+            <p-divider></p-divider>
+
+            <app-document-list [filtersForm]="documentForm" [currentUserLogin]="membership()?.userLogin ?? ''" />
+          </div>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
 
     @if ((isOwner() || isAdmin()) && group().visibility === 'REQUEST_ONLY') {
     <div class="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 z-20">

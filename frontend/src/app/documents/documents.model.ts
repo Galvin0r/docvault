@@ -19,6 +19,15 @@ export interface DocumentDto {
     nextAttemptAt?: string;
 }
 
+export interface DocumentAccessDto {
+    id: number;
+    documentId: number;
+    userId: number | null;
+    userLogin: string | null;
+    groupId: number | null;
+    groupName: string | null;
+}
+
 export interface UploadStatus {
     id: string;
     filename: string;

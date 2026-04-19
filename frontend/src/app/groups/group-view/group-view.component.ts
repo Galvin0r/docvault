@@ -20,6 +20,8 @@ import { GroupAddUserComponent } from '../group-add-user/group-add-user.componen
 import { GroupAddComponent } from '../group-add/group-add.component';
 import { isNotNil } from 'ramda';
 import { ConfirmationService } from 'primeng/api';
+import { DocumentListComponent } from '../../documents/document-list/document-list.component';
+import { GroupAddDocumentDialogComponent } from '../group-add-document-dialog/group-add-document-dialog.component';
 
 @Component({
   selector: 'app-group-edit',
@@ -34,7 +36,14 @@ export class GroupViewComponent implements AfterViewInit {
   router = inject(Router);
   confirmationSerice = inject(ConfirmationService);
 
-  dummyForm = this.formBuilder.group({});
+  membersForm = this.formBuilder.group({});
+  documentForm = this.formBuilder.group({
+    titleSearch: [''],
+    ownerName: [''],
+    dateFrom: [null as Date | null],
+    dateTo: [null as Date | null],
+    groupId: [null as number | null],
+  });
 
   group!: WritableSignal<Group>;
   membership = signal<GroupMembership | undefined>(undefined);
@@ -48,6 +57,7 @@ export class GroupViewComponent implements AfterViewInit {
   dialogService = inject(DialogService);
 
   list = viewChild(UserListComponent);
+  documentList = viewChild(DocumentListComponent);
 
   requestsOpen = signal(false);
 
@@ -55,6 +65,9 @@ export class GroupViewComponent implements AfterViewInit {
     activatedRoute.data.subscribe(({ group, membership, joinRequest }) => {
       if (group) {
         this.group = signal(group);
+        this.documentForm.patchValue({
+          groupId: group.id,
+        });
       }
       this.membership.set(membership);
       if (joinRequest !== undefined) {
@@ -86,6 +99,21 @@ export class GroupViewComponent implements AfterViewInit {
       this.groupService
         .addMember(this.group().id, data.email)
         .subscribe(() => this.list()?.refresh());
+    });
+  }
+
+  onAddDocument() {
+    this.ref = this.dialogService.open(GroupAddDocumentDialogComponent, {
+      header: 'Add documents to group',
+      width: '900px',
+      styleClass: 'group-dialog',
+      modal: true,
+      dismissableMask: true,
+      data: {
+        groupId: this.group().id,
+        groupName: this.group().name,
+        onDocumentLinked: () => this.documentList()?.refresh(),
+      },
     });
   }
 
@@ -188,5 +216,11 @@ export class GroupViewComponent implements AfterViewInit {
 
   toggleRequests() {
     this.requestsOpen.update((v) => !v);
+  }
+
+  clearDocumentFilters() {
+    this.documentForm.reset({
+      groupId: this.group().id,
+    });
   }
 }

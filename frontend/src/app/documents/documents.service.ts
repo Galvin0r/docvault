@@ -2,7 +2,7 @@ import { Injectable, signal, WritableSignal } from '@angular/core';
 import { HttpClient, HttpEventType, HttpHeaders, HttpParams, HttpRequest } from '@angular/common/http';
 import { Visibility } from '../groups/groups.model';
 import { Observable, catchError, map, of, switchMap } from 'rxjs';
-import { DocumentDto, UploadStatus } from './documents.model';
+import { DocumentAccessDto, DocumentDto, UploadStatus } from './documents.model';
 import { MessageService } from 'primeng/api';
 import { Page } from '../app.model';
 
@@ -104,6 +104,18 @@ export class DocumentService {
 
     download(documentId: number): Observable<string> {
         return this.http.get(`/api/documents/download/${documentId}`, { responseType: 'text' });
+    }
+
+    listAccess(documentId: number): Observable<DocumentAccessDto[]> {
+        return this.http.get<DocumentAccessDto[]>(`/api/documents/${documentId}/access`);
+    }
+
+    grantGroupAccess(documentId: number, groupId: number): Observable<void> {
+        return this.http.put<void>(`/api/documents/${documentId}/access/groups/${groupId}`, null);
+    }
+
+    revokeGroupAccess(documentId: number, groupId: number): Observable<void> {
+        return this.http.delete<void>(`/api/documents/${documentId}/access/groups/${groupId}`);
     }
 
     private addUpload(upload: UploadStatus) {

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, NO_ERRORS_SCHEMA } from '@angular/core';
+import { Component, EventEmitter, forwardRef, Input, Output, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, fakeAsync, flush } from '@angular/core/testing';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, Subject } from 'rxjs';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -25,6 +25,25 @@ class UserListStub {
 class GroupJoinRequestsStub {
   @Input() groupId!: number;
   @Output() changed = new EventEmitter<void>();
+}
+
+@Component({
+  selector: 'p-datepicker',
+  standalone: false,
+  template: '',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => DatePickerStubComponent),
+      multi: true,
+    },
+  ],
+})
+class DatePickerStubComponent implements ControlValueAccessor {
+  writeValue(): void {}
+  registerOnChange(): void {}
+  registerOnTouched(): void {}
+  setDisabledState(): void {}
 }
 
 class RouterStub {
@@ -80,7 +99,11 @@ class FakeRef {
 
 class DialogServiceStub {
   last?: FakeRef;
-  open(): DynamicDialogRef {
+  lastComponent?: unknown;
+  lastConfig?: unknown;
+  open(component?: unknown, config?: unknown): DynamicDialogRef {
+    this.lastComponent = component;
+    this.lastConfig = config;
     this.last = new FakeRef();
     return this.last as unknown as DynamicDialogRef;
   }
@@ -123,7 +146,7 @@ describe('GroupViewComponent (real template)', () => {
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       imports: [CommonModule, ReactiveFormsModule, UserListStub, GroupJoinRequestsStub],
-      declarations: [GroupViewComponent],
+      declarations: [GroupViewComponent, DatePickerStubComponent],
       providers: [
         FormBuilder,
         { provide: Router, useValue: router },
@@ -165,6 +188,23 @@ describe('GroupViewComponent (real template)', () => {
     dialog.last!.close({ email: 'user@x.y' });
     expect(svc.addMember).toHaveBeenCalledWith(1, 'user@x.y');
     expect(child.refresh).toHaveBeenCalled();
+  });
+
+  it('onAddDocument opens dialog with a refresh callback for the document list', () => {
+    create({ membership: { role: 'USER', userLogin: 'roman' } });
+    const documentList = { refresh: jasmine.createSpy('refresh') };
+    spyOn(component as any, 'documentList').and.returnValue(documentList);
+
+    component.onAddDocument();
+
+    expect(dialog.last).toBeTruthy();
+    const config = dialog.lastConfig as any;
+    expect(config.data.groupId).toBe(1);
+    expect(config.data.groupName).toBe('Test Group');
+
+    config.data.onDocumentLinked();
+
+    expect(documentList.refresh).toHaveBeenCalled();
   });
 
   it('onRequestChanged reloads group and refreshes list', () => {
@@ -215,7 +255,7 @@ describe('GroupViewComponent (real template)', () => {
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       imports: [CommonModule, ReactiveFormsModule, UserListStub, GroupJoinRequestsStub],
-      declarations: [GroupViewComponent],
+      declarations: [GroupViewComponent, DatePickerStubComponent],
       providers: [
         FormBuilder,
         { provide: Router, useValue: router },

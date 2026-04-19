@@ -1,0 +1,96 @@
+<div class="p-4 flex flex-col gap-4">
+  <div class="rounded-xl border border-primary-500/20 bg-primary-500/8 px-4 py-3 text-sm text-surface-300">
+    Choose from your uploaded documents.
+  </div>
+
+  <form [formGroup]="form" class="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4">
+    <p-floatlabel variant="on">
+      <input pInputText id="titleSearch" formControlName="titleSearch" class="w-full" />
+      <label for="titleSearch">Title</label>
+    </p-floatlabel>
+
+    <p-floatlabel variant="on">
+      <p-datepicker id="dateFrom" formControlName="dateFrom" showIcon="true" styleClass="w-full" />
+      <label for="dateFrom">Date From</label>
+    </p-floatlabel>
+
+    <p-floatlabel variant="on">
+      <p-datepicker id="dateTo" formControlName="dateTo" showIcon="true" styleClass="w-full" />
+      <label for="dateTo">Date To</label>
+    </p-floatlabel>
+
+    <button
+      pButton
+      type="button"
+      icon="pi pi-filter-slash"
+      class="p-button-outlined w-12"
+      pTooltip="Clear Filters"
+      tooltipPosition="bottom"
+      (click)="clearFilters()"></button>
+  </form>
+
+  <div class="flex flex-col gap-2">
+    @for (document of searchStore.items().content; track document.id) {
+    <p-card
+      class="w-full !rounded-xl border border-surface-700/40 hover:bg-surface-800/30 transition-colors">
+      <div class="flex flex-col gap-3 md:flex-row md:items-center">
+        <div class="min-w-0 flex-1">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="font-medium truncate">{{ document.title }}</span>
+            <span class="px-2 py-0.5 text-xs rounded-full border border-surface-600/60 text-foreground/80">
+              {{ document.size | fileSize }}
+            </span>
+            @if (isAlreadyAdded(document.id)) {
+            <span class="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-300">
+              <i class="pi pi-check-circle"></i>
+              Already added
+            </span>
+            } @else if (isChecking(document.id)) {
+            <span class="inline-flex items-center gap-1 rounded-full bg-surface-700 px-2 py-0.5 text-xs font-medium text-surface-300">
+              <i class="pi pi-spin pi-spinner"></i>
+              Checking
+            </span>
+            }
+          </div>
+
+          <div class="mt-1 flex flex-wrap items-center gap-3 text-xs text-surface-400">
+            <span class="font-medium">{{ document.originalFilename }}</span>
+            <span class="flex items-center gap-1">
+              <i class="pi pi-calendar"></i>
+              {{ document.uploadedAt | date:'short' }}
+            </span>
+          </div>
+        </div>
+
+        <button
+          pButton
+          type="button"
+          class="p-button-sm md:min-w-28"
+          [label]="isAlreadyAdded(document.id) ? 'Added' : (isChecking(document.id) ? 'Checking' : 'Add')"
+          [icon]="isAlreadyAdded(document.id) ? 'pi pi-check' : 'pi pi-plus'"
+          [severity]="isAlreadyAdded(document.id) ? 'success' : 'primary'"
+          [outlined]="isAlreadyAdded(document.id)"
+          [loading]="isAdding(document.id)"
+          [disabled]="isAlreadyAdded(document.id) || isChecking(document.id) || isAdding(document.id)"
+          (click)="addDocument(document)"></button>
+      </div>
+    </p-card>
+    } @empty {
+    <div class="rounded-xl border border-dashed border-surface-700 px-4 py-8 text-center text-surface-400">
+      No documents matched the current filters.
+    </div>
+    }
+  </div>
+
+  <app-paginator
+    [total]="searchStore.items().totalElements"
+    [sizeOptions]="limitOptions"
+    [page]="page()"
+    [size]="size()"
+    (pageChange)="onPageChange($event)"
+    (sizeChange)="onSizeChange($event)" />
+
+  <div class="flex justify-end">
+    <button pButton type="button" severity="secondary" outlined="true" (click)="close()">Close</button>
+  </div>
+</div>
