@@ -16,7 +16,7 @@ export class DocumentService {
     readonly uploads = this.uploadsSignal.asReadonly();
 
     find(params: Record<string, any>): Observable<Page<DocumentDto>> {
-        return this.http.get<Page<DocumentDto>>('/api/documents', { params });
+        return this.http.get<Page<DocumentDto>>('/api/document', { params });
     }
 
     createDraft(title: string, description: string | null, visibility: Visibility): Observable<number> {
@@ -24,7 +24,7 @@ export class DocumentService {
             .set('title', title)
             .set('visibility', visibility)
             .set('description', description || '');
-        return this.http.post<number>('api/documents/draft', null, { params });
+        return this.http.post<number>('/api/document/draft', null, { params });
     }
 
     uploadFile(documentId: number, file: File) {
@@ -79,11 +79,11 @@ export class DocumentService {
 
     signUpload(documentId: number, contentType: string, originalFilename: string): Observable<string> {
         const params = new HttpParams().set('contentType', contentType).set('originalFilename', originalFilename);
-        return this.http.post(`api/documents/${documentId}/sign-upload`, null, { params, responseType: 'text' });
+        return this.http.post(`/api/document/${documentId}/sign-upload`, null, { params, responseType: 'text' });
     }
 
     completeUpload(documentId: number): Observable<void> {
-        return this.http.post<void>(`api/documents/${documentId}/complete-upload`, {});
+        return this.http.post<void>(`/api/document/${documentId}/complete-upload`, {});
     }
 
     cancelUpload(uploadId: string) {
@@ -99,23 +99,23 @@ export class DocumentService {
     }
 
     delete(documentId: number): Observable<void> {
-        return this.http.delete<void>(`/api/documents/delete/${documentId}`);
+        return this.http.delete<void>(`/api/document/delete/${documentId}`);
     }
 
     download(documentId: number): Observable<string> {
-        return this.http.get(`/api/documents/download/${documentId}`, { responseType: 'text' });
+        return this.http.get(`/api/document/download/${documentId}`, { responseType: 'text' });
     }
 
     listAccess(documentId: number): Observable<DocumentAccessDto[]> {
-        return this.http.get<DocumentAccessDto[]>(`/api/documents/${documentId}/access`);
+        return this.http.get<DocumentAccessDto[]>(`/api/document/${documentId}/access`);
     }
 
     grantGroupAccess(documentId: number, groupId: number): Observable<void> {
-        return this.http.put<void>(`/api/documents/${documentId}/access/groups/${groupId}`, null);
+        return this.http.put<void>(`/api/document/${documentId}/access/groups/${groupId}`, null);
     }
 
     revokeGroupAccess(documentId: number, groupId: number): Observable<void> {
-        return this.http.delete<void>(`/api/documents/${documentId}/access/groups/${groupId}`);
+        return this.http.delete<void>(`/api/document/${documentId}/access/groups/${groupId}`);
     }
 
     private addUpload(upload: UploadStatus) {

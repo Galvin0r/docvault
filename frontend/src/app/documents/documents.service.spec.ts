@@ -24,7 +24,7 @@ describe('DocumentService', () => {
 
   afterEach(() => http.verify());
 
-  it('find should GET /api/documents with params passthrough', () => {
+  it('find should GET /api/document with params passthrough', () => {
     const response = { content: [], totalElements: 0, size: 10, number: 0 };
 
     service.find({ groupId: 4, ownedOnly: true, page: 1, size: 10 }).subscribe((value) => {
@@ -33,7 +33,7 @@ describe('DocumentService', () => {
 
     const req = http.expectOne(
       (request) =>
-        request.url === '/api/documents' &&
+        request.url === '/api/document' &&
         request.params.get('groupId') === '4' &&
         request.params.get('ownedOnly') === 'true' &&
         request.params.get('page') === '1' &&
@@ -52,7 +52,7 @@ describe('DocumentService', () => {
       expect(value).toEqual(response);
     });
 
-    const req = http.expectOne('/api/documents/9/access');
+    const req = http.expectOne('/api/document/9/access');
     expect(req.request.method).toBe('GET');
     req.flush(response);
   });
@@ -62,7 +62,7 @@ describe('DocumentService', () => {
       expect(value).toBeNull();
     });
 
-    const req = http.expectOne('/api/documents/9/access/groups/4');
+    const req = http.expectOne('/api/document/9/access/groups/4');
     expect(req.request.method).toBe('PUT');
     expect(req.request.body).toBeNull();
     req.flush(null);
@@ -73,7 +73,7 @@ describe('DocumentService', () => {
       expect(value).toBeNull();
     });
 
-    const req = http.expectOne('/api/documents/9/access/groups/4');
+    const req = http.expectOne('/api/document/9/access/groups/4');
     expect(req.request.method).toBe('DELETE');
     req.flush(null);
   });

@@ -50,7 +50,6 @@ class DocumentIndexerServiceTest {
     void indexDocumentStreamsFragmentsInBatchesAndEnrichesMetadata() {
         Document document = indexingDocument();
         when(documentRepository.findWithOwnerById(11L)).thenReturn(java.util.Optional.of(document));
-        when(documentRepository.save(any(Document.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(documentAccessRepository.findUserIdsByDocumentId(11L)).thenReturn(List.of(7L, 8L));
         when(documentAccessRepository.findGroupIdsByDocumentId(11L)).thenReturn(List.of(17L));
         when(googleCloudStorageService.generateGetSignedUrl("bucket/object")).thenReturn("https://signed");
@@ -86,6 +85,7 @@ class DocumentIndexerServiceTest {
         assertThat(firstFragment.getFragmentOrder()).isZero();
         assertThat(firstFragment.getTitle()).isEqualTo("Indexed Document");
         assertThat(firstFragment.getOwnerId()).isEqualTo(3L);
+        assertThat(firstFragment.getOwnerLogin()).isEqualTo("alice");
         assertThat(firstFragment.getCreatedAt()).isEqualTo(document.getCreated());
         assertThat(firstFragment.getVisibility()).isEqualTo(DocumentVisibility.PRIVATE);
         assertThat(firstFragment.getPermittedUserIds()).containsExactly(7L, 8L);
@@ -111,6 +111,7 @@ class DocumentIndexerServiceTest {
     private Document indexingDocument() {
         User owner = new User();
         owner.setId(3L);
+        owner.setLogin("alice");
 
         Document document = new Document();
         document.setId(11L);

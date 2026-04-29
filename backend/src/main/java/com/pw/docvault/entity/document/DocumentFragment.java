@@ -33,6 +33,9 @@ public class DocumentFragment {
     @Field(type = FieldType.Long)
     private Long ownerId;
 
+    @Field(type = FieldType.Text)
+    private String ownerLogin;
+
     @Field(type = FieldType.Date, format = DateFormat.date_time)
     private Instant createdAt;
 

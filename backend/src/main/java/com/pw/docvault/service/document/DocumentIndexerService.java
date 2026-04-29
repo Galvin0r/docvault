@@ -87,6 +87,7 @@ public class DocumentIndexerService {
         fragment.setFragmentOrder(fragment.getFragmentOrder() != null ? fragment.getFragmentOrder() : fallbackFragmentOrder);
         fragment.setTitle(document.getTitle());
         fragment.setOwnerId(document.getOwner().getId());
+        fragment.setOwnerLogin(document.getOwner().getLogin());
         fragment.setCreatedAt(document.getCreated());
         fragment.setVisibility(document.getVisibility());
         fragment.setPermittedUserIds(List.copyOf(permittedUserIds));

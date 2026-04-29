@@ -2,8 +2,12 @@ package com.pw.docvault.controller;
 
 import com.pw.docvault.model.document.DocumentAccessDto;
 import com.pw.docvault.model.document.DocumentDto;
+import com.pw.docvault.model.document.DocumentSearchResultDto;
+import com.pw.docvault.model.enums.DocumentSearchMode;
+import com.pw.docvault.model.enums.DocumentSearchScope;
 import com.pw.docvault.model.enums.DocumentVisibility;
 import com.pw.docvault.service.document.DocumentAccessService;
+import com.pw.docvault.service.document.DocumentSearchService;
 import com.pw.docvault.service.document.DocumentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,11 +21,12 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("documents")
+@RequestMapping("document")
 public class DocumentController {
 
     private final DocumentService documentService;
     private final DocumentAccessService documentAccessService;
+    private final DocumentSearchService documentSearchService;
 
     @PostMapping("draft")
     public ResponseEntity<Long> uploadDraft(@RequestParam("title") String title,
@@ -59,25 +64,31 @@ public class DocumentController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<DocumentDto>> listDocuments(
-            @RequestParam(required = false) String titleSearch,
-            @RequestParam(required = false) String ownerName,
-            @RequestParam(required = false) Instant dateFrom,
-            @RequestParam(required = false) Instant dateTo,
-            @RequestParam(required = false) Long groupId,
-            @RequestParam(defaultValue = "false") boolean ownedOnly,
-            Pageable pageable
-    ) {
-        Page<DocumentDto> documents = documentService.listUserDocuments(
-                titleSearch,
-                ownerName,
-                dateFrom,
-                dateTo,
-                groupId,
-                ownedOnly,
-                pageable
-        );
+    public ResponseEntity<Page<DocumentDto>> listDocuments(@RequestParam(required = false) String titleSearch,
+                                                           @RequestParam(required = false) String ownerName,
+                                                           @RequestParam(required = false) Instant dateFrom,
+                                                           @RequestParam(required = false) Instant dateTo,
+                                                           @RequestParam(required = false) Long groupId,
+                                                           @RequestParam(defaultValue = "false") boolean ownedOnly,
+                                                           Pageable pageable) {
+        Page<DocumentDto> documents = documentService.listUserDocuments(titleSearch, ownerName, dateFrom, dateTo,
+                groupId, ownedOnly, pageable);
         return ResponseEntity.ok(documents);
+    }
+
+    @GetMapping("search")
+    public ResponseEntity<Page<DocumentSearchResultDto>> search(@RequestParam(defaultValue = "KEYWORD") DocumentSearchMode mode,
+                                                                @RequestParam(required = false) String content,
+                                                                @RequestParam(required = false) String title,
+                                                                @RequestParam(required = false) String author,
+                                                                @RequestParam(required = false) Instant uploadedFrom,
+                                                                @RequestParam(required = false) Instant uploadedTo,
+                                                                @RequestParam(defaultValue = "ACCESSIBLE") DocumentSearchScope scope,
+                                                                Pageable pageable
+    ) {
+        return ResponseEntity.ok(documentSearchService.search(mode, content, title, author,
+                uploadedFrom, uploadedTo, scope, pageable
+        ));
     }
 
     @GetMapping("/{id}/access")

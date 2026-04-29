@@ -2,9 +2,13 @@ package com.pw.docvault.controller;
 
 import com.pw.docvault.model.document.DocumentAccessDto;
 import com.pw.docvault.model.document.DocumentDto;
+import com.pw.docvault.model.document.DocumentSearchResultDto;
+import com.pw.docvault.model.enums.DocumentSearchMode;
+import com.pw.docvault.model.enums.DocumentSearchScope;
 import com.pw.docvault.model.enums.DocumentStatus;
 import com.pw.docvault.model.enums.DocumentVisibility;
 import com.pw.docvault.service.document.DocumentAccessService;
+import com.pw.docvault.service.document.DocumentSearchService;
 import com.pw.docvault.service.document.DocumentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,11 +41,14 @@ class DocumentControllerTest {
     @Mock 
     private DocumentAccessService documentAccessService;
 
+    @Mock
+    private DocumentSearchService documentSearchService;
+
     private MockMvc mockMvc;
 
     @BeforeEach
     void setup() {
-        DocumentController controller = new DocumentController(documentService, documentAccessService);
+        DocumentController controller = new DocumentController(documentService, documentAccessService, documentSearchService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .build();
@@ -52,7 +59,7 @@ class DocumentControllerTest {
         when(documentService.createDocumentDraft(eq("My File"), eq("Desc"), eq(DocumentVisibility.PUBLIC)))
                 .thenReturn(10L);
 
-        mockMvc.perform(post("/documents/draft")
+        mockMvc.perform(post("/document/draft")
                         .param("title", "My File")
                         .param("description", "Desc")
                         .param("visibility", "PUBLIC"))
@@ -65,7 +72,7 @@ class DocumentControllerTest {
         when(documentService.initiateUpload(eq(10L), eq("image/png"), eq("pic.png")))
                 .thenReturn("http://signed-url");
 
-        mockMvc.perform(post("/documents/10/sign-upload")
+        mockMvc.perform(post("/document/10/sign-upload")
                         .param("contentType", "image/png")
                         .param("originalFilename", "pic.png"))
                 .andExpect(status().isOk())
@@ -74,7 +81,7 @@ class DocumentControllerTest {
 
     @Test
     void completeUploadReturnsCreated() throws Exception {
-        mockMvc.perform(post("/documents/10/complete-upload"))
+        mockMvc.perform(post("/document/10/complete-upload"))
                 .andExpect(status().isCreated());
 
         verify(documentService).completeUpload(10L);
@@ -82,7 +89,7 @@ class DocumentControllerTest {
 
     @Test
     void updateVisibilityReturnsNoContent() throws Exception {
-        mockMvc.perform(patch("/documents/10/visibility")
+        mockMvc.perform(patch("/document/10/visibility")
                         .param("visibility", "PUBLIC"))
                 .andExpect(status().isNoContent());
 
@@ -93,7 +100,7 @@ class DocumentControllerTest {
     void downloadReturnsSignedUrl() throws Exception {
         when(documentService.download(10L)).thenReturn("http://download-url");
 
-        mockMvc.perform(get("/documents/download/10"))
+        mockMvc.perform(get("/document/download/10"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("http://download-url"));
     }
@@ -108,7 +115,7 @@ class DocumentControllerTest {
         when(documentService.listUserDocuments(any(), any(), any(), any(), any(), anyBoolean(), any()))
                 .thenReturn(page);
 
-        mockMvc.perform(get("/documents")
+        mockMvc.perform(get("/document")
                         .param("titleSearch", "test")
                         .param("groupId", "7")
                         .param("ownedOnly", "true")
@@ -122,11 +129,50 @@ class DocumentControllerTest {
     }
 
     @Test
+    void searchReturnsPage() throws Exception {
+        var uploadedAt = Instant.parse("2026-04-11T10:15:30Z");
+        var dto = new DocumentSearchResultDto(
+                10L, 2, "T", "<mark>T</mark>", "snippet", "<mark>snippet</mark>",
+                uploadedAt, 1L, "alice", DocumentVisibility.PUBLIC, 2.5f
+        );
+        var page = new PageImpl<>(List.of(dto), PageRequest.of(0, 10), 1);
+
+        when(documentSearchService.search(any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(page);
+
+        mockMvc.perform(get("/document/search")
+                        .param("mode", "KEYWORD")
+                        .param("content", "invoice")
+                        .param("title", "tax")
+                        .param("author", "alice")
+                        .param("uploadedFrom", "2026-04-01T00:00:00Z")
+                        .param("uploadedTo", "2026-04-30T23:59:59Z")
+                        .param("scope", "PUBLIC")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].documentId").value(10))
+                .andExpect(jsonPath("$.content[0].highlightedContentSnippet").value("<mark>snippet</mark>"))
+                .andExpect(jsonPath("$.totalElements").value(1));
+
+        verify(documentSearchService).search(
+                eq(DocumentSearchMode.KEYWORD),
+                eq("invoice"),
+                eq("tax"),
+                eq("alice"),
+                eq(Instant.parse("2026-04-01T00:00:00Z")),
+                eq(Instant.parse("2026-04-30T23:59:59Z")),
+                eq(DocumentSearchScope.PUBLIC),
+                eq(PageRequest.of(0, 10))
+        );
+    }
+
+    @Test
     void listAccessReturnsEntries() throws Exception {
         var access = new DocumentAccessDto(1L, 10L, 2L, "alice", null, null);
         when(documentAccessService.listAccess(10L)).thenReturn(List.of(access));
 
-        mockMvc.perform(get("/documents/10/access"))
+        mockMvc.perform(get("/document/10/access"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].documentId").value(10))
                 .andExpect(jsonPath("$[0].userLogin").value("alice"));
@@ -134,7 +180,7 @@ class DocumentControllerTest {
 
     @Test
     void grantUserAccessReturnsNoContent() throws Exception {
-        mockMvc.perform(put("/documents/10/access/users/2"))
+        mockMvc.perform(put("/document/10/access/users/2"))
                 .andExpect(status().isNoContent());
 
         verify(documentAccessService).grantUserAccess(10L, 2L);
@@ -142,7 +188,7 @@ class DocumentControllerTest {
 
     @Test
     void revokeUserAccessReturnsNoContent() throws Exception {
-        mockMvc.perform(delete("/documents/10/access/users/2"))
+        mockMvc.perform(delete("/document/10/access/users/2"))
                 .andExpect(status().isNoContent());
 
         verify(documentAccessService).revokeUserAccess(10L, 2L);
@@ -150,7 +196,7 @@ class DocumentControllerTest {
 
     @Test
     void grantGroupAccessReturnsNoContent() throws Exception {
-        mockMvc.perform(put("/documents/10/access/groups/4"))
+        mockMvc.perform(put("/document/10/access/groups/4"))
                 .andExpect(status().isNoContent());
 
         verify(documentAccessService).grantGroupAccess(10L, 4L);
@@ -158,7 +204,7 @@ class DocumentControllerTest {
 
     @Test
     void revokeGroupAccessReturnsNoContent() throws Exception {
-        mockMvc.perform(delete("/documents/10/access/groups/4"))
+        mockMvc.perform(delete("/document/10/access/groups/4"))
                 .andExpect(status().isNoContent());
 
         verify(documentAccessService).revokeGroupAccess(10L, 4L);
@@ -166,7 +212,7 @@ class DocumentControllerTest {
 
     @Test
     void deleteReturnsNoContent() throws Exception {
-        mockMvc.perform(delete("/documents/delete/10"))
+        mockMvc.perform(delete("/document/delete/10"))
                 .andExpect(status().isNoContent());
 
         verify(documentService).delete(10L);

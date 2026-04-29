@@ -22,6 +22,7 @@ public class DocumentFragmentIndexService {
     private static final String METADATA_SYNC_SCRIPT = """
             ctx._source.title = params.title;
             ctx._source.ownerId = params.ownerId;
+            ctx._source.ownerLogin = params.ownerLogin;
             ctx._source.createdAt = params.createdAt;
             ctx._source.visibility = params.visibility;
             ctx._source.permittedUserIds = params.permittedUserIds;
@@ -49,6 +50,7 @@ public class DocumentFragmentIndexService {
         var params = new LinkedHashMap<String, Object>();
         params.put("title", document.getTitle());
         params.put("ownerId", document.getOwner().getId());
+        params.put("ownerLogin", document.getOwner().getLogin());
         params.put("createdAt", document.getCreated().toString());
         params.put("visibility", document.getVisibility().name());
         params.put("permittedUserIds", List.copyOf(permittedUserIds));
