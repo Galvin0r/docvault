@@ -14,6 +14,7 @@ import java.util.List;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -261,14 +262,46 @@ class DocumentSearchIT extends AbstractDocumentIT {
     }
 
     @Test
-    void vectorSearchModeIsReservedForLaterImplementation() throws Exception {
+    void vectorSearchRanksByEmbeddingSimilarityAndHonorsFiltersAndAcl() throws Exception {
         var alice = documents.createUser("alice");
+        var bob = documents.createUser("bob");
+
+        var matching = documents.createDocument(bob, "Security Controls Manual",
+                DocumentVisibility.PUBLIC, DocumentStatus.INDEXED, Instant.parse("2026-04-01T10:00:00Z"));
+        var weakerMatch = documents.createDocument(bob, "Security Controls Reference",
+                DocumentVisibility.PUBLIC, DocumentStatus.INDEXED, Instant.parse("2026-04-02T10:00:00Z"));
+        var hidden = documents.createDocument(bob, "Security Controls Private",
+                DocumentVisibility.PRIVATE, DocumentStatus.INDEXED, Instant.parse("2026-04-03T10:00:00Z"));
+        var wrongTitle = documents.createDocument(bob, "Kitchen Controls Manual",
+                DocumentVisibility.PUBLIC, DocumentStatus.INDEXED, Instant.parse("2026-04-04T10:00:00Z"));
+
+        when(documentProcessingClient.embedText("semantic controls")).thenReturn(unitVector(0));
+
+        documents.indexFragment(matching, 0, "encryption key rotation and incident containment",
+                List.of(), List.of(), unitVector(0));
+        documents.indexFragment(weakerMatch, 0, "security policy summary",
+                List.of(), List.of(), mixedVector(0, 1));
+        documents.indexFragment(hidden, 0, "private security controls",
+                List.of(), List.of(), unitVector(0));
+        documents.indexFragment(wrongTitle, 0, "security controls with unrelated title",
+                List.of(), List.of(), unitVector(0));
+        documents.refreshIndex();
 
         documents.mockMvc().perform(get("/document/search")
                         .with(user(alice))
                         .param("mode", "VECTOR")
-                        .param("content", "anything"))
-                .andExpect(status().isBadRequest());
+                        .param("content", "semantic controls")
+                        .param("title", "Security")
+                        .param("author", "BOB")
+                        .param("uploadedFrom", "2026-04-01T00:00:00Z")
+                        .param("uploadedTo", "2026-04-30T23:59:59Z")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(2))
+                .andExpect(jsonPath("$.content[0].documentId").value(matching.getId()))
+                .andExpect(jsonPath("$.content[1].documentId").value(weakerMatch.getId()))
+                .andExpect(jsonPath("$.content[*].documentId", not(org.hamcrest.Matchers.hasItem(hidden.getId().intValue()))))
+                .andExpect(jsonPath("$.content[*].documentId", not(org.hamcrest.Matchers.hasItem(wrongTitle.getId().intValue()))));
     }
 
     private void assertSearchTotal(User user, String content, String scope, int total) {
@@ -278,5 +311,18 @@ class DocumentSearchIT extends AbstractDocumentIT {
                         .param("scope", scope))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(total)));
+    }
+
+    private float[] unitVector(int dimension) {
+        float[] vector = new float[384];
+        vector[dimension] = 1.0f;
+        return vector;
+    }
+
+    private float[] mixedVector(int firstDimension, int secondDimension) {
+        float[] vector = new float[384];
+        vector[firstDimension] = 0.7f;
+        vector[secondDimension] = 0.7f;
+        return vector;
     }
 }

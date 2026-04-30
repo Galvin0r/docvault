@@ -7,8 +7,9 @@ from fastapi.responses import StreamingResponse
 import requests
 
 from .config import get_settings
+from .embedding import embed_texts
 from .extraction import EmptyDocumentError, UnsupportedMimeTypeError
-from .schemas import HealthResponse, ProcessRequest
+from .schemas import EmbedRequest, EmbedResponse, HealthResponse, ProcessRequest
 from .service import stream_processed_fragments_from_document
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s - %(message)s")
@@ -56,3 +57,8 @@ def process_document(request: ProcessRequest) -> StreamingResponse:
         chain([first_fragment], fragment_stream),
         media_type="application/x-ndjson",
     )
+
+
+@app.post("/embed", response_model=EmbedResponse)
+def embed_query(request: EmbedRequest) -> EmbedResponse:
+    return EmbedResponse(embedding=embed_texts([request.text])[0])

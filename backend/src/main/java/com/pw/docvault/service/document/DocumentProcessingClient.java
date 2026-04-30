@@ -7,4 +7,6 @@ import java.util.function.Consumer;
 public interface DocumentProcessingClient {
 
     void processFromSignedUrl(String signedUrl, String mimeType, Consumer<DocumentFragment> fragmentConsumer);
+
+    float[] embedText(String text);
 }

@@ -30,7 +30,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -48,6 +47,9 @@ class DocumentSearchServiceTest {
 
     @Mock
     private SearchHits<DocumentFragment> searchHits;
+
+    @Mock
+    private DocumentProcessingClient documentProcessingClient;
 
     @InjectMocks
     private DocumentSearchService documentSearchService;
@@ -130,10 +132,36 @@ class DocumentSearchServiceTest {
     }
 
     @Test
-    void vectorSearchIsExplicitlyReserved() {
-        assertThrows(BadRequestException.class, () -> documentSearchService.search(
+    void vectorSearchBuildsScriptScoreQueryFromProcessorEmbedding() {
+        when(currentUserProvider.getOptional()).thenReturn(Optional.empty());
+        when(documentProcessingClient.embedText("policy")).thenReturn(unitVector(0));
+        when(elasticsearchOperations.search(org.mockito.ArgumentMatchers.any(NativeQuery.class), eq(DocumentFragment.class)))
+                .thenReturn(searchHits);
+        when(searchHits.getSearchHits()).thenReturn(List.of());
+        when(searchHits.getTotalHits()).thenReturn(0L);
+
+        documentSearchService.search(
                 DocumentSearchMode.VECTOR,
                 "policy",
+                "Policy",
+                null,
+                null,
+                null,
+                DocumentSearchScope.ACCESSIBLE,
+                PageRequest.of(0, 10)
+        );
+
+        ArgumentCaptor<NativeQuery> captor = ArgumentCaptor.forClass(NativeQuery.class);
+        verify(elasticsearchOperations).search(captor.capture(), eq(DocumentFragment.class));
+        assertThat(captor.getValue().getQuery().toString())
+                .contains("script_score", "cosineSimilarity", "query_vector", "embedding", "PUBLIC", "Policy");
+    }
+
+    @Test
+    void vectorSearchRequiresContentQuery() {
+        assertThrows(BadRequestException.class, () -> documentSearchService.search(
+                DocumentSearchMode.VECTOR,
+                " ",
                 null,
                 null,
                 null,
@@ -141,8 +169,6 @@ class DocumentSearchServiceTest {
                 DocumentSearchScope.ACCESSIBLE,
                 PageRequest.of(0, 10)
         ));
-
-        verify(elasticsearchOperations, never()).search(org.mockito.ArgumentMatchers.any(NativeQuery.class), eq(DocumentFragment.class));
     }
 
     private DocumentFragment fragment() {
@@ -156,5 +182,11 @@ class DocumentSearchServiceTest {
         fragment.setOwnerLogin("alice");
         fragment.setVisibility(DocumentVisibility.PUBLIC);
         return fragment;
+    }
+
+    private float[] unitVector(int dimension) {
+        float[] vector = new float[384];
+        vector[dimension] = 1.0f;
+        return vector;
     }
 }

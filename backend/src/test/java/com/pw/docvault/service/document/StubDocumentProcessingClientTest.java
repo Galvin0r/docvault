@@ -21,6 +21,7 @@ class StubDocumentProcessingClientTest {
         assertThat(fragments).hasSize(1);
         assertThat(fragments.getFirst().getFragmentOrder()).isZero();
         assertThat(fragments.getFirst().getContent()).contains("text/plain");
+        assertThat(fragments.getFirst().getEmbedding()).hasSize(384);
     }
 
     @Test
@@ -31,5 +32,14 @@ class StubDocumentProcessingClientTest {
 
         assertThat(fragments).hasSize(3);
         assertThat(fragments).extracting(DocumentFragment::getFragmentOrder).containsExactly(0, 1, 2);
+    }
+
+    @Test
+    void embedTextReturnsDeterministicVector() {
+        float[] first = stubDocumentProcessingClient.embedText("retention policy");
+        float[] second = stubDocumentProcessingClient.embedText("retention policy");
+
+        assertThat(first).hasSize(384);
+        assertThat(first).containsExactly(second);
     }
 }

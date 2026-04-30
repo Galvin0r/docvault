@@ -94,6 +94,33 @@ class HttpDocumentProcessingClientIT {
                 }));
     }
 
+    @Test
+    void embedTextPostsQueryTextAndReturnsEmbedding() {
+        var requestBody = new AtomicReference<String>();
+        var requestContentType = new AtomicReference<String>();
+        var requestAccept = new AtomicReference<String>();
+        var requestProtocol = new AtomicReference<String>();
+
+        httpServer.createContext("/embed", exchange -> respond(
+                exchange,
+                requestBody,
+                requestContentType,
+                requestAccept,
+                requestProtocol,
+                200,
+                "{\"embedding\":[0.4,0.5,0.6]}",
+                "application/json"
+        ));
+
+        float[] embedding = client.embedText("semantic query");
+
+        assertThat(embedding).containsExactly(0.4f, 0.5f, 0.6f);
+        assertThat(requestProtocol.get()).isEqualTo("HTTP/1.1");
+        assertThat(requestContentType.get()).isEqualTo("application/json; charset=UTF-8");
+        assertThat(requestAccept.get()).isEqualTo("application/json");
+        assertThat(requestBody.get()).isEqualTo("{\"text\":\"semantic query\"}");
+    }
+
     private void respond(HttpExchange exchange,
                          AtomicReference<String> requestBody,
                          AtomicReference<String> requestContentType,
@@ -101,13 +128,25 @@ class HttpDocumentProcessingClientIT {
                          AtomicReference<String> requestProtocol,
                          int statusCode,
                          String body) throws IOException {
+        respond(exchange, requestBody, requestContentType, requestAccept, requestProtocol, statusCode, body,
+                "application/x-ndjson");
+    }
+
+    private void respond(HttpExchange exchange,
+                         AtomicReference<String> requestBody,
+                         AtomicReference<String> requestContentType,
+                         AtomicReference<String> requestAccept,
+                         AtomicReference<String> requestProtocol,
+                         int statusCode,
+                         String body,
+                         String responseContentType) throws IOException {
         requestBody.set(new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
         requestContentType.set(exchange.getRequestHeaders().getFirst("Content-Type"));
         requestAccept.set(exchange.getRequestHeaders().getFirst("Accept"));
         requestProtocol.set(exchange.getProtocol());
 
         var bytes = body.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().add("Content-Type", "application/x-ndjson");
+        exchange.getResponseHeaders().add("Content-Type", responseContentType);
         exchange.sendResponseHeaders(statusCode, bytes.length);
         try (OutputStream outputStream = exchange.getResponseBody()) {
             outputStream.write(bytes);

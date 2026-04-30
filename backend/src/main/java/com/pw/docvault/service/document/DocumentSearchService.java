@@ -3,6 +3,7 @@ package com.pw.docvault.service.document;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType;
+import co.elastic.clients.json.JsonData;
 import com.pw.docvault.entity.User;
 import com.pw.docvault.entity.document.DocumentFragment;
 import com.pw.docvault.exception.BadRequestException;
@@ -42,33 +43,33 @@ public class DocumentSearchService {
     private final ElasticsearchOperations elasticsearchOperations;
     private final CurrentUserProvider currentUserProvider;
     private final GroupMembershipRepository groupMembershipRepository;
+    private final DocumentProcessingClient documentProcessingClient;
 
     public Page<DocumentSearchResultDto> search(DocumentSearchMode mode, String content, String title, String author,
                                                 Instant uploadedFrom, Instant uploadedTo, DocumentSearchScope scope,
                                                 Pageable pageable) {
-        if (mode == DocumentSearchMode.VECTOR) {
-            throw new BadRequestException(
-                    ErrorCode.DOCUMENT_INVALID_STATE,
-                    "Vector search endpoint is reserved, but semantic search is not implemented yet."
-            );
-        }
-
         Optional<User> user = currentUserProvider.getOptional();
         List<Long> groupIds = user.map(value -> groupMembershipRepository.findAllByUserId(value.getId()).stream()
                                                                          .map(membership ->
                                                                                       membership.getGroup().getId())
                                                                          .toList())
                                   .orElseGet(List::of);
+        DocumentSearchMode effectiveMode = mode == null ? DocumentSearchMode.KEYWORD : mode;
+        DocumentSearchScope effectiveScope = scope == null ? DocumentSearchScope.ACCESSIBLE : scope;
+        Query searchQuery = switch (effectiveMode) {
+            case KEYWORD -> keywordQuery(content, title, author, uploadedFrom, uploadedTo, effectiveScope, user, groupIds);
+            case VECTOR -> vectorQuery(content, title, author, uploadedFrom, uploadedTo, effectiveScope, user, groupIds);
+        };
 
-        var query = NativeQuery.builder()
-                .withQuery(keywordQuery(content, title, author, uploadedFrom, uploadedTo,
-                        scope == null ? DocumentSearchScope.ACCESSIBLE : scope, user, groupIds))
+        var queryBuilder = NativeQuery.builder()
+                .withQuery(searchQuery)
                 .withPageable(pageable)
-                .withTrackTotalHits(true)
-                .withHighlightQuery(highlightQuery())
-                .build();
+                .withTrackTotalHits(true);
+        if (effectiveMode == DocumentSearchMode.KEYWORD) {
+            queryBuilder.withHighlightQuery(highlightQuery());
+        }
 
-        var hits = elasticsearchOperations.search(query, DocumentFragment.class);
+        var hits = elasticsearchOperations.search(queryBuilder.build(), DocumentFragment.class);
         List<DocumentSearchResultDto> results = hits.getSearchHits().stream().map(this::toDto).toList();
 
         return new PageImpl<>(results, pageable, hits.getTotalHits());
@@ -77,7 +78,6 @@ public class DocumentSearchService {
     private Query keywordQuery(String content, String title, String author, Instant uploadedFrom, Instant uploadedTo,
                                DocumentSearchScope scope, Optional<User> user, List<Long> groupIds) {
         List<Query> must = new ArrayList<>();
-        List<Query> filter = new ArrayList<>();
 
         if (hasText(content)) {
             must.add(Query.of(q -> q.multiMatch(mm -> mm
@@ -89,6 +89,36 @@ public class DocumentSearchService {
         } else {
             must.add(Query.of(q -> q.matchAll(ma -> ma)));
         }
+
+        return Query.of(q -> q.bool(b -> b
+                .must(must)
+                .filter(metadataFilters(title, author, uploadedFrom, uploadedTo, scope, user, groupIds))
+        ));
+    }
+
+    private Query vectorQuery(String content, String title, String author, Instant uploadedFrom, Instant uploadedTo,
+                              DocumentSearchScope scope, Optional<User> user, List<Long> groupIds) {
+        if (!hasText(content)) {
+            throw new BadRequestException(
+                    ErrorCode.DOCUMENT_INVALID_STATE, "Vector search requires a non-blank content query.");
+        }
+
+        List<Query> filter = metadataFilters(title, author, uploadedFrom, uploadedTo, scope, user, groupIds);
+        filter.add(Query.of(q -> q.exists(e -> e.field("embedding"))));
+        float[] queryVector = documentProcessingClient.embedText(content.trim());
+
+        return Query.of(q -> q.scriptScore(ss -> ss
+                .query(Query.of(inner -> inner.bool(b -> b.filter(filter))))
+                .script(s -> s
+                        .source(source -> source.scriptString("cosineSimilarity(params.query_vector, 'embedding') + 1.0"))
+                        .params("query_vector", JsonData.of(queryVector))
+                )
+        ));
+    }
+
+    private List<Query> metadataFilters(String title, String author, Instant uploadedFrom, Instant uploadedTo,
+                                        DocumentSearchScope scope, Optional<User> user, List<Long> groupIds) {
+        List<Query> filter = new ArrayList<>();
 
         if (hasText(title)) {
             filter.add(Query.of(q -> q.match(m -> m.field("title").query(title.trim()))));
@@ -110,8 +140,7 @@ public class DocumentSearchService {
         }
 
         filter.add(accessQuery(scope, user, groupIds));
-
-        return Query.of(q -> q.bool(b -> b.must(must).filter(filter)));
+        return filter;
     }
 
     private Query accessQuery(DocumentSearchScope scope, Optional<User> user, List<Long> groupIds) {

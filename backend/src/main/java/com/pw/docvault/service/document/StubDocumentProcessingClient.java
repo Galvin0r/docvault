@@ -22,8 +22,14 @@ public class StubDocumentProcessingClient implements DocumentProcessingClient {
                     Stub fragment %d generated for mime type %s.
                     Replace StubDocumentProcessingClient with the streaming processor service later.
                     """.formatted(i + 1, safeMimeType).trim());
+            fragment.setEmbedding(HashingTextEmbedding.embed(fragment.getContent()));
             fragmentConsumer.accept(fragment);
         }
+    }
+
+    @Override
+    public float[] embedText(String text) {
+        return HashingTextEmbedding.embed(text);
     }
 
     private int fragmentCountFor(String mimeType) {

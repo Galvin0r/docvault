@@ -195,6 +195,11 @@ class DocumentIntegrationSupport {
 
     void indexFragment(Document document, int fragmentOrder, String content,
                        List<Long> permittedUsers, List<Long> permittedGroups) {
+        indexFragment(document, fragmentOrder, content, permittedUsers, permittedGroups, null);
+    }
+
+    void indexFragment(Document document, int fragmentOrder, String content,
+                       List<Long> permittedUsers, List<Long> permittedGroups, float[] embedding) {
         var fragment = new DocumentFragment();
         fragment.setId(UUID.randomUUID().toString());
         fragment.setDocumentId(document.getId());
@@ -207,6 +212,7 @@ class DocumentIntegrationSupport {
         fragment.setPermittedUserIds(List.copyOf(permittedUsers));
         fragment.setPermittedGroupIds(List.copyOf(permittedGroups));
         fragment.setContent(content);
+        fragment.setEmbedding(embedding);
         documentFragmentRepository.save(fragment);
     }
 

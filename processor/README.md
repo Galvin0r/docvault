@@ -5,6 +5,7 @@ Standalone Python document processor for DocVault.
 It exposes:
 - `GET /health`
 - `POST /process`
+- `POST /embed`
 
 `POST /process` accepts:
 
@@ -19,6 +20,16 @@ The response is streamed as `application/x-ndjson`, one fragment per line:
 
 ```json
 {"fragmentOrder":0,"content":"...","embedding":[0.1,0.2]}
+```
+
+`POST /embed` accepts query text and returns one embedding from the same model used for document fragments:
+
+```json
+{"text":"semantic search query"}
+```
+
+```json
+{"embedding":[0.1,0.2]}
 ```
 
 Run standalone:
