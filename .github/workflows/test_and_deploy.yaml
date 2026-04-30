@@ -60,18 +60,22 @@ jobs:
 
       - name: Backend - run tests
         working-directory: backend
-        run: mvn -B verify
+        run: ./mvnw -B -DskipITs=true -Djacoco.skip=true test
+
+      - name: Backend - run integration tests
+        working-directory: backend
+        run: ./mvnw -B -DskipUnitTests=true -DskipITs=false -Djacoco.skip=true verify
 
       - name: Backend - package app (no tests)
         working-directory: backend
-        run: mvn -B package -DskipTests
+        run: ./mvnw -B package -DskipTests -Djacoco.skip=true
 
         # Frontend
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24.11.0
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
