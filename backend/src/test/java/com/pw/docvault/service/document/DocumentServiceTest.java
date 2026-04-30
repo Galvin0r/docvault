@@ -84,13 +84,13 @@ class DocumentServiceTest {
         user.setLogin("testuser");
 
         lenient().when(currentUser.getId()).thenReturn(user.getId());
+        lenient().when(currentUser.getOptional()).thenReturn(Optional.of(user));
         lenient().doAnswer(invocation -> {
             java.util.function.Consumer<org.springframework.transaction.TransactionStatus> consumer = invocation.getArgument(0);
             consumer.accept(null);
             return null;
         }).when(transactionTemplate).executeWithoutResult(any());
         
-        ReflectionTestUtils.setField(documentService, "bufferStorageSpace", 500);
         ReflectionTestUtils.setField(documentService, "maxAttempts", 3);
         ReflectionTestUtils.setField(documentService, "retryDelaySeconds", 300);
     }

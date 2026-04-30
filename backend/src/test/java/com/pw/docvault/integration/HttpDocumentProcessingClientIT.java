@@ -1,8 +1,9 @@
-package com.pw.docvault.service.document;
+package com.pw.docvault.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pw.docvault.entity.document.DocumentFragment;
 import com.pw.docvault.exception.DocumentException;
+import com.pw.docvault.service.document.HttpDocumentProcessingClient;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;
@@ -16,13 +17,12 @@ import java.net.InetSocketAddress;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class HttpDocumentProcessingClientTest {
+class HttpDocumentProcessingClientIT {
 
     private HttpServer httpServer;
     private HttpDocumentProcessingClient client;
@@ -44,10 +44,10 @@ class HttpDocumentProcessingClientTest {
 
     @Test
     void processFromSignedUrlStreamsNdjsonFragments() {
-        AtomicReference<String> requestBody = new AtomicReference<>();
-        AtomicReference<String> requestContentType = new AtomicReference<>();
-        AtomicReference<String> requestAccept = new AtomicReference<>();
-        AtomicReference<String> requestProtocol = new AtomicReference<>();
+        var requestBody = new AtomicReference<String>();
+        var requestContentType = new AtomicReference<String>();
+        var requestAccept = new AtomicReference<String>();
+        var requestProtocol = new AtomicReference<String>();
 
         httpServer.createContext("/process", exchange -> respond(
                 exchange,
@@ -62,7 +62,7 @@ class HttpDocumentProcessingClientTest {
                 """
         ));
 
-        List<DocumentFragment> fragments = new ArrayList<>();
+        var fragments = new ArrayList<DocumentFragment>();
 
         client.processFromSignedUrl("https://signed", "application/pdf", fragments::add);
 
@@ -106,7 +106,7 @@ class HttpDocumentProcessingClientTest {
         requestAccept.set(exchange.getRequestHeaders().getFirst("Accept"));
         requestProtocol.set(exchange.getProtocol());
 
-        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+        var bytes = body.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().add("Content-Type", "application/x-ndjson");
         exchange.sendResponseHeaders(statusCode, bytes.length);
         try (OutputStream outputStream = exchange.getResponseBody()) {

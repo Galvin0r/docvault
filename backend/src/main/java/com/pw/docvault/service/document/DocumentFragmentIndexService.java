@@ -5,6 +5,7 @@ import com.pw.docvault.entity.document.DocumentFragment;
 import com.pw.docvault.repository.document.DocumentFragmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.RefreshPolicy;
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 import org.springframework.data.elasticsearch.core.query.DeleteQuery;
@@ -51,7 +52,7 @@ public class DocumentFragmentIndexService {
         params.put("title", document.getTitle());
         params.put("ownerId", document.getOwner().getId());
         params.put("ownerLogin", document.getOwner().getLogin());
-        params.put("createdAt", document.getCreated().toString());
+        params.put("createdAt", document.getCreated().toEpochMilli());
         params.put("visibility", document.getVisibility().name());
         params.put("permittedUserIds", List.copyOf(permittedUserIds));
         params.put("permittedGroupIds", List.copyOf(permittedGroupIds));
@@ -62,6 +63,7 @@ public class DocumentFragmentIndexService {
                 .withScript(METADATA_SYNC_SCRIPT)
                 .withParams(params)
                 .withLang(PAINLESS)
+                .withRefreshPolicy(RefreshPolicy.IMMEDIATE)
                 .build();
 
         var indexCoordinates = elasticsearchOperations.getIndexCoordinatesFor(DocumentFragment.class);

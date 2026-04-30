@@ -416,5 +416,11 @@
                 constraintName="uq_document_access_document_group"/>
     </changeSet>
 
+    <changeSet id="26" author="Roman">
+        <modifyDataType tableName="documents"
+                        columnName="status"
+                        newDataType="VARCHAR(20)"/>
+    </changeSet>
+
     <include file="db.insert-data.xml" relativeToChangelogFile="true" />
 </databaseChangeLog>

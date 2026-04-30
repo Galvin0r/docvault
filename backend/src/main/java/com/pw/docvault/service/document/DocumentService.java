@@ -41,9 +41,6 @@ public class DocumentService {
     private final DocumentMapper documentMapper;
     private final TransactionTemplate transactionTemplate;
 
-    @Value(value = "${app.gsc.buffer.storage.space}")
-    private Integer bufferStorageSpace;
-
     @Value(value = "${indexer.maxAttempts:3}")
     private int maxAttempts;
 
@@ -235,17 +232,19 @@ public class DocumentService {
 
     public Document getReadableDocumentOrThrow(Long documentId) {
         var document = getDocumentOrThrow(documentId);
-        var userId = currentUser.getId();
+        var user = currentUser.getOptional();
 
-        boolean isReadable = document.getVisibility() == DocumentVisibility.PUBLIC
-                || Objects.equals(document.getOwner().getId(), userId)
-                || documentAccessRepository.countReadableEntries(documentId, userId) > 0;
+        if (document.getVisibility() == DocumentVisibility.PUBLIC) {
+            return document;
+        }
+
+        boolean isReadable = user
+                .map(value -> Objects.equals(document.getOwner().getId(), value.getId())
+                        || documentAccessRepository.countReadableEntries(documentId, value.getId()) > 0)
+                .orElse(false);
 
         if (!isReadable) {
-            throw new ForbiddenException(
-                    ErrorCode.DOCUMENT_FORBIDDEN,
-                    "You are not allowed to access this document."
-            );
+            throw new ForbiddenException(ErrorCode.DOCUMENT_FORBIDDEN, "You are not allowed to access this document.");
         }
 
         return document;

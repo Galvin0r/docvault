@@ -33,10 +33,10 @@ public class DocumentFragment {
     @Field(type = FieldType.Long)
     private Long ownerId;
 
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Keyword, normalizer = "lc_normalizer")
     private String ownerLogin;
 
-    @Field(type = FieldType.Date, format = DateFormat.date_time)
+    @Field(type = FieldType.Date, format = {DateFormat.strict_date_optional_time, DateFormat.epoch_millis})
     private Instant createdAt;
 
     @Field(type = FieldType.Keyword)

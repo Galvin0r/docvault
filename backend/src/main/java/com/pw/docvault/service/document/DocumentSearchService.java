@@ -36,8 +36,8 @@ import java.util.Optional;
 public class DocumentSearchService {
 
     private static final int SNIPPET_LENGTH = 220;
-    private static final String HIGHLIGHT_PRE_TAG = "<strong>";
-    private static final String HIGHLIGHT_POST_TAG = "</strong>";
+    private static final String HIGHLIGHT_PRE_TAG = "<mark>";
+    private static final String HIGHLIGHT_POST_TAG = "</mark>";
 
     private final ElasticsearchOperations elasticsearchOperations;
     private final CurrentUserProvider currentUserProvider;
@@ -94,7 +94,7 @@ public class DocumentSearchService {
             filter.add(Query.of(q -> q.match(m -> m.field("title").query(title.trim()))));
         }
         if (hasText(author)) {
-            filter.add(Query.of(q -> q.match(m -> m.field("ownerLogin").query(author.trim()))));
+            filter.add(termQuery("ownerLogin", author.trim().toLowerCase()));
         }
         if (uploadedFrom != null || uploadedTo != null) {
             filter.add(Query.of(q -> q.range(r -> r.date(d -> {
@@ -162,6 +162,10 @@ public class DocumentSearchService {
     }
 
     private Query termQuery(String field, Long value) {
+        return Query.of(q -> q.term(t -> t.field(field).value(value)));
+    }
+
+    private Query termQuery(String field, String value) {
         return Query.of(q -> q.term(t -> t.field(field).value(value)));
     }
 
