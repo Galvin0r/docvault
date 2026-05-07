@@ -3,6 +3,7 @@ import { DocumentDto } from '../documents.model';
 import { DocumentService } from '../documents.service';
 import { DialogService } from 'primeng/dynamicdialog';
 import { DocumentInfoDialogComponent } from '../document-info-dialog/document-info-dialog.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-simple-document',
@@ -17,6 +18,7 @@ export class SimpleDocumentComponent {
   deleting = signal(false);
   private documentService = inject(DocumentService);
   private dialogService = inject(DialogService);
+  private router = inject(Router);
 
   isOwner = computed(() => this.document().ownerLogin === this.currentUserLogin());
 
@@ -46,6 +48,10 @@ export class SimpleDocumentComponent {
         currentUserLogin: this.currentUserLogin()
       }
     });
+  }
+
+  openDocument() {
+    this.router.navigate(['/document', this.document().id]);
   }
 
   download() {

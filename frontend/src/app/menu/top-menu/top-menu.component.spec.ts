@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TopMenuComponent } from './top-menu.component';
 import { Router, ActivatedRoute } from '@angular/router';
+import { ReactiveFormsModule } from '@angular/forms';
 import { SecurityService } from '../../security/security.service';
 import { DialogService } from 'primeng/dynamicdialog';
 import { MessageService } from 'primeng/api';
@@ -23,6 +24,7 @@ describe('TopMenuComponent', () => {
 
         await TestBed.configureTestingModule({
             declarations: [TopMenuComponent],
+            imports: [ReactiveFormsModule],
             providers: [
                 { provide: Router, useValue: router },
                 { provide: SecurityService, useValue: securityService },
@@ -54,7 +56,16 @@ describe('TopMenuComponent', () => {
 
     it('should navigate home on home()', () => {
         component.home();
-        expect(router.navigate).toHaveBeenCalledWith(['']);
+        expect(router.navigate).toHaveBeenCalledWith(['/']);
+    });
+
+    it('should navigate home with content query on search', () => {
+        component.searchControl.setValue('  solar clinic  ');
+        component.search();
+
+        expect(router.navigate).toHaveBeenCalledWith(['/'], {
+            queryParams: { content: 'solar clinic' }
+        });
     });
 
     it('should call logout on logout()', (done) => {

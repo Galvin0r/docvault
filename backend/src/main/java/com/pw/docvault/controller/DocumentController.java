@@ -1,6 +1,7 @@
 package com.pw.docvault.controller;
 
 import com.pw.docvault.model.document.DocumentAccessDto;
+import com.pw.docvault.model.document.DocumentContentFragmentDto;
 import com.pw.docvault.model.document.DocumentDto;
 import com.pw.docvault.model.document.DocumentSearchResultDto;
 import com.pw.docvault.model.enums.DocumentSearchMode;
@@ -57,6 +58,12 @@ public class DocumentController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{id}/title")
+    public ResponseEntity<Void> updateTitle(@PathVariable Long id, @RequestParam("title") String title) {
+        documentService.updateTitle(id, title);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping(value = "/download/{id}")
     public ResponseEntity<String> download(@PathVariable Long id) {
         String url = documentService.download(id);
@@ -91,6 +98,17 @@ public class DocumentController {
         ));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<DocumentDto> getDocument(@PathVariable Long id) {
+        return ResponseEntity.ok(documentService.getReadableDocument(id));
+    }
+
+    @GetMapping("/{id}/fragments")
+    public ResponseEntity<List<DocumentContentFragmentDto>> contentPreview(@PathVariable Long id,
+                                                                           @RequestParam(defaultValue = "4") int limit) {
+        return ResponseEntity.ok(documentService.getReadableContentPreview(id, limit));
+    }
+
     @GetMapping("/{id}/access")
     public ResponseEntity<List<DocumentAccessDto>> listAccess(@PathVariable Long id) {
         return ResponseEntity.ok(documentAccessService.listAccess(id));
@@ -99,6 +117,12 @@ public class DocumentController {
     @PutMapping("/{id}/access/users/{userId}")
     public ResponseEntity<Void> grantUserAccess(@PathVariable Long id, @PathVariable Long userId) {
         documentAccessService.grantUserAccess(id, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/access/users/by-login")
+    public ResponseEntity<Void> grantUserAccessByLogin(@PathVariable Long id, @RequestParam("login") String login) {
+        documentAccessService.grantUserAccessByLogin(id, login);
         return ResponseEntity.noContent().build();
     }
 

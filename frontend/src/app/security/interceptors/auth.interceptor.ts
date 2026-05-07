@@ -19,12 +19,20 @@ export class AuthInterceptor implements HttpInterceptor {
         if (
           error.status === 401 &&
           this.router.url !== '/login' &&
-          !req.url.includes('/api/accounts')
+          !this.isPublicOrSessionProbe(req.url)
         ) {
           this.router.navigate(['/login']);
         }
         return throwError(() => error);
       })
     );
+  }
+
+  private isPublicOrSessionProbe(url: string): boolean {
+    return [
+      '/api/accounts',
+      '/api/document/search',
+      '/api/document/download/',
+    ].some(publicUrl => url.includes(publicUrl));
   }
 }

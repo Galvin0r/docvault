@@ -132,7 +132,8 @@ class DocumentControllerTest {
     void searchReturnsPage() throws Exception {
         var uploadedAt = Instant.parse("2026-04-11T10:15:30Z");
         var dto = new DocumentSearchResultDto(
-                10L, 2, "T", "<mark>T</mark>", "snippet", "<mark>snippet</mark>",
+                10L, 2, "T", "tax.pdf", "application/pdf", 2048L,
+                "<mark>T</mark>", "snippet", "<mark>snippet</mark>",
                 uploadedAt, 1L, "alice", DocumentVisibility.PUBLIC, 2.5f
         );
         var page = new PageImpl<>(List.of(dto), PageRequest.of(0, 10), 1);
@@ -152,6 +153,8 @@ class DocumentControllerTest {
                         .param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].documentId").value(10))
+                .andExpect(jsonPath("$.content[0].originalFilename").value("tax.pdf"))
+                .andExpect(jsonPath("$.content[0].size").value(2048))
                 .andExpect(jsonPath("$.content[0].highlightedContentSnippet").value("<mark>snippet</mark>"))
                 .andExpect(jsonPath("$.totalElements").value(1));
 

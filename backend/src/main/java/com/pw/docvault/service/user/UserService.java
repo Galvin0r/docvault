@@ -20,4 +20,21 @@ public class UserService {
                 () -> new NotFoundException(ErrorCode.USER_NOT_FOUND, "User with id " + userId + " not found.")
         );
     }
+
+    @Transactional(readOnly = true)
+    public User z(String login) {
+        return userRepository.findByLogin(login).orElseThrow(
+                () -> new NotFoundException(ErrorCode.USER_NOT_FOUND, "User with login " + login + " not found.")
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public User getUserByLoginOrEmailOrThrow(String identifier) {
+        return userRepository.findByLogin(identifier)
+                .or(() -> userRepository.findByEmail(identifier))
+                .orElseThrow(() -> new NotFoundException(
+                        ErrorCode.USER_NOT_FOUND,
+                        "User with login or email " + identifier + " not found."
+                ));
+    }
 }

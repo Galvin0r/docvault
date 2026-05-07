@@ -15,6 +15,7 @@ import com.pw.docvault.model.enums.DocumentStatus;
 import com.pw.docvault.model.enums.DocumentSyncOperation;
 import com.pw.docvault.model.enums.DocumentVisibility;
 import com.pw.docvault.repository.document.DocumentAccessRepository;
+import com.pw.docvault.repository.document.DocumentFragmentRepository;
 import com.pw.docvault.repository.document.DocumentIndexJobRepository;
 import com.pw.docvault.repository.document.DocumentRepository;
 import com.pw.docvault.service.security.CurrentUserProvider;
@@ -47,6 +48,9 @@ class DocumentServiceTest {
 
     @Mock
     private DocumentAccessRepository documentAccessRepository;
+
+    @Mock
+    private DocumentFragmentRepository documentFragmentRepository;
 
     @Mock
     private DocumentIndexJobRepository documentIndexJobRepository;

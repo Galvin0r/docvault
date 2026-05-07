@@ -2,7 +2,7 @@ import { Injectable, signal, WritableSignal } from '@angular/core';
 import { HttpClient, HttpEventType, HttpHeaders, HttpParams, HttpRequest } from '@angular/common/http';
 import { Visibility } from '../groups/groups.model';
 import { Observable, catchError, map, of, switchMap } from 'rxjs';
-import { DocumentAccessDto, DocumentDto, UploadStatus } from './documents.model';
+import { DocumentAccessDto, DocumentContentFragmentDto, DocumentDto, DocumentSearchResultDto, UploadStatus } from './documents.model';
 import { MessageService } from 'primeng/api';
 import { Page } from '../app.model';
 
@@ -17,6 +17,19 @@ export class DocumentService {
 
     find(params: Record<string, any>): Observable<Page<DocumentDto>> {
         return this.http.get<Page<DocumentDto>>('/api/document', { params });
+    }
+
+    search(params: Record<string, any>): Observable<Page<DocumentSearchResultDto>> {
+        return this.http.get<Page<DocumentSearchResultDto>>('/api/document/search', { params });
+    }
+
+    get(documentId: number): Observable<DocumentDto> {
+        return this.http.get<DocumentDto>(`/api/document/${documentId}`);
+    }
+
+    getFragments(documentId: number, limit = 2): Observable<DocumentContentFragmentDto[]> {
+        const params = new HttpParams().set('limit', limit);
+        return this.http.get<DocumentContentFragmentDto[]>(`/api/document/${documentId}/fragments`, { params });
     }
 
     createDraft(title: string, description: string | null, visibility: Visibility): Observable<number> {
@@ -86,6 +99,16 @@ export class DocumentService {
         return this.http.post<void>(`/api/document/${documentId}/complete-upload`, {});
     }
 
+    updateTitle(documentId: number, title: string): Observable<void> {
+        const params = new HttpParams().set('title', title);
+        return this.http.patch<void>(`/api/document/${documentId}/title`, null, { params });
+    }
+
+    updateVisibility(documentId: number, visibility: Visibility): Observable<void> {
+        const params = new HttpParams().set('visibility', visibility);
+        return this.http.patch<void>(`/api/document/${documentId}/visibility`, null, { params });
+    }
+
     cancelUpload(uploadId: string) {
         const upload = this.uploadsSignal().find(u => u.id === uploadId);
         if (upload && upload.subscription) {
@@ -108,6 +131,19 @@ export class DocumentService {
 
     listAccess(documentId: number): Observable<DocumentAccessDto[]> {
         return this.http.get<DocumentAccessDto[]>(`/api/document/${documentId}/access`);
+    }
+
+    grantUserAccess(documentId: number, userId: number): Observable<void> {
+        return this.http.put<void>(`/api/document/${documentId}/access/users/${userId}`, null);
+    }
+
+    grantUserAccessByLogin(documentId: number, login: string): Observable<void> {
+        const params = new HttpParams().set('login', login);
+        return this.http.put<void>(`/api/document/${documentId}/access/users/by-login`, null, { params });
+    }
+
+    revokeUserAccess(documentId: number, userId: number): Observable<void> {
+        return this.http.delete<void>(`/api/document/${documentId}/access/users/${userId}`);
     }
 
     grantGroupAccess(documentId: number, groupId: number): Observable<void> {

@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { MainLayoutComponent } from './menu/main-layout/main-layout.component';
 import { AuthLayoutComponent } from './menu/auth-layout/auth-layout.component';
 import { HomeComponent } from './menu/home/home.component';
+import { DocumentViewComponent } from './documents/document-view/document-view.component';
 import { currentUserResolver } from './security/security.service';
 import { mainLayoutCanMatch } from './utils/consts';
 
@@ -24,6 +25,10 @@ const routes: Routes = [
         path: 'home', 
         redirectTo: '', 
         pathMatch: 'full' 
+      },
+      {
+        path: 'document/:id',
+        component: DocumentViewComponent,
       },
       {
         path: '',

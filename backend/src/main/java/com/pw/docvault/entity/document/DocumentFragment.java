@@ -30,13 +30,26 @@ public class DocumentFragment {
     @Field(type = FieldType.Text)
     private String title;
 
+    @Field(type = FieldType.Keyword)
+    private String originalFilename;
+
+    @Field(type = FieldType.Keyword)
+    private String mimeType;
+
+    @Field(type = FieldType.Long)
+    private Long sizeBytes;
+
     @Field(type = FieldType.Long)
     private Long ownerId;
 
     @Field(type = FieldType.Keyword, normalizer = "lc_normalizer")
     private String ownerLogin;
 
-    @Field(type = FieldType.Date, format = {DateFormat.strict_date_optional_time, DateFormat.epoch_millis})
+    @Field(type = FieldType.Date, format = {
+            DateFormat.strict_date_optional_time_nanos,
+            DateFormat.strict_date_optional_time,
+            DateFormat.epoch_millis
+    })
     private Instant createdAt;
 
     @Field(type = FieldType.Keyword)

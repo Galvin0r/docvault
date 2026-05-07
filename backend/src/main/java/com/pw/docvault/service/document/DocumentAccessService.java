@@ -64,6 +64,12 @@ public class DocumentAccessService {
     }
 
     @Transactional
+    public void grantUserAccessByLogin(Long documentId, String login) {
+        var user = userService.getUserByLoginOrEmailOrThrow(login);
+        grantUserAccess(documentId, user.getId());
+    }
+
+    @Transactional
     public void revokeUserAccess(Long documentId, Long userId) {
         documentService.getOwnedDocumentOrThrow(documentId);
         long deleted = documentAccessRepository.deleteByDocumentIdAndUserId(documentId, userId);

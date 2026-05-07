@@ -19,6 +19,31 @@ export interface DocumentDto {
     nextAttemptAt?: string;
 }
 
+export type DocumentSearchMode = 'KEYWORD' | 'VECTOR';
+export type DocumentSearchScope = 'ACCESSIBLE' | 'PUBLIC' | 'OWNED_BY_ME' | 'SHARED_WITH_ME';
+
+export interface DocumentSearchResultDto {
+    documentId: number;
+    fragmentOrder: number | null;
+    title: string;
+    originalFilename: string | null;
+    mimeType: string | null;
+    size: number | null;
+    highlightedTitle: string | null;
+    contentSnippet: string | null;
+    highlightedContentSnippet: string | null;
+    uploadedAt: string;
+    ownerId: number;
+    ownerLogin: string;
+    visibility: Visibility;
+    score: number;
+}
+
+export interface DocumentContentFragmentDto {
+    fragmentOrder: number | null;
+    content: string;
+}
+
 export interface DocumentAccessDto {
     id: number;
     documentId: number;

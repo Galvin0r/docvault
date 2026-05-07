@@ -57,6 +57,15 @@ describe('AuthInterceptor', () => {
     expect(router.navigate).not.toHaveBeenCalled();
   });
 
+  it('does NOT navigate for 401 on public document search', () => {
+    http.get('/api/document/search').subscribe({ error: () => {} });
+
+    const req = httpMock.expectOne('/api/document/search');
+    req.flush({ message: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
+
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
+
   it('does NOT navigate when current route is already /login', () => {
     router.url = '/login';
 

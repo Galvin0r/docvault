@@ -1,1 +1,139 @@
-<p>home works!</p>
+<section class="home-search">
+  <div class="search-header">
+    <div>
+      <h1>Documents</h1>
+      <p>
+        @if (userInfo) {
+          Search public documents, your own library, and documents shared with you.
+        } @else {
+          Search public documents. Sign in to see private and shared results.
+        }
+      </p>
+    </div>
+  </div>
+
+  <form class="search-filters" [formGroup]="filtersForm">
+    <div class="field field-wide">
+      <label for="content">Content</label>
+      <p-iconfield>
+        <p-inputicon class="pi pi-search" />
+        <input id="content" pInputText type="search" formControlName="content" placeholder="Find text inside documents" />
+      </p-iconfield>
+    </div>
+
+    <div class="field field-title">
+      <label for="title">Title</label>
+      <input id="title" pInputText type="search" formControlName="title" placeholder="Document title" />
+    </div>
+
+    <div class="field field-author">
+      <label for="author">Author</label>
+      <input id="author" pInputText type="search" formControlName="author" placeholder="Owner login" />
+    </div>
+
+    <div class="field field-mode">
+      <label for="mode">Mode</label>
+      <p-select inputId="mode" formControlName="mode" [options]="modeOptions" optionLabel="label" optionValue="value" />
+    </div>
+
+    @if (userInfo) {
+      <div class="field field-scope">
+        <label for="scope">Scope</label>
+        <p-select inputId="scope" formControlName="scope" [options]="scopeOptions" optionLabel="label" optionValue="value" />
+      </div>
+    }
+
+    <div class="field field-date">
+      <label for="uploadedFrom">Uploaded from</label>
+      <p-datepicker inputId="uploadedFrom" formControlName="uploadedFrom" dateFormat="yy-mm-dd" [showIcon]="true" appendTo="body" />
+    </div>
+
+    <div class="field field-date">
+      <label for="uploadedTo">Uploaded to</label>
+      <p-datepicker inputId="uploadedTo" formControlName="uploadedTo" dateFormat="yy-mm-dd" [showIcon]="true" appendTo="body" />
+    </div>
+
+    <div class="filter-actions">
+      <button pButton type="button" icon="pi pi-filter-slash" label="Clear" severity="secondary" [outlined]="true" (click)="resetFilters()"></button>
+    </div>
+  </form>
+
+  <div class="results-bar">
+    <span>{{ results().totalElements }} result{{ results().totalElements === 1 ? '' : 's' }}</span>
+    @if (loading()) {
+      <span class="loading-text"><i class="pi pi-spin pi-spinner"></i> Searching</span>
+    }
+  </div>
+
+  <div class="results-list">
+    @for (result of results().content; track result.documentId + '-' + result.fragmentOrder) {
+      <article class="result-item">
+        <div class="file-preview" [ngClass]="fileKindClass(result)" aria-hidden="true">
+          <span>{{ fileKind(result) }}</span>
+        </div>
+
+        <div class="result-body">
+          <div class="result-title-row">
+            <h2 [innerHTML]="displayTitle(result)"></h2>
+          </div>
+
+          <div class="metadata metadata-top">
+            <a class="doc-link font-semibold" [routerLink]="['/user', result.ownerLogin]">{{ result.ownerLogin }}</a>
+            @if (userInfo) {
+              <span class="visibility">
+                <i class="pi" [ngClass]="visibilityIcon(result)"></i>
+                {{ visibilityLabel(result) | titlecase }}
+              </span>
+            }
+          </div>
+
+          <p class="snippet" [innerHTML]="displaySnippet(result)"></p>
+
+          <div class="metadata metadata-bottom">
+            <span>{{ result.uploadedAt | date: 'mediumDate' }}</span>
+          </div>
+        </div>
+
+        <div class="result-actions">
+          @if (result.size != null) {
+            <span class="download-size">{{ result.size | fileSize }}</span>
+          }
+          <div class="action-buttons">
+            <button
+              pButton
+              type="button"
+              icon="pi pi-download"
+              aria-label="Download document"
+              pTooltip="Download document"
+              tooltipPosition="left"
+              (click)="download(result.documentId)">
+            </button>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-arrow-right"
+              severity="secondary"
+              [outlined]="true"
+              pTooltip="Open document"
+              tooltipPosition="left"
+              (click)="openDocument(result.documentId)">
+            </button>
+          </div>
+        </div>
+      </article>
+    } @empty {
+      <div class="empty-state">
+        <i class="pi pi-file-search"></i>
+        <span>No documents found</span>
+      </div>
+    }
+  </div>
+
+  <app-paginator
+    [total]="results().totalElements"
+    [sizeOptions]="sizeOptions"
+    [page]="page()"
+    [size]="size()"
+    (pageChange)="onPageChange($event)"
+    (sizeChange)="onSizeChange($event)" />
+</section>
