@@ -84,6 +84,9 @@ class DocumentIndexerServiceTest {
         assertThat(firstFragment.getDocumentId()).isEqualTo(11L);
         assertThat(firstFragment.getFragmentOrder()).isZero();
         assertThat(firstFragment.getTitle()).isEqualTo("Indexed Document");
+        assertThat(firstFragment.getOriginalFilename()).isEqualTo("indexed.pdf");
+        assertThat(firstFragment.getMimeType()).isEqualTo("application/pdf");
+        assertThat(firstFragment.getSizeBytes()).isEqualTo(4096L);
         assertThat(firstFragment.getOwnerId()).isEqualTo(3L);
         assertThat(firstFragment.getOwnerLogin()).isEqualTo("alice");
         assertThat(firstFragment.getCreatedAt()).isEqualTo(document.getCreated());
@@ -116,8 +119,10 @@ class DocumentIndexerServiceTest {
         Document document = new Document();
         document.setId(11L);
         document.setTitle("Indexed Document");
+        document.setOriginalFilename("indexed.pdf");
         document.setPath("bucket/object");
         document.setMimeType("application/pdf");
+        document.setSizeBytes(4096L);
         document.setOwner(owner);
         document.setCreated(Instant.parse("2026-03-15T10:15:30Z"));
         document.setVisibility(DocumentVisibility.PRIVATE);

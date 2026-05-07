@@ -4,12 +4,14 @@ import com.pw.docvault.entity.document.Document;
 import com.pw.docvault.entity.document.DocumentIndexJob;
 import com.pw.docvault.exception.*;
 import com.pw.docvault.mapper.DocumentMapper;
+import com.pw.docvault.model.document.DocumentContentFragmentDto;
 import com.pw.docvault.model.document.DocumentDto;
 import com.pw.docvault.model.enums.DocumentStatus;
 import com.pw.docvault.model.enums.DocumentIndexJobStatus;
 import com.pw.docvault.model.enums.DocumentSyncOperation;
 import com.pw.docvault.model.enums.DocumentVisibility;
 import com.pw.docvault.repository.document.DocumentAccessRepository;
+import com.pw.docvault.repository.document.DocumentFragmentRepository;
 import com.pw.docvault.repository.document.DocumentIndexJobRepository;
 import com.pw.docvault.repository.document.DocumentRepository;
 import com.pw.docvault.service.security.CurrentUserProvider;
@@ -17,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -32,6 +35,7 @@ public class DocumentService {
 
     private final DocumentRepository documentRepository;
     private final DocumentAccessRepository documentAccessRepository;
+    private final DocumentFragmentRepository documentFragmentRepository;
     private final DocumentIndexJobRepository documentIndexJobRepository;
     private final GoogleCloudStorageService googleCloudStorageService;
     private final CurrentUserProvider currentUser;
@@ -110,6 +114,22 @@ public class DocumentService {
         documentMetadataSyncService.schedule(documentId);
     }
 
+    public void updateTitle(Long documentId, String title) {
+        if (title == null || title.isBlank()) {
+            throw new BadRequestException(ErrorCode.DOCUMENT_INVALID_STATE, "Document title cannot be blank.");
+        }
+
+        var document = getOwnedDocumentOrThrow(documentId);
+        String trimmedTitle = title.trim();
+        if (Objects.equals(document.getTitle(), trimmedTitle)) {
+            return;
+        }
+
+        document.setTitle(trimmedTitle);
+        documentRepository.save(document);
+        documentMetadataSyncService.schedule(documentId);
+    }
+
     private String safeContentType(String ct) {
         return (ct == null || ct.isBlank()) ? "application/octet-stream" : ct;
     }
@@ -178,6 +198,20 @@ public class DocumentService {
             throw new NotFoundException(ErrorCode.DOCUMENT_NOT_FOUND, "Document path is missing");
         }
         return googleCloudStorageService.generateGetSignedUrl(document.getPath(), document.getOriginalFilename());
+    }
+
+    public DocumentDto getReadableDocument(Long documentId) {
+        return documentMapper.toDto(getReadableDocumentOrThrow(documentId));
+    }
+
+    public List<DocumentContentFragmentDto> getReadableContentPreview(Long documentId, int limit) {
+        getReadableDocumentOrThrow(documentId);
+        int sanitizedLimit = Math.clamp(limit, 1, 2);
+        return documentFragmentRepository
+                .findByDocumentIdOrderByFragmentOrderAsc(documentId, PageRequest.of(0, sanitizedLimit))
+                .stream()
+                .map(fragment -> new DocumentContentFragmentDto(fragment.getFragmentOrder(), fragment.getContent()))
+                .toList();
     }
 
     public Page<DocumentDto> listUserDocuments(String titleSearch, String ownerName, Instant dateFrom, Instant dateTo,

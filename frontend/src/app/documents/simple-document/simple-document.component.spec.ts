@@ -6,12 +6,14 @@ import { of } from 'rxjs';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FileSizePipe } from '../../utils/pipes/file-size.pipe';
 import { FileExtensionPipe } from '../../utils/pipes/file-extension.pipe';
+import { Router } from '@angular/router';
 
 describe('SimpleDocumentComponent', () => {
     let component: SimpleDocumentComponent;
     let fixture: ComponentFixture<SimpleDocumentComponent>;
     let documentService: jasmine.SpyObj<DocumentService>;
     let dialogService: jasmine.SpyObj<DialogService>;
+    let router: jasmine.SpyObj<Router>;
 
     const mockDocument = {
         id: 1,
@@ -28,12 +30,14 @@ describe('SimpleDocumentComponent', () => {
     beforeEach(async () => {
         documentService = jasmine.createSpyObj('DocumentService', ['download', 'delete']);
         dialogService = jasmine.createSpyObj('DialogService', ['open']);
+        router = jasmine.createSpyObj<Router>('Router', ['navigate']);
 
         await TestBed.configureTestingModule({
             declarations: [SimpleDocumentComponent, FileSizePipe, FileExtensionPipe],
             providers: [
                 { provide: DocumentService, useValue: documentService },
-                { provide: DialogService, useValue: dialogService }
+                { provide: DialogService, useValue: dialogService },
+                { provide: Router, useValue: router }
             ],
             schemas: [NO_ERRORS_SCHEMA]
         })
@@ -72,6 +76,11 @@ describe('SimpleDocumentComponent', () => {
         expect(dialogService.open).toHaveBeenCalledWith(jasmine.any(Function), jasmine.objectContaining({
             header: 'Document Information'
         }));
+    });
+
+    it('should navigate to document view', () => {
+        component.openDocument();
+        expect(router.navigate).toHaveBeenCalledWith(['/document', 1]);
     });
 
     it('should call download service', () => {

@@ -1,0 +1,186 @@
+<section class="document-view">
+  @if (loading()) {
+    <div class="loading-state">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span>Loading document</span>
+    </div>
+  }
+
+  @if (document(); as doc) {
+    <header class="document-header">
+      <div class="file-preview" [ngClass]="fileKindClass(doc)" aria-hidden="true">
+        <span>{{ fileKind(doc) }}</span>
+      </div>
+
+      <div class="document-title">
+        <h1>{{ doc.title }}</h1>
+        <div class="metadata">
+          <button pButton type="button" text class="owner-link" (click)="openOwner()">
+            {{ doc.ownerLogin }}
+          </button>
+          <span class="visibility">
+            <i class="pi" [ngClass]="doc.visibility === 'PUBLIC' ? 'pi-lock-open' : 'pi-shield'"></i>
+            {{ doc.visibility | titlecase }}
+          </span>
+          <span>{{ doc.size | fileSize }}</span>
+          <button pButton type="button" icon="pi pi-download" class="download-button" aria-label="Download document"
+            pTooltip="Download document" (click)="download()"></button>
+        </div>
+        @if (doc.description) {
+          <p class="description">{{ doc.description }}</p>
+        }
+      </div>
+
+      <div class="header-actions">
+        <span class="uploaded-date">Uploaded {{ doc.uploadedAt | date:'yyyy-MM-dd' }}</span>
+        <div class="side-info">
+          <div class="side-info-wide">
+            <span>Original file</span>
+            <strong>{{ doc.originalFilename || 'Unknown' }}</strong>
+          </div>
+          <div>
+            <span>Mime type</span>
+            <strong>{{ doc.mimeType || 'Unknown' }}</strong>
+          </div>
+          <div>
+            <span>Status</span>
+            <strong>{{ doc.status | titlecase }}</strong>
+          </div>
+        </div>
+        @if (isOwner()) {
+          <div class="owner-actions">
+            <button pButton type="button" icon="pi pi-pencil" label="Edit" severity="secondary" [outlined]="true"
+              (click)="openEditDialog()"></button>
+            <button pButton type="button" icon="pi pi-trash" label="Delete" severity="danger" [outlined]="true"
+              [loading]="deleting()" [disabled]="deleting()" (click)="deleteDocument()"></button>
+          </div>
+        }
+      </div>
+    </header>
+
+    <section class="document-section">
+      <h2>Content Preview</h2>
+      <div class="content-preview">
+        @for (fragment of fragments(); track fragment.fragmentOrder ?? $index) {
+          <p>{{ fragment.content }}</p>
+        } @empty {
+          <div class="empty-state">No indexed content preview yet</div>
+        }
+      </div>
+    </section>
+
+    @if (isOwner()) {
+      <section class="document-section">
+        <h2>Sharing</h2>
+        <form class="sharing-toolbar" [formGroup]="shareForm">
+          <div class="field share-user-field">
+            <label for="share-user">User login or email</label>
+            <input id="share-user" pInputText formControlName="userLogin" placeholder="Login or email" />
+          </div>
+          <div class="sharing-actions">
+            <button pButton type="button" icon="pi pi-user-plus" label="Share user"
+              [loading]="sharingUser()" [disabled]="sharingUser()" (click)="shareWithUser()"></button>
+
+            <button pButton type="button" icon="pi pi-users" label="Share group" severity="secondary"
+              [outlined]="true" (click)="openGroupShareDialog()"></button>
+          </div>
+        </form>
+
+        <div class="access-lists">
+          <div class="access-list">
+            <div class="access-list-header">
+              <h3>Shared Users</h3>
+              <span>{{ userAccess().length }}</span>
+            </div>
+            <div class="access-chips">
+              @for (entry of userAccess(); track entry.id) {
+                <div class="access-chip">
+                  <i class="pi pi-user"></i>
+                  <a class="doc-link" [routerLink]="['/user', entry.userLogin]">{{ entry.userLogin }}</a>
+                  <button pButton type="button" icon="pi pi-times" severity="secondary" [text]="true"
+                    aria-label="Revoke user access" pTooltip="Revoke access" (click)="revokeUser(entry.userId)"></button>
+                </div>
+              } @empty {
+                <div class="empty-inline">No users shared</div>
+              }
+            </div>
+          </div>
+
+          <div class="access-list">
+            <div class="access-list-header">
+              <h3>Shared Groups</h3>
+              <span>{{ groupAccess().length }}</span>
+            </div>
+            <div class="access-chips">
+              @for (entry of groupAccess(); track entry.id) {
+                <div class="access-chip">
+                  <i class="pi pi-users"></i>
+                  <a class="doc-link" [routerLink]="['/groups/edit', entry.groupId]">{{ entry.groupName }}</a>
+                  <button pButton type="button" icon="pi pi-times" severity="secondary" [text]="true"
+                    aria-label="Revoke group access" pTooltip="Revoke access" (click)="revokeGroup(entry.groupId)"></button>
+                </div>
+              } @empty {
+                <div class="empty-inline">No groups shared</div>
+              }
+            </div>
+          </div>
+        </div>
+      </section>
+    }
+
+    <p-dialog header="Edit Document" [modal]="true" [dismissableMask]="true" [visible]="editDialogVisible()"
+      (visibleChange)="editDialogVisible.set($event)" [style]="{ width: '32rem' }">
+      <form class="edit-dialog-form" [formGroup]="editForm">
+        <div class="field">
+          <label for="document-title">Title</label>
+          <input id="document-title" pInputText formControlName="title" />
+        </div>
+        <div class="field">
+          <label>Visibility</label>
+          <p-selectButton formControlName="visibility" [options]="visibilityOptions" optionLabel="label"
+            optionValue="value" />
+        </div>
+      </form>
+      <ng-template #footer>
+        <button pButton type="button" label="Cancel" severity="secondary" [text]="true"
+          (click)="editDialogVisible.set(false)"></button>
+        <button pButton type="button" icon="pi pi-save" label="Save" [loading]="saving()"
+          [disabled]="saving()" (click)="saveDetails()"></button>
+      </ng-template>
+    </p-dialog>
+
+    <p-dialog header="Share With Group" [modal]="true" [dismissableMask]="true" [visible]="groupShareDialogVisible()"
+      (visibleChange)="groupShareDialogVisible.set($event)" [style]="{ width: '34rem' }">
+      <div class="group-share-dialog" [formGroup]="shareForm">
+        <div class="share-search-row">
+          <div class="field">
+            <label for="share-group">Group name</label>
+            <input id="share-group" pInputText formControlName="groupName" placeholder="Search your groups" />
+          </div>
+          <button pButton type="button" icon="pi pi-search" label="Search" severity="secondary"
+            [outlined]="true" (click)="searchGroups(1)"></button>
+        </div>
+
+        <div class="group-options">
+          @for (membership of groupMemberships(); track membership.id) {
+            <button type="button" class="group-option" [class.group-option-shared]="isGroupShared(membership.groupId)"
+              [disabled]="isGroupShared(membership.groupId)" (click)="shareWithGroup(membership.groupId)">
+              <span>{{ membership.groupName }}</span>
+              @if (isGroupShared(membership.groupId)) {
+                <strong>Shared</strong>
+              } @else {
+                <i class="pi pi-users"></i>
+              }
+            </button>
+          } @empty {
+            <div class="empty-inline">No matching groups</div>
+          }
+        </div>
+
+        <app-paginator [total]="groupTotal()" [sizeOptions]="[5, 10, 20]" [page]="groupPage()"
+          [size]="groupSize()" [isSimplePaginator]="true" (pageChange)="onGroupPageChange($event)"
+          (sizeChange)="onGroupSizeChange($event)" />
+      </div>
+    </p-dialog>
+  }
+</section>

@@ -349,4 +349,11 @@ describe('SignupComponent', () => {
       '/api/oauth2/authorization/google'
     );
   });
+
+  it('shows a continue as guest link to the home page', () => {
+    create();
+    const guestLink = fixture.debugElement.query(By.css('a[routerLink="/"]'));
+    expect(guestLink).not.toBeNull();
+    expect((guestLink.nativeElement as HTMLAnchorElement).textContent).toContain('Continue as guest');
+  });
 });

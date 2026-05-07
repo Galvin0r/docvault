@@ -1,0 +1,254 @@
+.home-search {
+  width: min(1180px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2rem 0 3rem;
+}
+
+.search-header {
+  margin-bottom: 1.25rem;
+}
+
+.search-header h1 {
+  margin: 0;
+  color: var(--p-text-muted-color);
+  font-size: clamp(1.75rem, 2.4vw, 2.6rem);
+  font-weight: 700;
+}
+
+.search-header p {
+  max-width: 48rem;
+  margin: 0.75rem 0 0;
+  color: var(--p-text-muted-color);
+}
+
+.search-filters {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 0.85rem;
+  align-items: end;
+  padding: 1rem;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 8px;
+  background: var(--p-content-background);
+}
+
+.result-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.field-wide {
+  grid-column: span 7;
+}
+
+.field-title {
+  grid-column: span 5;
+}
+
+.field-author,
+.field-scope {
+  grid-column: span 3;
+}
+
+.field-mode,
+.field-date {
+  grid-column: span 2;
+}
+
+.filter-actions {
+  grid-column: 11 / -1;
+  justify-self: end;
+}
+
+.results-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 2.75rem;
+  color: var(--p-text-muted-color);
+  font-weight: 600;
+}
+
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.result-item {
+  display: grid;
+  grid-template-columns: 8.75rem minmax(0, 1fr) 3rem;
+  gap: 1rem;
+  align-items: stretch;
+  min-height: 12rem;
+  padding: 1rem;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 8px;
+  background: var(--p-content-background);
+}
+
+.result-title-row h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.visibility {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+}
+
+.metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  color: var(--p-text-muted-color);
+  font-size: 0.92rem;
+}
+
+.metadata-top {
+  margin-top: 0.5rem;
+}
+
+.metadata-bottom {
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.snippet {
+  margin: 1rem 0 0;
+  color: var(--p-text-color);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+:host ::ng-deep mark {
+  padding: 0;
+  background: transparent;
+  color: var(--p-text-color);
+  font-weight: 800;
+}
+
+.result-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0.65rem;
+}
+
+.download-size {
+  color: var(--p-text-muted-color);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.action-buttons button {
+  width: 3rem;
+  height: 3rem;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  min-height: 16rem;
+  border: 1px dashed var(--p-content-border-color);
+  border-radius: 8px;
+  color: var(--p-text-muted-color);
+  font-weight: 700;
+}
+
+@media (max-width: 980px) {
+  .search-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .field-wide {
+    grid-column: span 2;
+  }
+
+  .field-title,
+  .field-author,
+  .field-scope,
+  .field-mode,
+  .field-date,
+  .filter-actions {
+    grid-column: span 2;
+  }
+
+  .result-item {
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+  }
+
+  .result-actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .action-buttons {
+    flex-direction: row;
+  }
+}
+
+@media (max-width: 640px) {
+  .home-search {
+    width: min(100% - 1rem, 1180px);
+    padding-top: 1rem;
+  }
+
+  .search-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .field-wide {
+    grid-column: span 1;
+  }
+
+  .field-title,
+  .field-author,
+  .field-scope,
+  .field-mode,
+  .field-date,
+  .filter-actions {
+    grid-column: span 1;
+  }
+
+  .result-item {
+    grid-template-columns: 1fr;
+  }
+
+  .file-preview {
+    min-height: 8rem;
+  }
+
+  .results-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .result-actions {
+    justify-content: space-between;
+
+    .action-buttons {
+      margin-left: auto;
+    }
+  }
+}

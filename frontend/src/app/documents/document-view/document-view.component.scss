@@ -1,0 +1,260 @@
+.document-view {
+  width: min(1180px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2rem 0 3rem;
+}
+
+.document-header,
+.document-section {
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 8px;
+  background: var(--p-content-background);
+}
+
+.document-header {
+  position: relative;
+  display: grid;
+  grid-template-columns: 8.75rem minmax(0, 1fr) minmax(16rem, 20rem);
+  gap: 1.25rem;
+  align-items: start;
+  padding: 1rem;
+}
+
+.document-header .file-preview {
+  width: 8.75rem;
+  height: 10rem;
+}
+
+.document-title {
+  min-width: 0;
+}
+
+.document-title h1 {
+  margin: 0;
+  color: var(--p-text-muted-color);
+  font-size: clamp(1.45rem, 1.8vw, 2rem);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.metadata {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem;
+  margin-top: 0.75rem;
+  color: var(--p-text-muted-color);
+  font-weight: 600;
+}
+
+.owner-link {
+  padding: 0;
+  color: var(--p-primary-color);
+  font-weight: 700;
+}
+
+.visibility {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.description {
+  margin: 1.25rem 0 0;
+  color: var(--p-text-color);
+}
+
+.header-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+  padding-top: 1.65rem;
+}
+
+.download-button {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.uploaded-date {
+  position: absolute;
+  top: 0.85rem;
+  right: 1rem;
+  color: var(--p-text-muted-color);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.document-section {
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.document-section h2,
+.document-section h3 {
+  margin: 0;
+  color: var(--p-text-muted-color);
+}
+
+.document-section h2 {
+  font-size: 1.1rem;
+}
+
+.document-section h3 {
+  font-size: 0.95rem;
+}
+
+.sharing-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.share-user-field {
+  flex: 0 1 22rem;
+}
+
+.share-user-field input {
+  box-sizing: border-box;
+  height: 2.75rem;
+}
+
+.sharing-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.sharing-actions button {
+  box-sizing: border-box;
+  height: 2.75rem;
+  min-height: 2.75rem;
+  padding-block: 0;
+}
+
+.owner-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.edit-dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.content-preview {
+  margin-top: 1rem;
+  padding: 0.35rem 0.25rem 0.1rem;
+}
+
+.side-info {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem 1rem;
+}
+
+.side-info div {
+  min-width: 0;
+}
+
+.side-info-wide {
+  grid-column: 1 / -1;
+}
+
+.side-info span,
+.side-info strong {
+  display: block;
+}
+
+.side-info span {
+  color: var(--p-text-muted-color);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.side-info strong {
+  margin-top: 0.25rem;
+  overflow-wrap: anywhere;
+}
+
+.empty-state {
+  color: var(--p-text-muted-color);
+  font-weight: 700;
+}
+
+.content-preview p {
+  margin: 0;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.content-preview p + p {
+  margin-top: 0.75rem;
+}
+
+.access-lists {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.25rem;
+}
+
+.access-list {
+  min-width: 0;
+}
+
+.access-list + .access-list {
+  border-left: 1px solid var(--p-content-border-color);
+  padding-left: 1.5rem;
+}
+
+.access-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.55rem;
+  margin-bottom: 0.75rem;
+}
+
+.loading-state,
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 12rem;
+}
+
+@media (max-width: 860px) {
+  .document-header,
+  .access-lists {
+    grid-template-columns: 1fr;
+  }
+
+  .access-list + .access-list {
+    border-left: 0;
+    border-top: 1px solid var(--p-content-border-color);
+    padding-left: 0;
+    padding-top: 1rem;
+  }
+
+  .header-actions {
+    padding-top: 0;
+  }
+
+  .uploaded-date {
+    position: static;
+  }
+
+  .file-preview {
+    width: 8.75rem;
+    height: 10rem;
+  }
+}

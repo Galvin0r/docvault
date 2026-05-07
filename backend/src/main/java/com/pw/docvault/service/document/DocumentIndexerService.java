@@ -86,6 +86,9 @@ public class DocumentIndexerService {
         fragment.setDocumentId(document.getId());
         fragment.setFragmentOrder(fragment.getFragmentOrder() != null ? fragment.getFragmentOrder() : fallbackFragmentOrder);
         fragment.setTitle(document.getTitle());
+        fragment.setOriginalFilename(document.getOriginalFilename());
+        fragment.setMimeType(safeMimeType(document.getMimeType()));
+        fragment.setSizeBytes(document.getSizeBytes());
         fragment.setOwnerId(document.getOwner().getId());
         fragment.setOwnerLogin(document.getOwner().getLogin());
         fragment.setCreatedAt(document.getCreated());

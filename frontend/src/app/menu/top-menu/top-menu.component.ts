@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserInfo } from '../../security/security.model';
 import { MenuItem } from 'primeng/api';
@@ -18,6 +19,7 @@ export class TopMenuComponent {
   activatedRoute = inject(ActivatedRoute);
   userInfo: UserInfo | null = null;
   securityService = inject(SecurityService);
+  searchControl = new FormControl('', { nonNullable: true });
 
   menuItems: MenuItem[] = [
     { separator: true },
@@ -42,7 +44,15 @@ export class TopMenuComponent {
   }
 
   home() {
-    this.router.navigate(['']);
+    this.router.navigate(['/']);
+  }
+
+  search(event?: Event) {
+    event?.preventDefault();
+    const content = this.searchControl.value.trim();
+    this.router.navigate(['/'], {
+      queryParams: content ? { content } : {},
+    });
   }
 
   logout() {
