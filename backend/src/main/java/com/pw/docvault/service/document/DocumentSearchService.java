@@ -73,21 +73,29 @@ public class DocumentSearchService {
         var queryBuilder = NativeQuery.builder()
                 .withQuery(searchQuery)
                 .withPageable(pageable)
-                .withTrackTotalHits(true)
-                .withFieldCollapse(FieldCollapse.of(c -> c.field("documentId")))
-                .withAggregation(DOCUMENT_COUNT_AGGREGATION, documentCountAggregation());
+                .withTrackTotalHits(true);
+        boolean collapseResults = shouldCollapseResults(effectiveMode, content);
+        if (collapseResults) {
+            queryBuilder
+                    .withFieldCollapse(FieldCollapse.of(c -> c.field("documentId")))
+                    .withAggregation(DOCUMENT_COUNT_AGGREGATION, documentCountAggregation());
+        }
         if (effectiveMode == DocumentSearchMode.KEYWORD && shouldHighlight(content, title)) {
             queryBuilder.withHighlightQuery(highlightQuery(hasText(content), hasText(title)));
         }
 
         var hits = elasticsearchOperations.search(queryBuilder.build(), DocumentFragment.class);
-        var documentHits = distinctDocumentHits(hits.getSearchHits());
-        Map<Long, Document> documentsById = findDocumentMetadata(documentHits);
-        List<DocumentSearchResultDto> results = documentHits.stream()
+        var resultHits = collapseResults ? distinctDocumentHits(hits.getSearchHits()) : hits.getSearchHits();
+        Map<Long, Document> documentsById = findDocumentMetadata(resultHits);
+        List<DocumentSearchResultDto> results = resultHits.stream()
                 .map(hit -> toDto(hit, documentsById.get(hit.getContent().getDocumentId()), title))
                 .toList();
 
-        return new PageImpl<>(results, pageable, totalDocuments(hits));
+        return new PageImpl<>(results, pageable, totalHits(hits, collapseResults));
+    }
+
+    private boolean shouldCollapseResults(DocumentSearchMode mode, String content) {
+        return mode == DocumentSearchMode.VECTOR || !hasText(content);
     }
 
     private Query keywordQuery(String content, String title, String author, Instant uploadedFrom, Instant uploadedTo,
@@ -336,8 +344,8 @@ public class DocumentSearchService {
         return List.copyOf(hitsByDocumentId.values());
     }
 
-    private long totalDocuments(SearchHits<DocumentFragment> hits) {
-        if (hits.getAggregations() instanceof ElasticsearchAggregations aggregations) {
+    private long totalHits(SearchHits<DocumentFragment> hits, boolean collapseResults) {
+        if (collapseResults && hits.getAggregations() instanceof ElasticsearchAggregations aggregations) {
             var aggregation = aggregations.get(DOCUMENT_COUNT_AGGREGATION);
             if (aggregation != null && aggregation.aggregation().getAggregate().isCardinality()) {
                 return aggregation.aggregation().getAggregate().cardinality().value();

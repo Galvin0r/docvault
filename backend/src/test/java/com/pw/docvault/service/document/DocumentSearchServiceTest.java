@@ -1,6 +1,5 @@
 package com.pw.docvault.service.document;
 
-import co.elastic.clients.elasticsearch._types.aggregations.Aggregate;
 import com.pw.docvault.entity.User;
 import com.pw.docvault.entity.document.Document;
 import com.pw.docvault.entity.document.DocumentFragment;
@@ -20,7 +19,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -34,7 +32,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -107,12 +104,12 @@ class DocumentSearchServiceTest {
         ArgumentCaptor<NativeQuery> captor = ArgumentCaptor.forClass(NativeQuery.class);
         verify(elasticsearchOperations).search(captor.capture(), eq(DocumentFragment.class));
         assertThat(captor.getValue().getQuery().toString()).contains("PUBLIC");
-        assertThat(captor.getValue().getFieldCollapse().field()).isEqualTo("documentId");
-        assertThat(captor.getValue().getAggregations()).containsKey("documentCount");
+        assertThat(captor.getValue().getFieldCollapse()).isNull();
+        assertThat(captor.getValue().getAggregations()).doesNotContainKey("documentCount");
     }
 
     @Test
-    void searchReturnsOneResultPerDocument() {
+    void keywordContentSearchReturnsMatchingFragmentsFromSameDocument() {
         DocumentFragment firstFragment = fragment();
         firstFragment.setFragmentOrder(1);
         firstFragment.setContent("First matching fragment.");
@@ -128,7 +125,7 @@ class DocumentSearchServiceTest {
                 searchHit(firstFragment, 7.5f, Map.of("content", List.of("First <mark>matching</mark> fragment."))),
                 searchHit(secondFragment, 6.0f, Map.of("content", List.of("Second <mark>matching</mark> fragment.")))
         ));
-        doReturn(documentCountAggregation(1L)).when(searchHits).getAggregations();
+        when(searchHits.getTotalHits()).thenReturn(2L);
         when(documentRepository.findAllById(List.of(42L))).thenReturn(List.of(documentMetadata()));
 
         var page = documentSearchService.search(
@@ -142,8 +139,8 @@ class DocumentSearchServiceTest {
                 PageRequest.of(0, 10)
         );
 
-        assertThat(page.getTotalElements()).isEqualTo(1);
-        assertThat(page.getContent()).hasSize(1);
+        assertThat(page.getTotalElements()).isEqualTo(2);
+        assertThat(page.getContent()).hasSize(2);
         assertThat(page.getContent().getFirst().fragmentOrder()).isEqualTo(1);
         assertThat(page.getContent().getFirst().highlightedContentSnippet())
                 .isEqualTo("First <mark>matching</mark> fragment.");
@@ -342,6 +339,8 @@ class DocumentSearchServiceTest {
         verify(elasticsearchOperations).search(captor.capture(), eq(DocumentFragment.class));
         assertThat(captor.getValue().getQuery().toString())
                 .contains("script_score", "cosineSimilarity", "query_vector", "embedding", "PUBLIC", "Policy");
+        assertThat(captor.getValue().getFieldCollapse().field()).isEqualTo("documentId");
+        assertThat(captor.getValue().getAggregations()).containsKey("documentCount");
     }
 
     @Test
@@ -397,13 +396,6 @@ class DocumentSearchServiceTest {
                 Map.of(),
                 fragment
         );
-    }
-
-    private ElasticsearchAggregations documentCountAggregation(long count) {
-        return new ElasticsearchAggregations(Map.of(
-                "documentCount",
-                Aggregate.of(a -> a.cardinality(c -> c.value(count)))
-        ));
     }
 
     private float[] unitVector(int dimension) {

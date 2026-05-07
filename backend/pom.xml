@@ -281,4 +281,19 @@
             </plugin>
 		</plugins>
 	</build>
+
+    <profiles>
+        <profile>
+            <id>skip-jacoco-when-unit-tests-are-skipped</id>
+            <activation>
+                <property>
+                    <name>skipUnitTests</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <jacoco.skip>true</jacoco.skip>
+            </properties>
+        </profile>
+    </profiles>
 </project>
