@@ -5,6 +5,7 @@ import com.pw.docvault.resolver.CustomAuthorizationRequestResolver;
 import com.pw.docvault.service.security.JwtFilter;
 import com.pw.docvault.service.security.OAuth2UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -38,8 +39,10 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req
+                        .requestMatchers(HttpMethod.GET, "/document/{id}", "/document/{id}/fragments").permitAll()
                         .requestMatchers(
                                 "/auth/**",
+                                "/e2e/**",
                                 "/doc/find",
                                 "/document/search",
                                 "/document/download/**"

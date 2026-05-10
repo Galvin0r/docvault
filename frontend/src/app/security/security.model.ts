@@ -1,7 +1,7 @@
 export interface AuthenticationRequest {
-  email: string,
+  email: string | null,
   password: string,
-  login: string,
+  login: string | null,
   deviceInfo: string,
   rememberMe: boolean
 }

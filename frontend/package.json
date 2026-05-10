@@ -8,7 +8,11 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:cov": "ng test -c cov",
-    "test:ci": "ng test -c ci --no-progress"
+    "test:ci": "ng test -c ci --no-progress",
+    "e2e": "playwright test",
+    "poste2e": "docker compose -p docvault-e2e -f ../deploy/compose.e2e.yaml down --remove-orphans",
+    "e2e:ui": "playwright test --ui",
+    "e2e:headed": "playwright test --headed"
   },
   "private": true,
   "dependencies": {
@@ -34,6 +38,7 @@
     "@angular-devkit/build-angular": "^20.3.1",
     "@angular/cli": "^20.3.1",
     "@angular/compiler-cli": "^20.3.0",
+    "@playwright/test": "^1.59.1",
     "@tailwindcss/postcss": "^4.1.13",
     "@types/jasmine": "~5.1.0",
     "@types/ramda": "^0.31.1",

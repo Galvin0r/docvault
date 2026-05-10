@@ -29,9 +29,11 @@ export class LoginComponent extends BaseFormComponent {
 
     const deviceId = getDeviceId();
     const { identifier, password, rememberMe } = this.form.value;
+    const loginOrEmail = String(identifier).trim();
+    const isEmail = loginOrEmail.includes('@');
     const authRequest: AuthenticationRequest = {
-      login: identifier,
-      email: identifier,
+      login: isEmail ? null : loginOrEmail,
+      email: isEmail ? loginOrEmail : null,
       password,
       rememberMe,
       deviceInfo: deviceId,

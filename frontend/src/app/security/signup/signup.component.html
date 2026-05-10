@@ -2,12 +2,12 @@
   <form card-body class="mt-8 space-y-4" [formGroup]="form" (ngSubmit)="onSubmit()">
     <app-form-error [error]="error" (onClose)="onErrorClose()" />
     <div class="flex flex-col space-y-1">
-      <label class="font-semibold">Username</label>
+      <label for="register-username" class="font-semibold">Username</label>
       <p-input-group>
         <p-inputgroup-addon>
           <i class="pi pi-user"></i>
         </p-inputgroup-addon>
-        <input pInputText type="text" formControlName="username" [ngClass]="{
+        <input pInputText id="register-username" type="text" formControlName="username" [ngClass]="{
             'p-invalid': isInvalid('username'),
             'p-valid': isValid('username')
           }" [attr.aria-invalid]="isInvalid('username')" />
@@ -20,12 +20,12 @@
     </div>
 
     <div class="flex flex-col space-y-1">
-      <label class="font-semibold">Email</label>
+      <label for="register-email" class="font-semibold">Email</label>
       <p-input-group>
         <p-inputgroup-addon>
           <i class="pi pi-at"></i>
         </p-inputgroup-addon>
-        <input pInputText type="email" formControlName="email" [ngClass]="{
+        <input pInputText id="register-email" type="email" formControlName="email" [ngClass]="{
             'p-invalid': isInvalid('email'),
             'p-valid': isValid('email')
           }" [attr.aria-invalid]="isInvalid('email')" />
@@ -41,12 +41,12 @@
 
     <div formGroupName="passwords" class="flex flex-col space-y-4">
       <div class="flex flex-col space-y-1">
-        <label class="font-semibold">Password</label>
+        <label for="register-password" class="font-semibold">Password</label>
         <p-input-group>
           <p-inputgroup-addon>
             <i class="pi pi-lock"></i>
           </p-inputgroup-addon>
-          <p-password formControlName="password" [feedback]="false" [toggleMask]="true" [inputStyleClass]="
+          <p-password inputId="register-password" formControlName="password" [feedback]="false" [toggleMask]="true" [inputStyleClass]="
               isInvalid('passwords.password')
                 ? 'p-invalid'
                 : isValid('passwords.password')
@@ -66,12 +66,12 @@
       </div>
 
       <div class="flex flex-col space-y-1">
-        <label class="font-semibold">Confirm password</label>
+        <label for="register-confirm-password" class="font-semibold">Confirm password</label>
         <p-input-group>
           <p-inputgroup-addon>
             <i class="pi pi-lock"></i>
           </p-inputgroup-addon>
-          <p-password formControlName="confirmPassword" [feedback]="false" [toggleMask]="true" [inputStyleClass]="
+          <p-password inputId="register-confirm-password" formControlName="confirmPassword" [feedback]="false" [toggleMask]="true" [inputStyleClass]="
               isMismatched() ? 'p-invalid' : isValid('passwords.confirmPassword') ? 'p-valid' : ''
             " />
         </p-input-group>
