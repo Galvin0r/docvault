@@ -134,5 +134,5 @@ run('npm', ['start', '--', '--host', '127.0.0.1', '--port', '4200'], {
 });
 await waitForHttp('http://127.0.0.1:4200', 180_000);
 
-console.log('[e2e] Real DocVault stack is ready');
+console.log('[e2e] DocVault stack is ready');
 setInterval(() => {}, 60_000);

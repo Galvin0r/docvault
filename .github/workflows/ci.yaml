@@ -102,7 +102,7 @@ jobs:
         run: npm run build -- --configuration production
 
   e2e:
-    name: Real End-to-End Tests
+    name: End-to-End Tests
     runs-on: ubuntu-latest
     needs:
       - backend-integration
@@ -137,7 +137,7 @@ jobs:
         working-directory: frontend
         run: npx playwright install --with-deps chrome
 
-      - name: Run real E2E tests
+      - name: Run E2E tests
         working-directory: frontend
         run: npm run e2e
 

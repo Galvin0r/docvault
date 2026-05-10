@@ -23,8 +23,8 @@ test.beforeEach(async ({ request }) => {
   throw new Error(lastError);
 });
 
-test.describe('DocVault real end-to-end flows', () => {
-  test('guest searches public documents and opens the real document preview', async ({ page }) => {
+test.describe('DocVault end-to-end flows', () => {
+  test('guest searches public documents and opens a document preview', async ({ page }) => {
     await page.goto('/');
 
     await expect(page.getByRole('heading', { name: 'Documents' })).toBeVisible();
@@ -43,7 +43,7 @@ test.describe('DocVault real end-to-end flows', () => {
     await expect(page.getByText('The backup inverter is tested every Friday morning.')).toBeVisible();
   });
 
-  test('login uses the real backend and opens the authenticated workspace', async ({ page }) => {
+  test('login opens the authenticated workspace', async ({ page }) => {
     await page.goto('/login');
     await page.getByRole('button', { name: 'Sign in' }).click();
 
@@ -64,7 +64,7 @@ test.describe('DocVault real end-to-end flows', () => {
     await expect(page.getByText('Legal Archive Retention')).toBeVisible();
   });
 
-  test('owner shares a private document and the target user can find it through real search ACLs', async ({ page }) => {
+  test('owner shares a private document and the target user can find it through search ACLs', async ({ page }) => {
     await login(page, fixture.alice.login, fixture.alice.password);
 
     await page.goto(`/document/${fixture.privateDocumentId}`);
@@ -84,7 +84,7 @@ test.describe('DocVault real end-to-end flows', () => {
     await expect(page.getByText('Legal Archive Retention')).toBeVisible({ timeout: 10_000 });
   });
 
-  test('authenticated user browses real groups and profile data', async ({ page }) => {
+  test('authenticated user browses groups and profile data', async ({ page }) => {
     await login(page, fixture.alice.login, fixture.alice.password);
 
     await page.goto('/groups');

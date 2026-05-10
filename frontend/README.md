@@ -46,13 +46,13 @@ ng test
 
 ## Running end-to-end tests
 
-End-to-end tests use Playwright against a real local DocVault stack. The runner starts Postgres and Elasticsearch with Docker Compose, starts the Spring Boot backend with the `e2e` profile, starts the Angular dev server, resets deterministic fixture data through a profile-only backend endpoint, and then drives the browser:
+End-to-end tests use Playwright against a local DocVault stack. The runner starts Postgres and Elasticsearch with Docker Compose, starts the Spring Boot backend with the `e2e` profile, starts the Angular dev server, resets deterministic fixture data through a profile-only backend endpoint, and then drives the browser:
 
 ```bash
 npm run e2e
 ```
 
-To run against an already-running real stack, set `E2E_BASE_URL` and make sure the backend is available at `http://127.0.0.1:8080/api`:
+To run against an already-running stack, set `E2E_BASE_URL` and make sure the backend is available at `http://127.0.0.1:8080/api`:
 
 ```bash
 E2E_BASE_URL=http://127.0.0.1:4200 npm run e2e

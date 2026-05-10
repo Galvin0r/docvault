@@ -210,11 +210,22 @@ describe('LoginComponent', () => {
     expect(navSpy).toHaveBeenCalledWith(['/home']);
     const req = security.login.calls.mostRecent().args[0];
     expect(req.login).toBe('john');
-    expect(req.email).toBe('john');
+    expect(req.email).toBeNull();
     expect(req.password).toBe('secret');
     expect(req.rememberMe).toBeTrue();
     expect(typeof req.deviceInfo).toBe('string');
     expect((req.deviceInfo as string).length).toBeGreaterThan(0);
+  });
+
+  it('submits email identifiers as email credentials', () => {
+    create();
+    spyOn(router, 'navigate').and.stub();
+    security.login.and.returnValue(of(void 0));
+    component.form.setValue({ identifier: 'john@example.test', password: 'secret', rememberMe: false });
+    component.onSubmit();
+    const req = security.login.calls.mostRecent().args[0];
+    expect(req.login).toBeNull();
+    expect(req.email).toBe('john@example.test');
   });
 
   it('onSubmit branch: successful login (next path)', () => {

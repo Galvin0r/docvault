@@ -19,7 +19,7 @@ export default defineConfig({
   webServer: process.env.E2E_BASE_URL
     ? undefined
     : {
-        command: 'node e2e/start-real-stack.mjs',
+        command: 'node e2e/start-stack.mjs',
         url: baseURL,
         reuseExistingServer: false,
         timeout: 300_000,
