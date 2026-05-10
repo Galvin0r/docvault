@@ -92,16 +92,37 @@ async function cleanup(code = 0) {
   if (cleaningUp) return;
   cleaningUp = true;
 
-  for (const child of children.reverse()) {
-    try {
-      process.kill(-child.pid, 'SIGTERM');
-    } catch {
-      // Process already exited.
-    }
+  for (const child of children.toReversed()) {
+    terminateProcessGroup(child, 'SIGTERM');
+  }
+
+  await Promise.race([
+    Promise.all(children.map(waitForExit)),
+    delay(5_000),
+  ]);
+
+  for (const child of children.toReversed()) {
+    terminateProcessGroup(child, 'SIGKILL');
   }
 
   runOnce('docker', ['compose', '-p', composeProject, '-f', composeFile, 'down', '--remove-orphans']);
   process.exit(code);
+}
+
+function terminateProcessGroup(child, signal) {
+  if (!child.pid || child.exitCode !== null || child.signalCode !== null) return;
+  try {
+    process.kill(-child.pid, signal);
+  } catch {
+    // Process already exited.
+  }
+}
+
+function waitForExit(child) {
+  if (child.exitCode !== null || child.signalCode !== null) {
+    return Promise.resolve();
+  }
+  return new Promise(resolve => child.once('exit', resolve));
 }
 
 process.on('SIGINT', () => cleanup(130));
@@ -121,7 +142,8 @@ await waitForTcp('127.0.0.1', 55432);
 await waitForHttp('http://127.0.0.1:59200');
 
 run('./mvnw', [
-  '-q',
+  '-B',
+  '-ntp',
   '-DskipTests',
   'spring-boot:run',
   '-Dspring-boot.run.arguments=--spring.profiles.active=e2e',

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -82,6 +83,7 @@ public class BeansConfig {
     }
 
     @Bean
+    @Profile("!e2e")
     public com.google.cloud.storage.Storage storage(@Value("${app.gcs.credentials.location}") Resource credentials) throws java.io.IOException {
         return com.google.cloud.storage.StorageOptions.newBuilder()
                 .setCredentials(com.google.auth.oauth2.ServiceAccountCredentials.fromStream(credentials.getInputStream()))

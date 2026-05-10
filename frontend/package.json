@@ -10,7 +10,7 @@
     "test:cov": "ng test -c cov",
     "test:ci": "ng test -c ci --no-progress",
     "e2e": "playwright test",
-    "poste2e": "docker compose -p docvault-e2e -f ../deploy/compose.e2e.yaml down --remove-orphans",
+    "poste2e": "node e2e/cleanup-stack.mjs",
     "e2e:ui": "playwright test --ui",
     "e2e:headed": "playwright test --headed"
   },
