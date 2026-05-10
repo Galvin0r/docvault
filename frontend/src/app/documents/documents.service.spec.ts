@@ -57,12 +57,85 @@ describe('DocumentService', () => {
     req.flush(response);
   });
 
+  it('get should GET document details', () => {
+    const response = { id: 9, title: 'Doc' } as any;
+
+    service.get(9).subscribe((value) => {
+      expect(value).toEqual(response);
+    });
+
+    const req = http.expectOne('/api/document/9');
+    expect(req.request.method).toBe('GET');
+    req.flush(response);
+  });
+
+  it('getFragments should GET document fragments with limit param', () => {
+    const response = [{ fragmentOrder: 0, content: 'First' }];
+
+    service.getFragments(9, 2).subscribe((value) => {
+      expect(value).toEqual(response);
+    });
+
+    const req = http.expectOne(
+      (request) =>
+        request.url === '/api/document/9/fragments' &&
+        request.params.get('limit') === '2'
+    );
+    expect(req.request.method).toBe('GET');
+    req.flush(response);
+  });
+
+  it('updateTitle should PATCH document title endpoint', () => {
+    service.updateTitle(9, 'Updated').subscribe((value) => {
+      expect(value).toBeNull();
+    });
+
+    const req = http.expectOne(
+      (request) =>
+        request.url === '/api/document/9/title' &&
+        request.params.get('title') === 'Updated'
+    );
+    expect(req.request.method).toBe('PATCH');
+    expect(req.request.body).toBeNull();
+    req.flush(null);
+  });
+
+  it('updateVisibility should PATCH document visibility endpoint', () => {
+    service.updateVisibility(9, 'PUBLIC').subscribe((value) => {
+      expect(value).toBeNull();
+    });
+
+    const req = http.expectOne(
+      (request) =>
+        request.url === '/api/document/9/visibility' &&
+        request.params.get('visibility') === 'PUBLIC'
+    );
+    expect(req.request.method).toBe('PATCH');
+    expect(req.request.body).toBeNull();
+    req.flush(null);
+  });
+
   it('grantGroupAccess should PUT group share endpoint', () => {
     service.grantGroupAccess(9, 4).subscribe((value) => {
       expect(value).toBeNull();
     });
 
     const req = http.expectOne('/api/document/9/access/groups/4');
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toBeNull();
+    req.flush(null);
+  });
+
+  it('grantUserAccessByLogin should PUT user share endpoint with login param', () => {
+    service.grantUserAccessByLogin(9, 'alice').subscribe((value) => {
+      expect(value).toBeNull();
+    });
+
+    const req = http.expectOne(
+      (request) =>
+        request.url === '/api/document/9/access/users/by-login' &&
+        request.params.get('login') === 'alice'
+    );
     expect(req.request.method).toBe('PUT');
     expect(req.request.body).toBeNull();
     req.flush(null);

@@ -105,6 +105,7 @@ class DocumentIntegrationSupport {
                          documents, groups, activation_tokens, refresh_tokens, password_reset_tokens, users
                 RESTART IDENTITY CASCADE
                 """);
+        resetSequences();
 
         var indexOps = elasticsearchOperations.indexOps(DocumentFragment.class);
         if (indexOps.exists()) {
@@ -240,6 +241,21 @@ class DocumentIntegrationSupport {
 
     void refreshIndex() {
         elasticsearchOperations.indexOps(DocumentFragment.class).refresh();
+    }
+
+    private void resetSequences() {
+        jdbcTemplate.execute("""
+                ALTER SEQUENCE users_seq RESTART WITH 1;
+                ALTER SEQUENCE activation_tokens_seq RESTART WITH 1;
+                ALTER SEQUENCE refresh_tokens_seq RESTART WITH 1;
+                ALTER SEQUENCE groups_seq RESTART WITH 1;
+                ALTER SEQUENCE documents_seq RESTART WITH 1;
+                ALTER SEQUENCE document_access_seq RESTART WITH 1;
+                ALTER SEQUENCE group_membership_seq RESTART WITH 1;
+                ALTER SEQUENCE password_reset_tokens_seq RESTART WITH 1;
+                ALTER SEQUENCE group_join_requests_seq RESTART WITH 1;
+                ALTER SEQUENCE document_index_jobs_seq RESTART WITH 1;
+                """);
     }
 
     private void awaitIndexDeleted(IndexOperations indexOps) throws InterruptedException {

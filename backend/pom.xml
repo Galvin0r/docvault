@@ -25,6 +25,8 @@
         <jacoco.version>0.8.14</jacoco.version>
         <testcontainers.version>2.0.4</testcontainers.version>
         <opentelemetry.semconv.version>1.37.0</opentelemetry.semconv.version>
+        <mockito.version>5.20.0</mockito.version>
+        <argLine></argLine>
         <jacoco.skip>false</jacoco.skip>
         <skipUnitTests>false</skipUnitTests>
         <skipITs>true</skipITs>
@@ -241,6 +243,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <argLine>@{argLine} -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar</argLine>
                     <skipTests>${skipUnitTests}</skipTests>
                     <systemPropertyVariables>
                         <debug>false</debug>
@@ -254,6 +257,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
+                    <argLine>@{argLine} -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar</argLine>
                     <skipITs>${skipITs}</skipITs>
                     <environmentVariables>
                         <DOCKER_API_VERSION>1.40</DOCKER_API_VERSION>

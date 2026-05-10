@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RequiredArgsConstructor
-class DocumentSecurityIT extends AbstractDocumentIT {
+class DocumentSecurityIT extends AbstractSearchIntegrationIT {
 
     private final DocumentIntegrationSupport documents;
 
@@ -63,6 +63,10 @@ class DocumentSecurityIT extends AbstractDocumentIT {
 
         documents.mockMvc().perform(put("/document/1/access/users/2"))
                 .andExpect(status().isUnauthorized());
+
+        documents.mockMvc().perform(put("/document/1/access/users/by-login")
+                        .param("login", "alice"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -98,6 +102,11 @@ class DocumentSecurityIT extends AbstractDocumentIT {
 
         documents.mockMvc().perform(put("/document/%d/access/users/%d".formatted(indexedDocument.getId(), bob.getId()))
                         .with(user(bob)))
+                .andExpect(status().isForbidden());
+
+        documents.mockMvc().perform(put("/document/%d/access/users/by-login".formatted(indexedDocument.getId()))
+                        .with(user(bob))
+                        .param("login", "alice"))
                 .andExpect(status().isForbidden());
 
         documents.mockMvc().perform(put("/document/%d/access/groups/%d".formatted(indexedDocument.getId(), team.getId()))

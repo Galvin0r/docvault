@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RequiredArgsConstructor
-class DocumentIndexingFailureIT extends AbstractDocumentIT {
+class DocumentSyncFailureIT extends AbstractSearchIntegrationIT {
 
     private final DocumentIntegrationSupport documents;
 

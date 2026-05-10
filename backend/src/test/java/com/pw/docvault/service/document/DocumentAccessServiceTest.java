@@ -123,6 +123,28 @@ class DocumentAccessServiceTest {
     }
 
     @Test
+    void grantUserAccessByLoginResolvesUserAndCreatesEntry() {
+        User targetUser = new User();
+        targetUser.setId(2L);
+        targetUser.setLogin("alice");
+
+        when(userService.getUserByLoginOrEmailOrThrow("alice")).thenReturn(targetUser);
+        when(documentService.getOwnedDocumentOrThrow(10L)).thenReturn(document);
+        when(userService.getUserOrThrow(2L)).thenReturn(targetUser);
+        when(documentAccessRepository.findByDocumentIdAndUserId(10L, 2L)).thenReturn(Optional.empty());
+
+        documentAccessService.grantUserAccessByLogin(10L, "alice");
+
+        verify(userService).getUserByLoginOrEmailOrThrow("alice");
+        verify(documentAccessRepository).save(argThat(access ->
+                access.getDocument() == document
+                        && access.getUser() == targetUser
+                        && access.getPermission() == AccessPermission.READ
+        ));
+        verify(documentMetadataSyncService).schedule(10L);
+    }
+
+    @Test
     void grantGroupAccessRejectsWhenOwnerDoesNotBelongToGroup() {
         Group group = new Group();
         group.setId(4L);

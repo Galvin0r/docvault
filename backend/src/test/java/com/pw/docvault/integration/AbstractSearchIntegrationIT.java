@@ -1,6 +1,7 @@
 package com.pw.docvault.integration;
 
 import com.google.cloud.storage.Storage;
+import com.pw.docvault.service.EmailService;
 import com.pw.docvault.service.document.DocumentProcessingClient;
 import com.pw.docvault.service.document.GoogleCloudStorageService;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,7 +26,7 @@ import static org.testcontainers.containers.wait.strategy.Wait.forHttp;
 @ActiveProfiles("test")
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-abstract class AbstractDocumentIT {
+abstract class AbstractSearchIntegrationIT {
 
     @Container
     static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer(DockerImageName.parse("postgres:16"));
@@ -49,12 +50,15 @@ abstract class AbstractDocumentIT {
     @MockitoBean
     protected DocumentProcessingClient documentProcessingClient;
 
+    @MockitoBean
+    protected EmailService emailService;
+
     @DynamicPropertySource
     static void registerProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES::getUsername);
         registry.add("spring.datasource.password", POSTGRES::getPassword);
-        registry.add("spring.elasticsearch.uris", AbstractDocumentIT::elasticsearchUrl);
+        registry.add("spring.elasticsearch.uris", AbstractSearchIntegrationIT::elasticsearchUrl);
     }
 
     private static String elasticsearchUrl() {

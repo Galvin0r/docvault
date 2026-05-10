@@ -51,7 +51,7 @@ public class GroupMembershipService {
             throw  new ForbiddenException(ErrorCode.MEMBER_NOT_ALLOWED, "Only owner can change group role");
         }
 
-        if (actor.getId().equals(userId)) {
+        if (actor.getUser().getId().equals(userId)) {
             return;
         }
 

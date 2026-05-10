@@ -1,6 +1,7 @@
 package com.pw.docvault.controller;
 
 import com.pw.docvault.model.document.DocumentAccessDto;
+import com.pw.docvault.model.document.DocumentContentFragmentDto;
 import com.pw.docvault.model.document.DocumentDto;
 import com.pw.docvault.model.document.DocumentSearchResultDto;
 import com.pw.docvault.model.enums.DocumentSearchMode;
@@ -97,12 +98,49 @@ class DocumentControllerTest {
     }
 
     @Test
+    void updateTitleReturnsNoContent() throws Exception {
+        mockMvc.perform(patch("/document/10/title")
+                        .param("title", "Updated title"))
+                .andExpect(status().isNoContent());
+
+        verify(documentService).updateTitle(10L, "Updated title");
+    }
+
+    @Test
     void downloadReturnsSignedUrl() throws Exception {
         when(documentService.download(10L)).thenReturn("http://download-url");
 
         mockMvc.perform(get("/document/download/10"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("http://download-url"));
+    }
+
+    @Test
+    void getDocumentReturnsReadableDocument() throws Exception {
+        var uploadedAt = Instant.parse("2026-04-11T10:15:30Z");
+        var dto = new DocumentDto(10L, "Readable", "D", "f.txt", "text/plain", uploadedAt,
+                DocumentVisibility.PRIVATE, 1L, "alice", 100L, DocumentStatus.INDEXED, null, null);
+        when(documentService.getReadableDocument(10L)).thenReturn(dto);
+
+        mockMvc.perform(get("/document/10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(10))
+                .andExpect(jsonPath("$.title").value("Readable"))
+                .andExpect(jsonPath("$.ownerLogin").value("alice"));
+    }
+
+    @Test
+    void contentPreviewReturnsReadableFragments() throws Exception {
+        when(documentService.getReadableContentPreview(10L, 2)).thenReturn(List.of(
+                new DocumentContentFragmentDto(0, "First"),
+                new DocumentContentFragmentDto(1, "Second")
+        ));
+
+        mockMvc.perform(get("/document/10/fragments").param("limit", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].fragmentOrder").value(0))
+                .andExpect(jsonPath("$[0].content").value("First"))
+                .andExpect(jsonPath("$[1].fragmentOrder").value(1));
     }
 
     @Test
@@ -187,6 +225,15 @@ class DocumentControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(documentAccessService).grantUserAccess(10L, 2L);
+    }
+
+    @Test
+    void grantUserAccessByLoginReturnsNoContent() throws Exception {
+        mockMvc.perform(put("/document/10/access/users/by-login")
+                        .param("login", "alice"))
+                .andExpect(status().isNoContent());
+
+        verify(documentAccessService).grantUserAccessByLogin(10L, "alice");
     }
 
     @Test

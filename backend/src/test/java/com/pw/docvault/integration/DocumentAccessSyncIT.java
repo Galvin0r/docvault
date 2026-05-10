@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RequiredArgsConstructor
-class DocumentAccessSyncIT extends AbstractDocumentIT {
+class DocumentAccessSyncIT extends AbstractSearchIntegrationIT {
 
     private final DocumentIntegrationSupport documents;
 
@@ -60,6 +60,34 @@ class DocumentAccessSyncIT extends AbstractDocumentIT {
         documents.refreshIndex();
 
         assertSearchTotal(bob, "direct", "ACCESSIBLE", 0);
+    }
+
+    @Test
+    void directUserAccessGrantByLoginSynchronizesSearchAcl() throws Exception {
+        var alice = documents.createUser("alice");
+        var bob = documents.createUser("bob");
+
+        var document = documents.createDocument(alice, "Login Shared Roadmap", DocumentVisibility.PRIVATE,
+                DocumentStatus.INDEXED, Instant.parse("2026-04-02T10:00:00Z"));
+        documents.indexFragment(document, "login shared keyword");
+        documents.refreshIndex();
+
+        assertSearchTotal(bob, "login", "ACCESSIBLE", 0);
+
+        documents.mockMvc().perform(put("/document/%d/access/users/by-login".formatted(document.getId()))
+                        .with(user(alice))
+                        .param("login", bob.getLogin()))
+                .andExpect(status().isNoContent());
+        documents.documentIndexWorker().poll();
+        documents.refreshIndex();
+
+        assertSearchTotal(bob, "login", "ACCESSIBLE", 1);
+
+        documents.mockMvc().perform(get("/document/%d/access".formatted(document.getId())).with(user(alice)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].userId").value(bob.getId()))
+                .andExpect(jsonPath("$[0].userLogin").value(bob.getLogin()));
     }
 
     @Test
@@ -124,6 +152,30 @@ class DocumentAccessSyncIT extends AbstractDocumentIT {
     }
 
     @Test
+    void titleUpdateSynchronizesSearchMetadata() throws Exception {
+        var alice = documents.createUser("alice");
+        var document = documents.createDocument(alice, "Original Planning Title", DocumentVisibility.PRIVATE,
+                DocumentStatus.INDEXED, Instant.parse("2026-04-16T10:00:00Z"));
+        documents.indexFragment(document, "metadata sync body");
+        documents.refreshIndex();
+
+        assertSearchTotal(alice, null, "ACCESSIBLE", 0, "revised");
+
+        documents.mockMvc().perform(patch("/document/%d/title".formatted(document.getId()))
+                        .with(user(alice))
+                        .param("title", "Revised Planning Title"))
+                .andExpect(status().isNoContent());
+        documents.documentIndexWorker().poll();
+        documents.refreshIndex();
+
+        assertSearchTotal(alice, null, "ACCESSIBLE", 1, "revised");
+        documents.mockMvc().perform(get("/document/%d".formatted(document.getId()))
+                        .with(user(alice)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("Revised Planning Title"));
+    }
+
+    @Test
     void ownerCannotGrantAccessToSelf() throws Exception {
         var alice = documents.createUser("alice");
         var document = documents.createDocument(alice, "Self Share", DocumentVisibility.PRIVATE,
@@ -136,12 +188,25 @@ class DocumentAccessSyncIT extends AbstractDocumentIT {
 
     private void assertSearchTotal(org.springframework.security.core.userdetails.UserDetails user,
                                    String content, String scope, int total) {
-        await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> documents.mockMvc().perform(get("/document/search")
-                        .with(user(user))
-                        .param("content", content)
-                        .param("scope", scope))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(total)));
+        assertSearchTotal(user, content, scope, total, null);
+    }
+
+    private void assertSearchTotal(org.springframework.security.core.userdetails.UserDetails user,
+                                   String content, String scope, int total, String title) {
+        await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
+            var request = get("/document/search")
+                    .with(user(user))
+                    .param("scope", scope);
+            if (content != null) {
+                request.param("content", content);
+            }
+            if (title != null) {
+                request.param("title", title);
+            }
+            documents.mockMvc().perform(request)
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.totalElements").value(total));
+        });
     }
 
     private void assertAnonymousSearchTotal(String content, int total) {
