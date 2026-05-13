@@ -58,13 +58,9 @@ public class DocumentSearchService {
                                                 Instant uploadedFrom, Instant uploadedTo, DocumentSearchScope scope,
                                                 Pageable pageable) {
         Optional<User> user = currentUserProvider.getOptional();
-        List<Long> groupIds = user.map(value -> groupMembershipRepository.findAllByUserId(value.getId()).stream()
-                                                                         .map(membership ->
-                                                                                      membership.getGroup().getId())
-                                                                         .toList())
-                                  .orElseGet(List::of);
         DocumentSearchMode effectiveMode = mode == null ? DocumentSearchMode.KEYWORD : mode;
         DocumentSearchScope effectiveScope = scope == null ? DocumentSearchScope.ACCESSIBLE : scope;
+        List<Long> groupIds = groupIdsForSearch(user, effectiveScope);
         Query searchQuery = switch (effectiveMode) {
             case KEYWORD -> keywordQuery(content, title, author, uploadedFrom, uploadedTo, effectiveScope, user, groupIds);
             case VECTOR -> vectorQuery(content, title, author, uploadedFrom, uploadedTo, effectiveScope, user, groupIds);
@@ -73,29 +69,30 @@ public class DocumentSearchService {
         var queryBuilder = NativeQuery.builder()
                 .withQuery(searchQuery)
                 .withPageable(pageable)
-                .withTrackTotalHits(true);
-        boolean collapseResults = shouldCollapseResults(effectiveMode, content);
-        if (collapseResults) {
-            queryBuilder
-                    .withFieldCollapse(FieldCollapse.of(c -> c.field("documentId")))
-                    .withAggregation(DOCUMENT_COUNT_AGGREGATION, documentCountAggregation());
-        }
+                .withFieldCollapse(FieldCollapse.of(c -> c.field("documentId")))
+                .withAggregation(DOCUMENT_COUNT_AGGREGATION, documentCountAggregation());
         if (effectiveMode == DocumentSearchMode.KEYWORD && shouldHighlight(content, title)) {
             queryBuilder.withHighlightQuery(highlightQuery(hasText(content), hasText(title)));
         }
 
         var hits = elasticsearchOperations.search(queryBuilder.build(), DocumentFragment.class);
-        var resultHits = collapseResults ? distinctDocumentHits(hits.getSearchHits()) : hits.getSearchHits();
+        var resultHits = distinctDocumentHits(hits.getSearchHits());
         Map<Long, Document> documentsById = findDocumentMetadata(resultHits);
         List<DocumentSearchResultDto> results = resultHits.stream()
                 .map(hit -> toDto(hit, documentsById.get(hit.getContent().getDocumentId()), title))
                 .toList();
 
-        return new PageImpl<>(results, pageable, totalHits(hits, collapseResults));
+        return new PageImpl<>(results, pageable, totalHits(hits, resultHits));
     }
 
-    private boolean shouldCollapseResults(DocumentSearchMode mode, String content) {
-        return mode == DocumentSearchMode.VECTOR || !hasText(content);
+    private List<Long> groupIdsForSearch(Optional<User> user, DocumentSearchScope scope) {
+        if (user.isEmpty() || (scope != DocumentSearchScope.ACCESSIBLE && scope != DocumentSearchScope.SHARED_WITH_ME)) {
+            return List.of();
+        }
+
+        return groupMembershipRepository.findAllByUserId(user.get().getId()).stream()
+                .map(membership -> membership.getGroup().getId())
+                .toList();
     }
 
     private Query keywordQuery(String content, String title, String author, Instant uploadedFrom, Instant uploadedTo,
@@ -243,7 +240,10 @@ public class DocumentSearchService {
 
     private Query accessQuery(DocumentSearchScope scope, Optional<User> user, List<Long> groupIds) {
         if (user.isEmpty()) {
-            return publicQuery();
+            return switch (scope) {
+                case PUBLIC, ACCESSIBLE -> publicQuery();
+                case OWNED_BY_ME, SHARED_WITH_ME -> matchNoneQuery();
+            };
         }
 
         Long userId = user.get().getId();
@@ -286,6 +286,10 @@ public class DocumentSearchService {
                 .field("visibility")
                 .value(DocumentVisibility.PUBLIC.name())
         ));
+    }
+
+    private Query matchNoneQuery() {
+        return Query.of(q -> q.matchNone(mn -> mn));
     }
 
     private Query termQuery(String field, Long value) {
@@ -344,14 +348,14 @@ public class DocumentSearchService {
         return List.copyOf(hitsByDocumentId.values());
     }
 
-    private long totalHits(SearchHits<DocumentFragment> hits, boolean collapseResults) {
-        if (collapseResults && hits.getAggregations() instanceof ElasticsearchAggregations aggregations) {
+    private long totalHits(SearchHits<DocumentFragment> hits, List<SearchHit<DocumentFragment>> resultHits) {
+        if (hits.getAggregations() instanceof ElasticsearchAggregations aggregations) {
             var aggregation = aggregations.get(DOCUMENT_COUNT_AGGREGATION);
             if (aggregation != null && aggregation.aggregation().getAggregate().isCardinality()) {
                 return aggregation.aggregation().getAggregate().cardinality().value();
             }
         }
-        return hits.getTotalHits();
+        return resultHits.size();
     }
 
     private Map<Long, Document> findDocumentMetadata(List<SearchHit<DocumentFragment>> hits) {

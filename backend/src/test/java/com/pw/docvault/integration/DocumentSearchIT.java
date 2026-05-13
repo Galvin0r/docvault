@@ -241,7 +241,7 @@ class DocumentSearchIT extends AbstractSearchIntegrationIT {
     }
 
     @Test
-    void keywordSearchReturnsMatchingFragmentsForMultiFragmentDocument() throws Exception {
+    void keywordSearchReturnsBestMatchingFragmentForMultiFragmentDocument() throws Exception {
         var alice = documents.createUser("alice");
         var document = documents.createDocument(alice, "Multi Fragment Manual", DocumentVisibility.PRIVATE,
                 DocumentStatus.INDEXED, Instant.parse("2026-02-15T10:00:00Z"));
@@ -255,10 +255,10 @@ class DocumentSearchIT extends AbstractSearchIntegrationIT {
                         .param("content", "shared keyword")
                         .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(2))
-                .andExpect(jsonPath("$.content[*].documentId", org.hamcrest.Matchers.everyItem(
-                        org.hamcrest.Matchers.is(document.getId().intValue()))))
-                .andExpect(jsonPath("$.content[*].fragmentOrder", org.hamcrest.Matchers.containsInAnyOrder(0, 1)));
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].documentId").value(document.getId()))
+                .andExpect(jsonPath("$.content[0].fragmentOrder", org.hamcrest.Matchers.isOneOf(0, 1)));
     }
 
     @Test

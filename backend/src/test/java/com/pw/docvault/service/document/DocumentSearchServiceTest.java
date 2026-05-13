@@ -32,6 +32,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -80,7 +81,6 @@ class DocumentSearchServiceTest {
         when(elasticsearchOperations.search(org.mockito.ArgumentMatchers.any(NativeQuery.class), eq(DocumentFragment.class)))
                 .thenReturn(searchHits);
         when(searchHits.getSearchHits()).thenReturn(List.of(hit));
-        when(searchHits.getTotalHits()).thenReturn(1L);
         when(documentRepository.findAllById(List.of(42L))).thenReturn(List.of(documentMetadata()));
 
         var page = documentSearchService.search(
@@ -104,12 +104,12 @@ class DocumentSearchServiceTest {
         ArgumentCaptor<NativeQuery> captor = ArgumentCaptor.forClass(NativeQuery.class);
         verify(elasticsearchOperations).search(captor.capture(), eq(DocumentFragment.class));
         assertThat(captor.getValue().getQuery().toString()).contains("PUBLIC");
-        assertThat(captor.getValue().getFieldCollapse()).isNull();
-        assertThat(captor.getValue().getAggregations()).doesNotContainKey("documentCount");
+        assertThat(captor.getValue().getFieldCollapse().field()).isEqualTo("documentId");
+        assertThat(captor.getValue().getAggregations()).containsKey("documentCount");
     }
 
     @Test
-    void keywordContentSearchReturnsMatchingFragmentsFromSameDocument() {
+    void keywordContentSearchReturnsBestMatchingFragmentPerDocument() {
         DocumentFragment firstFragment = fragment();
         firstFragment.setFragmentOrder(1);
         firstFragment.setContent("First matching fragment.");
@@ -125,7 +125,6 @@ class DocumentSearchServiceTest {
                 searchHit(firstFragment, 7.5f, Map.of("content", List.of("First <mark>matching</mark> fragment."))),
                 searchHit(secondFragment, 6.0f, Map.of("content", List.of("Second <mark>matching</mark> fragment.")))
         ));
-        when(searchHits.getTotalHits()).thenReturn(2L);
         when(documentRepository.findAllById(List.of(42L))).thenReturn(List.of(documentMetadata()));
 
         var page = documentSearchService.search(
@@ -139,11 +138,16 @@ class DocumentSearchServiceTest {
                 PageRequest.of(0, 10)
         );
 
-        assertThat(page.getTotalElements()).isEqualTo(2);
-        assertThat(page.getContent()).hasSize(2);
+        assertThat(page.getTotalElements()).isEqualTo(1);
+        assertThat(page.getContent()).hasSize(1);
         assertThat(page.getContent().getFirst().fragmentOrder()).isEqualTo(1);
         assertThat(page.getContent().getFirst().highlightedContentSnippet())
                 .isEqualTo("First <mark>matching</mark> fragment.");
+
+        ArgumentCaptor<NativeQuery> captor = ArgumentCaptor.forClass(NativeQuery.class);
+        verify(elasticsearchOperations).search(captor.capture(), eq(DocumentFragment.class));
+        assertThat(captor.getValue().getFieldCollapse().field()).isEqualTo("documentId");
+        assertThat(captor.getValue().getAggregations()).containsKey("documentCount");
     }
 
     @Test
@@ -162,7 +166,6 @@ class DocumentSearchServiceTest {
         when(elasticsearchOperations.search(org.mockito.ArgumentMatchers.any(NativeQuery.class), eq(DocumentFragment.class)))
                 .thenReturn(searchHits);
         when(searchHits.getSearchHits()).thenReturn(List.of());
-        when(searchHits.getTotalHits()).thenReturn(0L);
 
         documentSearchService.search(
                 DocumentSearchMode.KEYWORD,
@@ -181,12 +184,82 @@ class DocumentSearchServiceTest {
     }
 
     @Test
+    void anonymousOwnedAndSharedScopesMatchNoDocuments() {
+        when(currentUserProvider.getOptional()).thenReturn(Optional.empty());
+        when(elasticsearchOperations.search(org.mockito.ArgumentMatchers.any(NativeQuery.class), eq(DocumentFragment.class)))
+                .thenReturn(searchHits);
+        when(searchHits.getSearchHits()).thenReturn(List.of());
+
+        documentSearchService.search(
+                DocumentSearchMode.KEYWORD,
+                "policy",
+                null,
+                null,
+                null,
+                null,
+                DocumentSearchScope.OWNED_BY_ME,
+                PageRequest.of(0, 10)
+        );
+
+        documentSearchService.search(
+                DocumentSearchMode.KEYWORD,
+                "policy",
+                null,
+                null,
+                null,
+                null,
+                DocumentSearchScope.SHARED_WITH_ME,
+                PageRequest.of(0, 10)
+        );
+
+        ArgumentCaptor<NativeQuery> captor = ArgumentCaptor.forClass(NativeQuery.class);
+        verify(elasticsearchOperations, org.mockito.Mockito.times(2)).search(captor.capture(), eq(DocumentFragment.class));
+        assertThat(captor.getAllValues())
+                .allSatisfy(query -> assertThat(query.getQuery().toString()).contains("match_none"));
+        verify(groupMembershipRepository, never()).findAllByUserId(org.mockito.ArgumentMatchers.anyLong());
+    }
+
+    @Test
+    void groupMembershipsAreOnlyLoadedForScopesThatNeedThem() {
+        User user = new User();
+        user.setId(5L);
+
+        when(currentUserProvider.getOptional()).thenReturn(Optional.of(user));
+        when(elasticsearchOperations.search(org.mockito.ArgumentMatchers.any(NativeQuery.class), eq(DocumentFragment.class)))
+                .thenReturn(searchHits);
+        when(searchHits.getSearchHits()).thenReturn(List.of());
+
+        documentSearchService.search(
+                DocumentSearchMode.KEYWORD,
+                null,
+                null,
+                null,
+                null,
+                null,
+                DocumentSearchScope.PUBLIC,
+                PageRequest.of(0, 10)
+        );
+
+        documentSearchService.search(
+                DocumentSearchMode.KEYWORD,
+                null,
+                null,
+                null,
+                null,
+                null,
+                DocumentSearchScope.OWNED_BY_ME,
+                PageRequest.of(0, 10)
+        );
+
+        verify(groupMembershipRepository, never()).findAllByUserId(org.mockito.ArgumentMatchers.anyLong());
+    }
+
+    @Test
     void titleFilterSupportsPartialPrefixes() {
         when(currentUserProvider.getOptional()).thenReturn(Optional.empty());
         when(elasticsearchOperations.search(org.mockito.ArgumentMatchers.any(NativeQuery.class), eq(DocumentFragment.class)))
                 .thenReturn(searchHits);
         when(searchHits.getSearchHits()).thenReturn(List.of());
-        when(searchHits.getTotalHits()).thenReturn(0L);
 
         documentSearchService.search(
                 DocumentSearchMode.KEYWORD,
@@ -211,7 +284,6 @@ class DocumentSearchServiceTest {
         when(elasticsearchOperations.search(org.mockito.ArgumentMatchers.any(NativeQuery.class), eq(DocumentFragment.class)))
                 .thenReturn(searchHits);
         when(searchHits.getSearchHits()).thenReturn(List.of());
-        when(searchHits.getTotalHits()).thenReturn(0L);
 
         documentSearchService.search(
                 DocumentSearchMode.KEYWORD,
@@ -242,7 +314,6 @@ class DocumentSearchServiceTest {
         when(searchHits.getSearchHits()).thenReturn(List.of(
                 searchHit(fragment, 7.5f, Map.of("title", List.of("<mark>D1_solar_clinic_backup_power</mark>")))
         ));
-        when(searchHits.getTotalHits()).thenReturn(1L);
         when(documentRepository.findAllById(List.of(42L))).thenReturn(List.of(documentMetadata()));
 
         var page = documentSearchService.search(
@@ -266,7 +337,6 @@ class DocumentSearchServiceTest {
         when(elasticsearchOperations.search(org.mockito.ArgumentMatchers.any(NativeQuery.class), eq(DocumentFragment.class)))
                 .thenReturn(searchHits);
         when(searchHits.getSearchHits()).thenReturn(List.of());
-        when(searchHits.getTotalHits()).thenReturn(0L);
 
         documentSearchService.search(
                 DocumentSearchMode.KEYWORD,
@@ -295,7 +365,6 @@ class DocumentSearchServiceTest {
         when(elasticsearchOperations.search(org.mockito.ArgumentMatchers.any(NativeQuery.class), eq(DocumentFragment.class)))
                 .thenReturn(searchHits);
         when(searchHits.getSearchHits()).thenReturn(List.of());
-        when(searchHits.getTotalHits()).thenReturn(0L);
 
         documentSearchService.search(
                 DocumentSearchMode.KEYWORD,
@@ -322,7 +391,6 @@ class DocumentSearchServiceTest {
         when(elasticsearchOperations.search(org.mockito.ArgumentMatchers.any(NativeQuery.class), eq(DocumentFragment.class)))
                 .thenReturn(searchHits);
         when(searchHits.getSearchHits()).thenReturn(List.of());
-        when(searchHits.getTotalHits()).thenReturn(0L);
 
         documentSearchService.search(
                 DocumentSearchMode.VECTOR,
