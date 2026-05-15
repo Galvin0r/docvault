@@ -6,7 +6,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 const root = new URL('../..', import.meta.url).pathname;
 const frontendDir = new URL('..', import.meta.url).pathname;
 const backendDir = new URL('../../backend', import.meta.url).pathname;
-const composeFile = new URL('../../deploy/compose.e2e.yaml', import.meta.url).pathname;
+const composeFile = new URL('compose.yaml', import.meta.url).pathname;
 const composeProject = 'docvault-e2e';
 
 const children = [];

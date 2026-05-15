@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 
-const composeFile = new URL('../../deploy/compose.e2e.yaml', import.meta.url).pathname;
+const composeFile = new URL('compose.yaml', import.meta.url).pathname;
 const composeProject = 'docvault-e2e';
 
 const processPatterns = [
