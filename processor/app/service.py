@@ -7,10 +7,11 @@ from itertools import chain
 
 import requests
 
-from .chunking import iter_text_chunks_from_units
+from .chunking import iter_text_chunks_from_paged_units
 from .config import get_settings
 from .embedding import embed_texts
 from .extraction import iter_extracted_text_units
+from .extractors.base import ExtractedTextUnit
 from .extractors import suffix_for_mime_type
 from .schemas import ProcessedFragment
 
@@ -43,12 +44,18 @@ def stream_processed_fragments(text: str) -> Iterator[str]:
     yield from stream_processed_fragments_from_units(iter([text]))
 
 
-def stream_processed_fragments_from_units(units: Iterator[str]) -> Iterator[str]:
+def stream_processed_fragments_from_units(units: Iterator[str | ExtractedTextUnit]) -> Iterator[str]:
     settings = get_settings()
-    pending_batch: list[tuple[int, str]] = []
+    pending_batch: list[tuple[int, str, int | None]] = []
 
-    chunk_iterator = iter_text_chunks_from_units(
-        units,
+    paged_units = (
+        (unit.content, unit.page_number)
+        if isinstance(unit, ExtractedTextUnit)
+        else (str(unit), None)
+        for unit in units
+    )
+    chunk_iterator = iter_text_chunks_from_paged_units(
+        paged_units,
         settings.chunk_size_chars,
         settings.chunk_overlap_chars,
         settings.min_chunk_size_chars,
@@ -57,7 +64,7 @@ def stream_processed_fragments_from_units(units: Iterator[str]) -> Iterator[str]
     for fragment_order, chunk in enumerate(
             chunk_iterator
     ):
-        pending_batch.append((fragment_order, chunk))
+        pending_batch.append((fragment_order, chunk.content, chunk.page_number))
         if len(pending_batch) >= settings.embedding_batch_size:
             yield from _serialize_batch(pending_batch)
             pending_batch.clear()
@@ -66,15 +73,16 @@ def stream_processed_fragments_from_units(units: Iterator[str]) -> Iterator[str]
         yield from _serialize_batch(pending_batch)
 
 
-def _serialize_batch(batch: list[tuple[int, str]]) -> Iterator[str]:
-    embeddings = embed_texts([chunk for _, chunk in batch])
-    for (fragment_order, chunk), embedding in zip(batch, embeddings, strict=True):
+def _serialize_batch(batch: list[tuple[int, str, int | None]]) -> Iterator[str]:
+    embeddings = embed_texts([chunk for _, chunk, _ in batch])
+    for (fragment_order, chunk, page_number), embedding in zip(batch, embeddings, strict=True):
         fragment = ProcessedFragment(
             fragmentOrder=fragment_order,
+            pageNumber=page_number,
             content=chunk,
             embedding=embedding,
         )
-        yield json.dumps(fragment.model_dump(), separators=(",", ":")) + "\n"
+        yield json.dumps(fragment.model_dump(exclude_none=True), separators=(",", ":")) + "\n"
 
 
 def _suffix_for(mime_type: str) -> str:

@@ -19,8 +19,10 @@ It exposes:
 The response is streamed as `application/x-ndjson`, one fragment per line:
 
 ```json
-{"fragmentOrder":0,"content":"...","embedding":[0.1,0.2]}
+{"fragmentOrder":0,"pageNumber":1,"content":"...","embedding":[0.1,0.2]}
 ```
+
+`pageNumber` is included when the source format exposes reliable page boundaries, such as PDF.
 
 `POST /embed` accepts query text and returns one embedding from the same model used for document fragments:
 

@@ -2,7 +2,14 @@ from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 from pathlib import Path
 
-ExtractorFunction = Callable[[Path], Iterator[str]]
+
+@dataclass(frozen=True, slots=True)
+class ExtractedTextUnit:
+    content: str
+    page_number: int | None = None
+
+
+ExtractorFunction = Callable[[Path], Iterator[str | ExtractedTextUnit]]
 
 
 @dataclass(frozen=True, slots=True)

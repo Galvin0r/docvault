@@ -1,8 +1,15 @@
 from collections.abc import Iterable
+from dataclasses import dataclass
 import re
 from typing import Iterator
 
 _SENTENCE_BOUNDARY_RE = re.compile(r'[.!?]["\')\]]*(?=\s|$)')
+
+
+@dataclass(frozen=True, slots=True)
+class TextChunk:
+    content: str
+    page_number: int | None = None
 
 
 def normalize_text(text: str) -> str:
@@ -60,6 +67,125 @@ def iter_text_chunks_from_units(
         chunk_size_chars,
         min_chunk_size_chars,
     )
+
+
+def iter_text_chunks_from_paged_units(
+        units: Iterable[tuple[str, int | None]],
+        chunk_size_chars: int,
+        chunk_overlap_chars: int,
+        min_chunk_size_chars: int = 0,
+) -> Iterator[TextChunk]:
+    if chunk_size_chars <= 0:
+        raise ValueError("chunk_size_chars must be positive")
+    if chunk_overlap_chars < 0 or chunk_overlap_chars >= chunk_size_chars:
+        raise ValueError("chunk_overlap_chars must be between 0 and chunk_size_chars - 1")
+    if min_chunk_size_chars < 0:
+        raise ValueError("min_chunk_size_chars must be non-negative")
+
+    yield from _merge_small_paged_chunks(
+        _iter_raw_paged_chunks(units, chunk_size_chars, chunk_overlap_chars),
+        chunk_size_chars,
+        min_chunk_size_chars,
+    )
+
+
+def _iter_raw_paged_chunks(
+        units: Iterable[tuple[str, int | None]],
+        chunk_size_chars: int,
+        chunk_overlap_chars: int,
+) -> Iterator[TextChunk]:
+    current_units: list[tuple[str, int | None]] = []
+    current_length = 0
+
+    for raw_text, page_number in units:
+        for text in iter_text_units(raw_text):
+            if len(text) > chunk_size_chars:
+                if current_units:
+                    yield _paged_chunk(current_units)
+                    current_units = []
+                    current_length = 0
+
+                for chunk in _split_long_unit(text, chunk_size_chars, chunk_overlap_chars):
+                    yield TextChunk(chunk, page_number)
+                continue
+
+            candidate_length = _candidate_length(current_length, len(text), bool(current_units))
+            if current_units and candidate_length > chunk_size_chars:
+                yield _paged_chunk(current_units)
+                current_units = _paged_overlap_tail(current_units, chunk_overlap_chars)
+                current_length = _paged_joined_length(current_units)
+
+                while current_units and _candidate_length(current_length, len(text), True) > chunk_size_chars:
+                    current_units.pop(0)
+                    current_length = _paged_joined_length(current_units)
+
+            if not current_units:
+                current_units = [(text, page_number)]
+                current_length = len(text)
+                continue
+
+            current_units.append((text, page_number))
+            current_length = _candidate_length(current_length, len(text), True)
+
+    if current_units:
+        yield _paged_chunk(current_units)
+
+
+def _merge_small_paged_chunks(
+        chunks: Iterable[TextChunk],
+        chunk_size_chars: int,
+        min_chunk_size_chars: int,
+) -> Iterator[TextChunk]:
+    pending: TextChunk | None = None
+
+    for chunk in chunks:
+        if pending is None:
+            pending = chunk
+            continue
+
+        if len(pending.content) < min_chunk_size_chars:
+            merged = f"{pending.content} {chunk.content}".strip()
+            if len(merged) <= chunk_size_chars:
+                pending = TextChunk(merged, pending.page_number)
+                continue
+
+        yield pending
+        pending = chunk
+
+    if pending:
+        yield pending
+
+
+def _paged_chunk(units: list[tuple[str, int | None]]) -> TextChunk:
+    text = " ".join(unit for unit, _ in units)
+    page_number = next((page for _, page in units if page is not None), None)
+    return TextChunk(text, page_number)
+
+
+def _paged_joined_length(units: list[tuple[str, int | None]]) -> int:
+    if not units:
+        return 0
+    return sum(len(unit) for unit, _ in units) + len(units) - 1
+
+
+def _paged_overlap_tail(
+        units: list[tuple[str, int | None]],
+        chunk_overlap_chars: int,
+) -> list[tuple[str, int | None]]:
+    if chunk_overlap_chars == 0 or not units:
+        return []
+
+    overlap_units: list[tuple[str, int | None]] = []
+    overlap_length = 0
+
+    for unit in reversed(units):
+        overlap_units.append(unit)
+        overlap_length += len(unit[0]) + (1 if len(overlap_units) > 1 else 0)
+        if overlap_length >= chunk_overlap_chars:
+            break
+
+    overlap_units.reverse()
+    return overlap_units
 
 
 def _iter_raw_chunks_from_units(

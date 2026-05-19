@@ -70,7 +70,7 @@ describe('DocumentService', () => {
   });
 
   it('getFragments should GET document fragments with limit param', () => {
-    const response = [{ fragmentOrder: 0, content: 'First' }];
+    const response = [{ fragmentOrder: 0, pageNumber: 2, content: 'First' }];
 
     service.getFragments(9, 2).subscribe((value) => {
       expect(value).toEqual(response);

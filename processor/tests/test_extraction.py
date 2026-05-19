@@ -7,14 +7,16 @@ def test_extract_plain_text_utf8(tmp_path: Path):
     doc_path.write_text("Hello World", encoding="utf-8")
     
     result = list(iter_extracted_text_units(doc_path, "text/plain"))
-    assert result == ["Hello World"]
+    assert [unit.content for unit in result] == ["Hello World"]
+    assert [unit.page_number for unit in result] == [None]
 
 def test_extract_plain_text_latin1(tmp_path: Path):
     doc_path = tmp_path / "test.txt"
     doc_path.write_bytes(b"Hello \xe9 World")
     
     result = list(iter_extracted_text_units(doc_path, "text/plain"))
-    assert result == ["Hello é World"]
+    assert [unit.content for unit in result] == ["Hello é World"]
+    assert [unit.page_number for unit in result] == [None]
 
 def test_unsupported_mime():
     with pytest.raises(UnsupportedMimeTypeError):

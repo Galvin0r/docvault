@@ -96,6 +96,12 @@
           <p class="snippet" [innerHTML]="displaySnippet(result)"></p>
 
           <div class="metadata metadata-bottom">
+            @if (result.pageNumber != null) {
+              <span class="flex items-center gap-1">
+                <i class="pi pi-file"></i>
+                Page {{ result.pageNumber }}
+              </span>
+            }
             <span>{{ result.uploadedAt | date: 'mediumDate' }}</span>
           </div>
         </div>

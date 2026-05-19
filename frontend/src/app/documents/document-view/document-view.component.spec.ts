@@ -49,7 +49,7 @@ describe('DocumentViewComponent', () => {
       size: 1200,
       status: 'INDEXED'
     }));
-    documentService.getFragments.and.returnValue(of([{ fragmentOrder: 1, content: 'First fragment' }]));
+    documentService.getFragments.and.returnValue(of([{ fragmentOrder: 1, pageNumber: 2, content: 'First fragment' }]));
     documentService.listAccess.and.returnValue(of([]));
     groupService.findMemberships.and.returnValue(of({ content: [], totalElements: 0 } as any));
 

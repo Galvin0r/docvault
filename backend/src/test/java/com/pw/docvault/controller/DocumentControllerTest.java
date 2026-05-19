@@ -132,13 +132,14 @@ class DocumentControllerTest {
     @Test
     void contentPreviewReturnsReadableFragments() throws Exception {
         when(documentService.getReadableContentPreview(10L, 2)).thenReturn(List.of(
-                new DocumentContentFragmentDto(0, "First"),
-                new DocumentContentFragmentDto(1, "Second")
+                new DocumentContentFragmentDto(0, 3, "First"),
+                new DocumentContentFragmentDto(1, null, "Second")
         ));
 
         mockMvc.perform(get("/document/10/fragments").param("limit", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].fragmentOrder").value(0))
+                .andExpect(jsonPath("$[0].pageNumber").value(3))
                 .andExpect(jsonPath("$[0].content").value("First"))
                 .andExpect(jsonPath("$[1].fragmentOrder").value(1));
     }
@@ -170,7 +171,7 @@ class DocumentControllerTest {
     void searchReturnsPage() throws Exception {
         var uploadedAt = Instant.parse("2026-04-11T10:15:30Z");
         var dto = new DocumentSearchResultDto(
-                10L, 2, "T", "tax.pdf", "application/pdf", 2048L,
+                10L, 2, 4, "T", "tax.pdf", "application/pdf", 2048L,
                 "<mark>T</mark>", "snippet", "<mark>snippet</mark>",
                 uploadedAt, 1L, "alice", DocumentVisibility.PUBLIC, 2.5f
         );
@@ -191,6 +192,7 @@ class DocumentControllerTest {
                         .param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].documentId").value(10))
+                .andExpect(jsonPath("$.content[0].pageNumber").value(4))
                 .andExpect(jsonPath("$.content[0].originalFilename").value("tax.pdf"))
                 .andExpect(jsonPath("$.content[0].size").value(2048))
                 .andExpect(jsonPath("$.content[0].highlightedContentSnippet").value("<mark>snippet</mark>"))

@@ -6,6 +6,7 @@ import java.time.Instant;
 
 public record DocumentFragmentDTO(
         Long documentId,
+        Integer pageNumber,
         String title,
         String highlightedTitle,
         String highlightedContentSnippet,

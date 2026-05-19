@@ -7,6 +7,7 @@ import java.time.Instant;
 public record DocumentSearchResultDto(
         Long documentId,
         Integer fragmentOrder,
+        Integer pageNumber,
         String title,
         String originalFilename,
         String mimeType,

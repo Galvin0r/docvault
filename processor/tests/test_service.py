@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
+from app.extractors.base import ExtractedTextUnit
 from app.service import download_to_file, stream_processed_fragments, stream_processed_fragments_from_document, _suffix_for
 
 def test_download_to_file(tmp_path: Path, mock_settings):
@@ -19,7 +20,10 @@ def test_stream_processed_fragments_from_document(mock_settings):
     with patch("app.service.download_to_file") as mock_download, \
          patch("app.service.iter_extracted_text_units") as mock_units, \
          patch("app.service.embed_texts") as mock_embed:
-        mock_units.return_value = iter(["Hello world.", "Second chunk."])
+        mock_units.return_value = iter([
+            ExtractedTextUnit("Hello world.", page_number=3),
+            ExtractedTextUnit("Second chunk.", page_number=3),
+        ])
         mock_embed.return_value = [[0.1, 0.2]]
 
         items = list(stream_processed_fragments_from_document("http://dummy", "text/plain"))
@@ -27,6 +31,7 @@ def test_stream_processed_fragments_from_document(mock_settings):
         assert len(items) == 1
         first = json.loads(items[0])
         assert first["content"] == "Hello world. Second chunk."
+        assert first["pageNumber"] == 3
 
 def test_stream_processed_fragments(mock_settings):
     text = "Hello world. This is a test string for fragmentation."
@@ -43,6 +48,7 @@ def test_stream_processed_fragments(mock_settings):
             assert data1["content"] == "Hello"
             assert data1["embedding"] == [0.1, 0.2]
             assert data1["fragmentOrder"] == 0
+            assert "pageNumber" not in data1
 
 def test_suffix_for():
     assert _suffix_for("application/pdf") == ".pdf"

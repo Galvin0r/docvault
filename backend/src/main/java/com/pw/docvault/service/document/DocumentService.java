@@ -210,7 +210,11 @@ public class DocumentService {
         return documentFragmentRepository
                 .findByDocumentIdOrderByFragmentOrderAsc(documentId, PageRequest.of(0, sanitizedLimit))
                 .stream()
-                .map(fragment -> new DocumentContentFragmentDto(fragment.getFragmentOrder(), fragment.getContent()))
+                .map(fragment -> new DocumentContentFragmentDto(
+                        fragment.getFragmentOrder(),
+                        fragment.getPageNumber(),
+                        fragment.getContent()
+                ))
                 .toList();
     }
 

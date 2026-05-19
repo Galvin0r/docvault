@@ -380,6 +380,7 @@ public class DocumentSearchService {
         return new DocumentSearchResultDto(
                 fragment.getDocumentId(),
                 fragment.getFragmentOrder(),
+                fragment.getPageNumber(),
                 fragment.getTitle(),
                 document != null ? document.getOriginalFilename() : fragment.getOriginalFilename(),
                 document != null ? document.getMimeType() : fragment.getMimeType(),

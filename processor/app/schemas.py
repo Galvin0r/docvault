@@ -16,6 +16,7 @@ class EmbedResponse(BaseModel):
 
 class ProcessedFragment(BaseModel):
     fragmentOrder: int
+    pageNumber: int | None = None
     content: str
     embedding: list[float]
 

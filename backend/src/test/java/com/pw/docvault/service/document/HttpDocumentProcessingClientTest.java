@@ -47,7 +47,7 @@ class HttpDocumentProcessingClientTest {
                 exchange,
                 200,
                 """
-                {"fragmentOrder":0,"content":"chunk one","embedding":[0.1,0.2]}
+                {"fragmentOrder":0,"pageNumber":7,"content":"chunk one","embedding":[0.1,0.2]}
                 {"fragmentOrder":1,"content":"chunk two","embedding":[0.3,0.4]}
                 """,
                 "application/x-ndjson"
@@ -59,6 +59,7 @@ class HttpDocumentProcessingClientTest {
 
         assertThat(fragments).hasSize(2);
         assertThat(fragments.getFirst().getFragmentOrder()).isZero();
+        assertThat(fragments.getFirst().getPageNumber()).isEqualTo(7);
         assertThat(fragments.getFirst().getContent()).isEqualTo("chunk one");
         assertThat(fragments.getFirst().getEmbedding()).containsExactly(0.1f, 0.2f);
     }

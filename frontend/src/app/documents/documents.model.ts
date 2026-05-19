@@ -25,6 +25,7 @@ export type DocumentSearchScope = 'ACCESSIBLE' | 'PUBLIC' | 'OWNED_BY_ME' | 'SHA
 export interface DocumentSearchResultDto {
     documentId: number;
     fragmentOrder: number | null;
+    pageNumber: number | null;
     title: string;
     originalFilename: string | null;
     mimeType: string | null;
@@ -41,6 +42,7 @@ export interface DocumentSearchResultDto {
 
 export interface DocumentContentFragmentDto {
     fragmentOrder: number | null;
+    pageNumber: number | null;
     content: string;
 }
 

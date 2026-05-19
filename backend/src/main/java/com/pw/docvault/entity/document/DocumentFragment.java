@@ -27,6 +27,9 @@ public class DocumentFragment {
     @Field(type = FieldType.Integer)
     private Integer fragmentOrder;
 
+    @Field(type = FieldType.Integer)
+    private Integer pageNumber;
+
     @Field(type = FieldType.Text)
     private String title;
 
