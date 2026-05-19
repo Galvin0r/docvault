@@ -8,6 +8,7 @@ import {
 import { ConfirmationService, MenuItem, PrimeIcons } from 'primeng/api';
 import { GroupService } from '../../groups/groups.service';
 import { TitleCasePipe } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user',
@@ -24,16 +25,11 @@ export class UserComponent {
   confirmationSerice = inject(ConfirmationService);
 
   groupService = inject(GroupService);
+  router = inject(Router);
   titleCase = new TitleCasePipe();
 
   menuItems = computed(() => {
-    const items: MenuItem[] = [
-      {
-        label: 'Profile',
-        icon: PrimeIcons.USER,
-        routerLink: ['/user/', this.membership().userLogin]
-      },
-    ];
+    const items: MenuItem[] = [];
     if (this.membership().role !== 'OWNER') {
       if (this.canManageRole()) {
         const nextRole = getRoleByKey(this.membership().role);
@@ -64,6 +60,10 @@ export class UserComponent {
     }
     return items;
   });
+
+  openProfile() {
+    this.router.navigate(['/user', this.membership().userLogin]);
+  }
 
   userRemove() {
     this.confirmationSerice.confirm({

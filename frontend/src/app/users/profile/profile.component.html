@@ -103,7 +103,12 @@
                   <div class="flex flex-col gap-1">
                     @for (item of items; track item.id) {
                     <p-card
-                      class="w-full !rounded-xl border border-surface-700/40 hover:bg-surface-800/40 hover:border-primary-500/40 transition-colors">
+                      class="w-full !rounded-xl border border-surface-700/40 hover:bg-surface-800/40 hover:border-primary-500/40 transition-colors clickable-card"
+                      role="button"
+                      tabindex="0"
+                      (click)="goToGroup(item)"
+                      (keydown.enter)="goToGroup(item)"
+                      (keydown.space)="$event.preventDefault(); goToGroup(item)">
                       <div class="flex items-center gap-3">
                         <div
                           class="h-9 w-9 rounded-lg flex items-center justify-center bg-primary-500/15 text-primary-400">
@@ -134,8 +139,7 @@
                           </div>
                         </div>
 
-                        <button pButton type="button" class="p-button-rounded p-button-text" icon="pi pi-arrow-right"
-                          pTooltip="Open group" (click)="goToGroup(item)"></button>
+                        <i class="pi pi-chevron-right row-chevron" aria-hidden="true"></i>
                       </div>
                     </p-card>
                     }

@@ -26,8 +26,8 @@
       </form>
       <p-button icon="pi pi-users" [rounded]="true" [text]="true" severity="secondary" routerLink="/groups"
         pTooltip="Groups" tooltipPosition="bottom"></p-button>
-      <p-button icon="pi pi-upload" [rounded]="true" [text]="true" severity="secondary" (click)="openUploadDialog()"
-        pTooltip="Upload Document" tooltipPosition="bottom"></p-button>
+      <p-button icon="pi pi-cloud-upload" label="Upload document" severity="primary" styleClass="upload-cta"
+        (click)="openUploadDialog()" pTooltip="Upload a new document" tooltipPosition="bottom"></p-button>
       <p-divider layout="vertical" />
       @if(userInfo) {
       <button type="button" class="rounded-full overflow-hidden avatar cursor-pointer" (click)="menu.toggle($event)">

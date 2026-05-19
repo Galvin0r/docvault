@@ -155,7 +155,7 @@ describe('GroupComponent', () => {
     expect(icon).toBeTruthy();
   });
 
-  it('navigates to edit page on open button click', () => {
+  it('navigates to edit page on row click', () => {
     render({
       id: 9,
       name: 'Gamma',
@@ -163,8 +163,8 @@ describe('GroupComponent', () => {
       membersNumber: 8,
       allowedToAccess: true,
     });
-    const btn = fixture.debugElement.query(By.css('button'));
-    btn.triggerEventHandler('click', {});
+    const row = fixture.debugElement.query(By.css('p-card'));
+    row.triggerEventHandler('click', {});
     expect(router.navigate).toHaveBeenCalledWith(['/groups/edit', 9]);
   });
 });

@@ -2,6 +2,27 @@
     display: block;
 }
 
+:host ::ng-deep .clickable-card {
+    cursor: pointer;
+}
+
+:host ::ng-deep .clickable-card:focus-visible {
+    outline: 2px solid var(--p-primary-color);
+    outline-offset: 3px;
+}
+
+.row-chevron {
+    color: var(--p-primary-color);
+    opacity: 0.85;
+    transition: transform 150ms ease, opacity 150ms ease;
+}
+
+:host ::ng-deep .clickable-card:hover .row-chevron,
+:host ::ng-deep .clickable-card:focus-visible .row-chevron {
+    opacity: 1;
+    transform: translateX(2px);
+}
+
 .profile-avatar-container {
     transition: transform 0.3s ease;
 

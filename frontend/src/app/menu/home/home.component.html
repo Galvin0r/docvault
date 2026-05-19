@@ -67,7 +67,13 @@
 
   <div class="results-list">
     @for (result of results().content; track result.documentId + '-' + result.fragmentOrder) {
-      <article class="result-item">
+      <article
+        class="result-item"
+        role="button"
+        tabindex="0"
+        (click)="openDocument(result.documentId)"
+        (keydown.enter)="openDocument(result.documentId)"
+        (keydown.space)="$event.preventDefault(); openDocument(result.documentId)">
         <div class="file-preview" [ngClass]="fileKindClass(result)" aria-hidden="true">
           <span>{{ fileKind(result) }}</span>
         </div>
@@ -78,7 +84,7 @@
           </div>
 
           <div class="metadata metadata-top">
-            <a class="doc-link font-semibold" [routerLink]="['/user', result.ownerLogin]">{{ result.ownerLogin }}</a>
+            <a class="doc-link font-semibold" [routerLink]="['/user', result.ownerLogin]" (click)="$event.stopPropagation()">{{ result.ownerLogin }}</a>
             @if (userInfo) {
               <span class="visibility">
                 <i class="pi" [ngClass]="visibilityIcon(result)"></i>
@@ -106,19 +112,9 @@
               aria-label="Download document"
               pTooltip="Download document"
               tooltipPosition="left"
-              (click)="download(result.documentId)">
+              (click)="$event.stopPropagation(); download(result.documentId)">
             </button>
-            <button
-              pButton
-              type="button"
-              icon="pi pi-arrow-right"
-              severity="secondary"
-              [outlined]="true"
-              aria-label="Open document"
-              pTooltip="Open document"
-              tooltipPosition="left"
-              (click)="openDocument(result.documentId)">
-            </button>
+            <i class="pi pi-chevron-right row-chevron" aria-hidden="true"></i>
           </div>
         </div>
       </article>

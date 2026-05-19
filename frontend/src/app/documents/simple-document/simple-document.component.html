@@ -1,5 +1,10 @@
 <p-card
-    class="w-full !rounded-xl border border-surface-700/40 hover:bg-surface-800/40 hover:border-primary-500/40 transition-colors">
+    class="w-full !rounded-xl border border-surface-700/40 hover:bg-surface-800/40 hover:border-primary-500/40 transition-colors clickable-card"
+    role="button"
+    tabindex="0"
+    (click)="openDocument()"
+    (keydown.enter)="openDocument()"
+    (keydown.space)="$event.preventDefault(); openDocument()">
     <div class="flex items-center gap-3">
         <div class="h-9 w-9 rounded-lg flex items-center justify-center bg-primary-500/15 text-primary-400">
             <i class="pi text-sm" [ngClass]="fileIcon()"></i>
@@ -24,17 +29,16 @@
         </div>
 
         <button pButton type="button" class="p-button-rounded p-button-text" icon="pi pi-download"
-            pTooltip="Download document" (click)="download()"></button>
+            pTooltip="Download document" (click)="$event.stopPropagation(); download()"></button>
 
         @if (isOwner()) {
         <button pButton type="button" class="p-button-rounded p-button-text p-button-danger" icon="pi pi-trash"
-            pTooltip="Delete document" (click)="delete()" [loading]="deleting()" [disabled]="deleting()"></button>
+            pTooltip="Delete document" (click)="$event.stopPropagation(); delete()" [loading]="deleting()" [disabled]="deleting()"></button>
         }
 
         <button pButton type="button" class="p-button-rounded p-button-text" icon="pi pi-info-circle"
-            pTooltip="Document information" (click)="openInfo()"></button>
+            pTooltip="Document information" (click)="$event.stopPropagation(); openInfo()"></button>
 
-        <button pButton type="button" class="p-button-rounded p-button-text" icon="pi pi-arrow-right"
-            pTooltip="Open document" (click)="openDocument()"></button>
+        <i class="pi pi-chevron-right row-chevron" aria-hidden="true"></i>
     </div>
 </p-card>

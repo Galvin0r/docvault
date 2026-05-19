@@ -44,3 +44,16 @@
   border-color: transparent !important;
   box-shadow: none !important;
 }
+
+:host ::ng-deep .upload-cta {
+  margin-left: 0.35rem;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--p-primary-color) 40%, transparent),
+    0 8px 22px color-mix(in srgb, var(--p-primary-color) 22%, transparent);
+  font-weight: 700;
+}
+
+@media (max-width: 720px) {
+  :host ::ng-deep .upload-cta .p-button-label {
+    display: none;
+  }
+}

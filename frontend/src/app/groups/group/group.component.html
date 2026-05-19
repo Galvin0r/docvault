@@ -1,5 +1,10 @@
 <p-card
-  class="w-full !rounded-xl border border-surface-700/40 hover:bg-surface-800/40 hover:border-primary-500/40 transition-colors"
+  class="w-full !rounded-xl border border-surface-700/40 hover:bg-surface-800/40 hover:border-primary-500/40 transition-colors clickable-card"
+  role="button"
+  tabindex="0"
+  (click)="goToGroup()"
+  (keydown.enter)="goToGroup()"
+  (keydown.space)="$event.preventDefault(); goToGroup()"
 >
   <div class="flex items-center gap-3">
     <div
@@ -35,13 +40,6 @@
       </div>
     </div>
 
-    <button
-      pButton
-      type="button"
-      class="p-button-rounded p-button-text"
-      icon="pi pi-arrow-right"
-      pTooltip="Open group"
-      (click)="goToGroup()"
-    ></button>
+    <i class="pi pi-chevron-right row-chevron" aria-hidden="true"></i>
   </div>
 </p-card>

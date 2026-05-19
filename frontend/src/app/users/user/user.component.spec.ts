@@ -6,6 +6,7 @@ import { UserComponent } from './user.component';
 import { GroupService } from '../../groups/groups.service';
 import { Confirmation, ConfirmationService, MenuItem, PrimeIcons } from 'primeng/api';
 import { GroupMembership, GroupRole } from '../../groups/groups.model';
+import { Router } from '@angular/router';
 
 describe('UserComponent', () => {
   let fixture: ComponentFixture<UserComponent>;
@@ -13,6 +14,7 @@ describe('UserComponent', () => {
 
   let groupService: jasmine.SpyObj<GroupService>;
   let confirmation: jasmine.SpyObj<ConfirmationService>;
+  let router: jasmine.SpyObj<Router>;
 
   const membershipAdmin: GroupMembership = {
     id: 10,
@@ -39,6 +41,7 @@ describe('UserComponent', () => {
   beforeEach(() => {
     groupService = jasmine.createSpyObj<GroupService>('GroupService', ['removeUser', 'changeRole']);
     confirmation = jasmine.createSpyObj<ConfirmationService>('ConfirmationService', ['confirm']);
+    router = jasmine.createSpyObj<Router>('Router', ['navigate']);
 
     groupService.removeUser.and.returnValue(of(void 0));
     groupService.changeRole.and.returnValue(of(void 0));
@@ -48,6 +51,7 @@ describe('UserComponent', () => {
       providers: [
         { provide: GroupService, useValue: groupService },
         { provide: ConfirmationService, useValue: confirmation },
+        { provide: Router, useValue: router },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     });
@@ -56,15 +60,14 @@ describe('UserComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('builds menuItems: only Profile for OWNER (even with manage/remove true)', () => {
+  it('builds no menuItems for OWNER because the row opens the profile', () => {
     fixture.componentRef.setInput('membership', membershipOwner);
     fixture.componentRef.setInput('canManageRole', true);
     fixture.componentRef.setInput('canRemove', true);
     fixture.detectChanges();
 
     const items = component.menuItems() as MenuItem[];
-    expect(items.length).toBe(1);
-    expect(items[0].icon).toBe(PrimeIcons.USER);
+    expect(items.length).toBe(0);
     expect(items.some((i) => typeof i.command === 'function')).toBeFalse();
   });
 
@@ -103,6 +106,15 @@ describe('UserComponent', () => {
     });
 
     component.userChangeRole(nextRole);
+  });
+
+  it('navigates to user profile when card is opened', () => {
+    fixture.componentRef.setInput('membership', membershipAdmin);
+    fixture.detectChanges();
+
+    component.openProfile();
+
+    expect(router.navigate).toHaveBeenCalledWith(['/user', 'john']);
   });
 
   it('userRemove opens confirm; accept calls removeUser and emits userRemoved', (done) => {

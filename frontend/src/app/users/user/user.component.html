@@ -1,5 +1,10 @@
 <p-card
-  class="w-full !rounded-xl border border-surface-700/40 hover:bg-surface-800/40 hover:border-primary-500/40 transition-colors"
+  class="w-full !rounded-xl border border-surface-700/40 hover:bg-surface-800/40 hover:border-primary-500/40 transition-colors clickable-card"
+  role="button"
+  tabindex="0"
+  (click)="openProfile()"
+  (keydown.enter)="openProfile()"
+  (keydown.space)="$event.preventDefault(); openProfile()"
 >
   <div class="flex items-center gap-3">
     <div
@@ -26,13 +31,16 @@
       </div>
     </div>
 
+    @if (menuItems().length) {
     <button
       pButton
       type="button"
       class="p-button-rounded p-button-text"
       icon="pi pi-ellipsis-h"
-      (click)="menu.toggle($event)"
+      pTooltip="Member actions"
+      (click)="$event.stopPropagation(); menu.toggle($event)"
     ></button>
     <p-menu #menu [popup]="true" [model]="menuItems()" appendTo="body"></p-menu>
+    }
   </div>
 </p-card>
