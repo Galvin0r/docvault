@@ -192,6 +192,7 @@
                         <exclude>**/entity/</exclude>
                         <exclude>**/mapper/</exclude>
                         <exclude>**/config/</exclude>
+                        <exclude>**/e2e/**</exclude>
                         <exclude>**/util/Constants.class</exclude>
 <!--                        Delete later-->
                         <exclude>**/DocumentIndexJobService.class</exclude>
